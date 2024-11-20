@@ -1,16 +1,16 @@
 ## 目录
 
-1. [什么是 ReentrantLock？](##什么是-ReentrantLock)
-2. [如何使用 ReentrantLock？](##ReentrantLock-和-synchronized-的对比)
-5. [源码：ReentrantLock 的设计与实现](##深入源码：ReentrantLock-的设计与实现)
-6. [总结](##总结)
-7. [学习建议](##学习建议与下一步)
+1. [什么是 ReentrantLock？](###1.什么是ReentrantLock？)
+2. [如何使用 ReentrantLock？](###2.如何使用ReentrantLock？)
+5. [源码：ReentrantLock 的设计与实现](###3.深入源码：ReentrantLock的设计与实现)
+6. [总结](###4.总结)
+7. [学习建议](###5.学习建议与下一步)
 
-[附录 加锁解锁部分源码及注解](##加锁解锁部分源码及注解)
+[附录 加锁解锁部分源码及注解](###6.加锁解锁部分源码及注解)
 
 ---
 
-### 1. 什么是 ReentrantLock？
+### 1.什么是ReentrantLock？
 
 `ReentrantLock` 是 Java 并发包（`java.util.concurrent.locks`）中的锁实现，提供了比 `synchronized` 更灵活的锁机制。其最大特点是允许**显式控制锁的获取和释放**，并支持诸如公平性、中断性等高级功能。
 
@@ -48,7 +48,7 @@
 3. **精细化同步**  
    比如需要部分代码加锁，部分不加锁的情况，`ReentrantLock` 的显式控制更加灵活。
 
-### 2.  如何使用 ReentrantLock？
+### 2.如何使用ReentrantLock？
 
 以下是一个简单的例子，展示如何使用 `ReentrantLock` 进行线程同步：
 
@@ -83,7 +83,7 @@ public class ReentrantLockExample {
 
 
 
-### 3. 深入源码：ReentrantLock 的设计与实现
+### 3.深入源码：ReentrantLock的设计与实现
 
 `ReentrantLock` 的核心依赖于 **AQS (AbstractQueuedSynchronizer)**，这是 JUC（`java.util.concurrent`）中用于实现锁和其他同步器的基础框架。理解 AQS 是深入学习 `ReentrantLock` 的关键。
 
@@ -166,13 +166,13 @@ final void lock() {
 
 
 
-### 4. 总结
+### 4.总结
 
 在 Java 并发编程中，`ReentrantLock` 提供了比 `synchronized` 更灵活的锁机制。然而，当我们阅读其源码时，会发现加锁与解锁的逻辑似乎比想象中复杂得多。但值得注意的是，这些复杂性并非完全由 `ReentrantLock` 自身实现，而是大部分依赖于背后的 **AQS (AbstractQueuedSynchronizer)** 框架。
 
 `ReentrantLock` 本质上只是一个包装器，大量核心逻辑是由 AQS 提供的`ReentrantLock` 仅需实现 AQS 中暴露的少量方法，其余功能则完全依赖于 AQS 的默认实现。
 
-### 5. 学习建议与下一步
+### 5.学习建议与下一步
 
 在阅读 `ReentrantLock` 源码时，你可能会发现逻辑相对复杂。这主要是因为其大量功能依赖于 AQS。如果你尚未完全掌握，可以选择暂时跳过细节，专注于整体架构。理解 AQS 后，回头再看 `ReentrantLock`，一切都会豁然开朗。
 
@@ -180,7 +180,7 @@ final void lock() {
 
 > **学习建议**：不要急于掌握所有细节，允许自己在初学时“遗忘”。专注于框架设计思想，你会更轻松地突破理解瓶颈。
 
-### 6. 加锁解锁部分源码及注解
+### 6.加锁解锁部分源码及注解
 
 附录1 ReentrantLock加锁操作源码，有细微改动，不影响逻辑
 
