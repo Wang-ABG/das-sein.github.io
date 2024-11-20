@@ -14,7 +14,6 @@
 
 1. [什么是 ReentrantLock？](##什么是-ReentrantLock)
 2. [如何使用 ReentrantLock？](##ReentrantLock-和-synchronized-的对比)
-4. [适用场景](##适用场景)
 5. [源码：ReentrantLock 的设计与实现](##深入源码：ReentrantLock-的设计与实现)
 6. [总结](##总结)
 7. [学习建议](##学习建议与下一步)
@@ -23,7 +22,7 @@
 
 ---
 
-### 什么是 ReentrantLock？
+### 1. 什么是 ReentrantLock？
 
 `ReentrantLock` 是 Java 并发包（`java.util.concurrent.locks`）中的锁实现，提供了比 `synchronized` 更灵活的锁机制。">
 <meta property="og:title" content="一个友好的 JUC 源码阅读指南（1）：从 ReentrantLock 开始">
@@ -31,7 +30,6 @@
 
 1. [什么是 ReentrantLock？](##什么是-ReentrantLock)
 2. [如何使用 ReentrantLock？](##ReentrantLock-和-synchronized-的对比)
-4. [适用场景](##适用场景)
 5. [源码：ReentrantLock 的设计与实现](##深入源码：ReentrantLock-的设计与实现)
 6. [总结](##总结)
 7. [学习建议](##学习建议与下一步)
@@ -40,7 +38,7 @@
 
 ---
 
-### 什么是 ReentrantLock？
+### 1. 什么是 ReentrantLock？
 
 `ReentrantLock` 是 Java 并发包（`java.util.concurrent.locks`）中的锁实现，提供了比 `synchronized` 更灵活的锁机制。">
 <meta property="og:type" content="article">
@@ -117,14 +115,13 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <ol>
 <li><a href="##%E4%BB%80%E4%B9%88%E6%98%AF-ReentrantLock">什么是 ReentrantLock？</a></li>
 <li><a href="##ReentrantLock-%E5%92%8C-synchronized-%E7%9A%84%E5%AF%B9%E6%AF%94">如何使用 ReentrantLock？</a></li>
-<li><a href="##%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF">适用场景</a></li>
 <li><a href="##%E6%B7%B1%E5%85%A5%E6%BA%90%E7%A0%81%EF%BC%9AReentrantLock-%E7%9A%84%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0">源码：ReentrantLock 的设计与实现</a></li>
 <li><a href="##%E6%80%BB%E7%BB%93">总结</a></li>
 <li><a href="##%E5%AD%A6%E4%B9%A0%E5%BB%BA%E8%AE%AE%E4%B8%8E%E4%B8%8B%E4%B8%80%E6%AD%A5">学习建议</a></li>
 </ol>
 <p><a href="##%E5%8A%A0%E9%94%81%E8%A7%A3%E9%94%81%E9%83%A8%E5%88%86%E6%BA%90%E7%A0%81%E5%8F%8A%E6%B3%A8%E8%A7%A3">附录 加锁解锁部分源码及注解</a></p>
 <hr>
-<h3>什么是 ReentrantLock？</h3>
+<h3>1. 什么是 ReentrantLock？</h3>
 <p><code class="notranslate">ReentrantLock</code> 是 Java 并发包（<code class="notranslate">java.util.concurrent.locks</code>）中的锁实现，提供了比 <code class="notranslate">synchronized</code> 更灵活的锁机制。其最大特点是允许<strong>显式控制锁的获取和释放</strong>，并支持诸如公平性、中断性等高级功能。</p>
 <h4>核心特点</h4>
 <ol>
@@ -141,7 +138,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <li><strong>条件变量支持</strong><br>
 配合 <code class="notranslate">Condition</code>，实现线程间复杂的通信机制。</li>
 </ol>
-<h3>ReentrantLock 和 synchronized 的对比</h3>
+<h4>ReentrantLock 和 synchronized 的对比</h4>
 <markdown-accessiblity-table><table role="table">
 <thead>
 <tr>
@@ -173,7 +170,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </tr>
 </tbody>
 </table></markdown-accessiblity-table>
-<h3>适用场景</h3>
+<h4>适用场景</h4>
 <ol>
 <li>
 <p><strong>复杂并发控制</strong><br>
@@ -188,7 +185,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 比如需要部分代码加锁，部分不加锁的情况，<code class="notranslate">ReentrantLock</code> 的显式控制更加灵活。</p>
 </li>
 </ol>
-<h3>如何使用 ReentrantLock？</h3>
+<h3>2.  如何使用 ReentrantLock？</h3>
 <p>以下是一个简单的例子，展示如何使用 <code class="notranslate">ReentrantLock</code> 进行线程同步：</p>
 <div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">java</span>.<span class="pl-s1">util</span>.<span class="pl-s1">concurrent</span>.<span class="pl-s1">locks</span>.<span class="pl-s1">ReentrantLock</span>;
 
@@ -215,7 +212,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 }</pre></div>
 <p>运行结果表明多个线程依次执行，这正是 <code class="notranslate">ReentrantLock</code> 显式控制锁的结果。</p>
-<h3>深入源码：ReentrantLock 的设计与实现</h3>
+<h3>3. 深入源码：ReentrantLock 的设计与实现</h3>
 <p><code class="notranslate">ReentrantLock</code> 的核心依赖于 <strong>AQS (AbstractQueuedSynchronizer)</strong>，这是 JUC（<code class="notranslate">java.util.concurrent</code>）中用于实现锁和其他同步器的基础框架。理解 AQS 是深入学习 <code class="notranslate">ReentrantLock</code> 的关键。</p>
 <h4>构造函数</h4>
 <p>以下是 <code class="notranslate">ReentrantLock</code> 的核心构造代码：</p>
@@ -230,7 +227,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <li><strong>非公平锁</strong>（默认）：通过 <code class="notranslate">NonfairSync</code> 实现，允许线程插队获取锁。</li>
 <li><strong>公平锁</strong>：通过 <code class="notranslate">FairSync</code> 实现，线程按排队顺序获取锁。</li>
 </ul>
-<h3>加锁的核心流程</h3>
+<h4>加锁的核心流程</h4>
 <p>调用 <code class="notranslate">lock()</code> 方法时：</p>
 <div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-s1">lock</span>() {
     <span class="pl-s1">sync</span>.<span class="pl-en">lock</span>();
@@ -274,16 +271,16 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </li>
 </ul>
 <p>公平锁需要先检查队列，确保无其他线程等待。</p>
-<h3>总结</h3>
+<h3>4. 总结</h3>
 <p>在 Java 并发编程中，<code class="notranslate">ReentrantLock</code> 提供了比 <code class="notranslate">synchronized</code> 更灵活的锁机制。然而，当我们阅读其源码时，会发现加锁与解锁的逻辑似乎比想象中复杂得多。但值得注意的是，这些复杂性并非完全由 <code class="notranslate">ReentrantLock</code> 自身实现，而是大部分依赖于背后的 <strong>AQS (AbstractQueuedSynchronizer)</strong> 框架。</p>
 <p><code class="notranslate">ReentrantLock</code> 本质上只是一个包装器，大量核心逻辑是由 AQS 提供的<code class="notranslate">ReentrantLock</code> 仅需实现 AQS 中暴露的少量方法，其余功能则完全依赖于 AQS 的默认实现。</p>
-<h3>学习建议与下一步</h3>
+<h3>5. 学习建议与下一步</h3>
 <p>在阅读 <code class="notranslate">ReentrantLock</code> 源码时，你可能会发现逻辑相对复杂。这主要是因为其大量功能依赖于 AQS。如果你尚未完全掌握，可以选择暂时跳过细节，专注于整体架构。理解 AQS 后，回头再看 <code class="notranslate">ReentrantLock</code>，一切都会豁然开朗。</p>
 <p>下一步，我们将深入学习 <strong>AQS</strong>，剖析其同步队列与状态管理机制。AQS 是 JUC 的核心，掌握它，将为后续理解 <code class="notranslate">ReentrantLock</code> 等工具奠定坚实基础。</p>
 <blockquote>
 <p><strong>学习建议</strong>：不要急于掌握所有细节，允许自己在初学时“遗忘”。专注于框架设计思想，你会更轻松地突破理解瓶颈。</p>
 </blockquote>
-<h3>加锁解锁部分源码及注解</h3>
+<h3>6. 加锁解锁部分源码及注解</h3>
 <p>附录1 ReentrantLock加锁操作源码，有细微改动，不影响逻辑</p>
 <div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">ReentrantLock</span> <span class="pl-k">implements</span> <span class="pl-smi">Lock</span>, <span class="pl-smi">java</span>.<span class="pl-smi">io</span>.<span class="pl-smi">Serializable</span> {
     <span class="pl-c">// 用于同步的核心组件，定义了公平锁和非公平锁的具体实现</span>
