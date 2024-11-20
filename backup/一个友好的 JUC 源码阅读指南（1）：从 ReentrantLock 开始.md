@@ -1,22 +1,21 @@
 ## 目录
 
-1. [[什么是 ReentrantLock？](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##%E4%BB%80%E4%B9%88%E6%98%AF-ReentrantLock)](##什么是-ReentrantLock)
-2. [[如何使用 ReentrantLock？](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-ReentrantLock)](##如何使用-ReentrantLock)
-3. [[ReentrantLock 和 synchronized 的对比](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##ReentrantLock-%E5%92%8C-synchronized-%E7%9A%84%E5%AF%B9%E6%AF%94)](##ReentrantLock-和-synchronized-的对比)
-4. [[适用场景](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF)](##适用场景)
-5. [[源码：ReentrantLock 的设计与实现](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##%E6%B7%B1%E5%85%A5%E6%BA%90%E7%A0%81%EF%BC%9AReentrantLock-%E7%9A%84%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0)](##深入源码：ReentrantLock-的设计与实现)
-6. [[总结](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##%E6%80%BB%E7%BB%93)](##总结)
-7. [[学习建议](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##%E5%AD%A6%E4%B9%A0%E5%BB%BA%E8%AE%AE%E4%B8%8E%E4%B8%8B%E4%B8%80%E6%AD%A5)](##学习建议与下一步)
+1. [什么是 ReentrantLock？](##什么是-ReentrantLock)
+2. [如何使用 ReentrantLock？](##ReentrantLock-和-synchronized-的对比)
+4. [适用场景](##适用场景)
+5. [源码：ReentrantLock 的设计与实现](##深入源码：ReentrantLock-的设计与实现)
+6. [总结](##总结)
+7. [学习建议](##学习建议与下一步)
 
-[[附录 加锁解锁部分源码及注解](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##%E5%8A%A0%E9%94%81%E8%A7%A3%E9%94%81%E9%83%A8%E5%88%86%E6%BA%90%E7%A0%81%E5%8F%8A%E6%B3%A8%E8%A7%A3)](##加锁解锁部分源码及注解)
+[附录 加锁解锁部分源码及注解](##加锁解锁部分源码及注解)
 
 ---
 
-## 什么是 ReentrantLock？
+### 什么是 ReentrantLock？
 
 `ReentrantLock` 是 Java 并发包（`java.util.concurrent.locks`）中的锁实现，提供了比 `synchronized` 更灵活的锁机制。其最大特点是允许**显式控制锁的获取和释放**，并支持诸如公平性、中断性等高级功能。
 
-### 核心特点
+#### 核心特点
 
 1. **可重入性**  
    和 `synchronized` 类似，同一线程可以多次获取同一把锁，不会发生死锁。
@@ -28,9 +27,9 @@
 4. **条件变量支持**  
    配合 `Condition`，实现线程间复杂的通信机制。
 
----
 
-## ReentrantLock 和 synchronized 的对比
+
+### ReentrantLock 和 synchronized 的对比
 
 | 特性             | `ReentrantLock`                | `synchronized`       |
 | ---------------- | ------------------------------ | -------------------- |
@@ -39,7 +38,7 @@
 | **实现复杂度**   | 高：需显式控制锁的获取与释放   | 低：隐式控制         |
 | **条件变量支持** | 支持多个条件变量               | 仅支持 `wait/notify` |
 
-## 适用场景
+### 适用场景
 
 1. **复杂并发控制**  
    需要等待锁超时、响应中断，或者多个条件变量的场景。
@@ -50,7 +49,7 @@
 3. **精细化同步**  
    比如需要部分代码加锁，部分不加锁的情况，`ReentrantLock` 的显式控制更加灵活。
 
-## 如何使用 ReentrantLock？
+### 如何使用 ReentrantLock？
 
 以下是一个简单的例子，展示如何使用 `ReentrantLock` 进行线程同步：
 
@@ -83,13 +82,13 @@ public class ReentrantLockExample {
 
 运行结果表明多个线程依次执行，这正是 `ReentrantLock` 显式控制锁的结果。
 
----
 
-## 深入源码：ReentrantLock 的设计与实现
+
+### 深入源码：ReentrantLock 的设计与实现
 
 `ReentrantLock` 的核心依赖于 **AQS (AbstractQueuedSynchronizer)**，这是 JUC（`java.util.concurrent`）中用于实现锁和其他同步器的基础框架。理解 AQS 是深入学习 `ReentrantLock` 的关键。
 
-### 构造函数
+#### 构造函数
 
 以下是 `ReentrantLock` 的核心构造代码：
 
@@ -134,7 +133,7 @@ final void lock() {
 
 
 
-### 公平锁与非公平锁的区别
+#### 公平锁与非公平锁的区别
 
 两者的不同点主要体现在 `tryAcquire` 方法中：
 
@@ -166,15 +165,15 @@ final void lock() {
 
 公平锁需要先检查队列，确保无其他线程等待。
 
----
 
-## 总结
+
+### 总结
 
 在 Java 并发编程中，`ReentrantLock` 提供了比 `synchronized` 更灵活的锁机制。然而，当我们阅读其源码时，会发现加锁与解锁的逻辑似乎比想象中复杂得多。但值得注意的是，这些复杂性并非完全由 `ReentrantLock` 自身实现，而是大部分依赖于背后的 **AQS (AbstractQueuedSynchronizer)** 框架。
 
 `ReentrantLock` 本质上只是一个包装器，大量核心逻辑是由 AQS 提供的`ReentrantLock` 仅需实现 AQS 中暴露的少量方法，其余功能则完全依赖于 AQS 的默认实现。
 
-## 学习建议与下一步
+### 学习建议与下一步
 
 在阅读 `ReentrantLock` 源码时，你可能会发现逻辑相对复杂。这主要是因为其大量功能依赖于 AQS。如果你尚未完全掌握，可以选择暂时跳过细节，专注于整体架构。理解 AQS 后，回头再看 `ReentrantLock`，一切都会豁然开朗。
 
@@ -182,7 +181,7 @@ final void lock() {
 
 > **学习建议**：不要急于掌握所有细节，允许自己在初学时“遗忘”。专注于框架设计思想，你会更轻松地突破理解瓶颈。
 
-## 加锁解锁部分源码及注解
+### 加锁解锁部分源码及注解
 
 附录1 ReentrantLock加锁操作源码，有细微改动，不影响逻辑
 

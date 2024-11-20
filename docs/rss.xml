@@ -1,19 +1,18 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Absoluter Geist</title><link>https://wangjiawenmath.github.io/das-sein.github.io</link><description>纵使时光百年遥，将感我心在咫尺。</description><copyright>Absoluter Geist</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/101440642?s=400&amp;u=06c88f077afc7b58938225692af72f3644e8b1ba&amp;v=4</url><title>avatar</title><link>https://wangjiawenmath.github.io/das-sein.github.io</link></image><lastBuildDate>Tue, 19 Nov 2024 16:13:49 +0000</lastBuildDate><managingEditor>Absoluter Geist</managingEditor><ttl>60</ttl><webMaster>Absoluter Geist</webMaster><item><title>一个友好的 JUC 源码阅读指南（1）：从 ReentrantLock 开始</title><link>https://wangjiawenmath.github.io/das-sein.github.io/post/yi-ge-you-hao-de-%20JUC%20-yuan-ma-yue-du-zhi-nan-%EF%BC%881%EF%BC%89%EF%BC%9A-cong-%20ReentrantLock%20-kai-shi.html</link><description>## 目录&#13;
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Absoluter Geist</title><link>https://wangjiawenmath.github.io/das-sein.github.io</link><description>纵使时光百年遥，将感我心在咫尺。</description><copyright>Absoluter Geist</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/101440642?s=400&amp;u=06c88f077afc7b58938225692af72f3644e8b1ba&amp;v=4</url><title>avatar</title><link>https://wangjiawenmath.github.io/das-sein.github.io</link></image><lastBuildDate>Wed, 20 Nov 2024 01:25:57 +0000</lastBuildDate><managingEditor>Absoluter Geist</managingEditor><ttl>60</ttl><webMaster>Absoluter Geist</webMaster><item><title>一个友好的 JUC 源码阅读指南（1）：从 ReentrantLock 开始</title><link>https://wangjiawenmath.github.io/das-sein.github.io/post/yi-ge-you-hao-de-%20JUC%20-yuan-ma-yue-du-zhi-nan-%EF%BC%881%EF%BC%89%EF%BC%9A-cong-%20ReentrantLock%20-kai-shi.html</link><description>## 目录&#13;
 &#13;
-1. [[什么是 ReentrantLock？](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##%E4%BB%80%E4%B9%88%E6%98%AF-ReentrantLock)](##什么是-ReentrantLock)&#13;
-2. [[如何使用 ReentrantLock？](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-ReentrantLock)](##如何使用-ReentrantLock)&#13;
-3. [[ReentrantLock 和 synchronized 的对比](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##ReentrantLock-%E5%92%8C-synchronized-%E7%9A%84%E5%AF%B9%E6%AF%94)](##ReentrantLock-和-synchronized-的对比)&#13;
-4. [[适用场景](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF)](##适用场景)&#13;
-5. [[源码：ReentrantLock 的设计与实现](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##%E6%B7%B1%E5%85%A5%E6%BA%90%E7%A0%81%EF%BC%9AReentrantLock-%E7%9A%84%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0)](##深入源码：ReentrantLock-的设计与实现)&#13;
-6. [[总结](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##%E6%80%BB%E7%BB%93)](##总结)&#13;
-7. [[学习建议](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##%E5%AD%A6%E4%B9%A0%E5%BB%BA%E8%AE%AE%E4%B8%8E%E4%B8%8B%E4%B8%80%E6%AD%A5)](##学习建议与下一步)&#13;
+1. [什么是 ReentrantLock？](##什么是-ReentrantLock)&#13;
+2. [如何使用 ReentrantLock？](##ReentrantLock-和-synchronized-的对比)&#13;
+4. [适用场景](##适用场景)&#13;
+5. [源码：ReentrantLock 的设计与实现](##深入源码：ReentrantLock-的设计与实现)&#13;
+6. [总结](##总结)&#13;
+7. [学习建议](##学习建议与下一步)&#13;
 &#13;
-[[附录 加锁解锁部分源码及注解](https://github.com/wangjiawenmath/das-sein.github.io/issues/7##%E5%8A%A0%E9%94%81%E8%A7%A3%E9%94%81%E9%83%A8%E5%88%86%E6%BA%90%E7%A0%81%E5%8F%8A%E6%B3%A8%E8%A7%A3)](##加锁解锁部分源码及注解)&#13;
+[附录 加锁解锁部分源码及注解](##加锁解锁部分源码及注解)&#13;
 &#13;
 ---&#13;
 &#13;
-## 什么是 ReentrantLock？&#13;
+### 什么是 ReentrantLock？&#13;
 &#13;
 `ReentrantLock` 是 Java 并发包（`java.util.concurrent.locks`）中的锁实现，提供了比 `synchronized` 更灵活的锁机制。</description><guid isPermaLink="true">https://wangjiawenmath.github.io/das-sein.github.io/post/yi-ge-you-hao-de-%20JUC%20-yuan-ma-yue-du-zhi-nan-%EF%BC%881%EF%BC%89%EF%BC%9A-cong-%20ReentrantLock%20-kai-shi.html</guid><pubDate>Tue, 19 Nov 2024 15:28:59 +0000</pubDate></item><item><title>论文：奶牛数之和为好奇数</title><link>https://wangjiawenmath.github.io/das-sein.github.io/post/lun-wen-%EF%BC%9A-nai-niu-shu-zhi-he-wei-hao-qi-shu.html</link><description>&#13;
 [奶牛数中的好奇数 v0.5.pdf](https://github.com/user-attachments/files/17791176/v0.5.pdf)&#13;
