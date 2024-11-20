@@ -10,9 +10,15 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="
-[奶牛数中的好奇数 v0.5.pdf](https://github.com/user-attachments/files/17791176/v0.5.pdf)
+<meta name="description" content="[ 下载 ](###下载)
+[预览](###预览)
+[推广](###推广)
 
+### 下载
+[奶牛数中的好奇数 v0.6(精简版).pdf](https://github.com/user-attachments/files/17823523/7.pdf)
+
+
+### 预览
 ![奶牛数中的好奇数 (5)_00](https://github.com/user-attachments/assets/4e105d59-ec11-4c47-a0fb-f80f03fb9db5)
 ![奶牛数中的好奇数 (5)_01](https://github.com/user-attachments/assets/43328412-49f5-4a9e-ba10-3d6f93d54f03)
 ![奶牛数中的好奇数 (5)_02](https://github.com/user-attachments/assets/0c855b31-2ddb-41cd-be8f-80653edf2db6)
@@ -68,11 +74,118 @@
 ![奶牛数中的好奇数 (5)_52](https://github.com/user-attachments/assets/805f82a2-5aaa-46ad-85d4-35dcdaf63a24)
 ![奶牛数中的好奇数 (5)_53](https://github.com/user-attachments/assets/7df07fba-2a2e-4ec9-b6e7-eacc4763b761)
 ![奶牛数中的好奇数 (5)_54](https://github.com/user-attachments/assets/762bb898-cb64-47af-9120-4f96d932de1b)
+
+
+### 记录1 关于推广原问题为（2,3）为（n,m）的方程组织顺序
+####方程组织顺序
+```javapublic class Test6 {
+    public static int random = 0;  // 随机变量预留
+    public static int count = 0;   // 边数计数
+    public static int count0 = 0;  // 方程数（节点数）计数
+    public static int count1 = 0;  // 路径数（叶子数）计数
+
+    // 动态设置终止目标
+    public static int targetA = 2;  // 目标 a 值
+    public static int targetB = 4;  // 目标 b 值
+
+    public static void main(String[] args) {
+        int a = 1;  // 初始值 (1,1)
+        int b = 1;
+        count0 = targetA * targetB; // 方程数
+
+        String startLabel = NumberToLetterMapping.mapToLetters(a, b, random);
+        System.out.println('graph TD\n' + startLabel + '[' + b + ',' + a + ']');
+
+        // 调用递归树
+        leftTree(a, b);
+        rightTree(a, b);
+
+        System.out.println('count: ' + count);
+        System.out.println('count0: ' + count0);
+        System.out.println('count1: ' + count1);
+    }
+
+    public static void leftTree(int a, int b) {
+        // 若 a 达到 targetA，则输出 (a, True) 并停止递归
+        if (a == targetA) {
+            printLeaf(a, b, true);
+            return;
+        }
+        printEdge(a, b, a + 1, b); // 递增 a
+        leftTree(a + 1, b);
+        rightTree(a + 1, b);
+    }
+
+    public static void rightTree(int a, int b) {
+        // 若 b 达到 targetB，则停止递归
+        if (b == targetB) return;
+        printEdge(a, b, a, b + 1); // 递增 b
+        rightTree(a, b + 1);
+        leftTree(a, b + 1);
+    }
+
+    private static void printEdge(int a1, int b1, int a2, int b2) {
+        String start = NumberToLetterMapping.mapToLetters(a1, b1, random);
+        String end = NumberToLetterMapping.mapToLetters(a2, b2, random);
+
+        count++;
+        System.out.println(start + '-->' + end + '[' + a2 + ',' + b2 + ']');
+    }
+
+    private static void printLeaf(int a, int b, boolean isATerminal) {
+        String start = NumberToLetterMapping.mapToLetters(a, b, random);
+        count++;
+        count1++;
+
+        // 终止条件输出不同格式
+        if (isATerminal) {
+            System.out.println(start + '--> end0[' + a + ', True]');
+        } else {
+            System.out.println(start + '--> end0[' + b + ', False]');
+        }
+    }
+
+    public static class NumberToLetterMapping {
+
+        public static String mapToLetters(int M, int N, int random) {
+            long combinedValue = cantorPairing(M, N);
+            return numberToLetters(combinedValue);
+        }
+
+        private static long cantorPairing(int M, int N) {
+            return (M + N) * (M + N + 1) / 2 + N;
+        }
+
+        private static String numberToLetters(long number) {
+            StringBuilder result = new StringBuilder();
+            while (number >= 0) {
+                int remainder = (int) (number % 26);
+                result.insert(0, (char) ('A' + remainder));
+                number = number / 26 - 1;
+                if (number < 0) break;
+            }
+            return result.toString();
+        }
+    }
+}
+
+
+```
+
+#### 示例：（3,5）问题方程组织顺序
+
+![export (6)](https://github.com/user-attachments/assets/5d6c86bb-4b41-428c-8357-7d06b4edcc53)
 。">
 <meta property="og:title" content="论文：奶牛数之和为好奇数">
-<meta property="og:description" content="
-[奶牛数中的好奇数 v0.5.pdf](https://github.com/user-attachments/files/17791176/v0.5.pdf)
+<meta property="og:description" content="[ 下载 ](###下载)
+[预览](###预览)
+[推广](###推广)
 
+### 下载
+[奶牛数中的好奇数 v0.6(精简版).pdf](https://github.com/user-attachments/files/17823523/7.pdf)
+
+
+### 预览
 ![奶牛数中的好奇数 (5)_00](https://github.com/user-attachments/assets/4e105d59-ec11-4c47-a0fb-f80f03fb9db5)
 ![奶牛数中的好奇数 (5)_01](https://github.com/user-attachments/assets/43328412-49f5-4a9e-ba10-3d6f93d54f03)
 ![奶牛数中的好奇数 (5)_02](https://github.com/user-attachments/assets/0c855b31-2ddb-41cd-be8f-80653edf2db6)
@@ -128,6 +241,107 @@
 ![奶牛数中的好奇数 (5)_52](https://github.com/user-attachments/assets/805f82a2-5aaa-46ad-85d4-35dcdaf63a24)
 ![奶牛数中的好奇数 (5)_53](https://github.com/user-attachments/assets/7df07fba-2a2e-4ec9-b6e7-eacc4763b761)
 ![奶牛数中的好奇数 (5)_54](https://github.com/user-attachments/assets/762bb898-cb64-47af-9120-4f96d932de1b)
+
+
+### 记录1 关于推广原问题为（2,3）为（n,m）的方程组织顺序
+####方程组织顺序
+```javapublic class Test6 {
+    public static int random = 0;  // 随机变量预留
+    public static int count = 0;   // 边数计数
+    public static int count0 = 0;  // 方程数（节点数）计数
+    public static int count1 = 0;  // 路径数（叶子数）计数
+
+    // 动态设置终止目标
+    public static int targetA = 2;  // 目标 a 值
+    public static int targetB = 4;  // 目标 b 值
+
+    public static void main(String[] args) {
+        int a = 1;  // 初始值 (1,1)
+        int b = 1;
+        count0 = targetA * targetB; // 方程数
+
+        String startLabel = NumberToLetterMapping.mapToLetters(a, b, random);
+        System.out.println('graph TD\n' + startLabel + '[' + b + ',' + a + ']');
+
+        // 调用递归树
+        leftTree(a, b);
+        rightTree(a, b);
+
+        System.out.println('count: ' + count);
+        System.out.println('count0: ' + count0);
+        System.out.println('count1: ' + count1);
+    }
+
+    public static void leftTree(int a, int b) {
+        // 若 a 达到 targetA，则输出 (a, True) 并停止递归
+        if (a == targetA) {
+            printLeaf(a, b, true);
+            return;
+        }
+        printEdge(a, b, a + 1, b); // 递增 a
+        leftTree(a + 1, b);
+        rightTree(a + 1, b);
+    }
+
+    public static void rightTree(int a, int b) {
+        // 若 b 达到 targetB，则停止递归
+        if (b == targetB) return;
+        printEdge(a, b, a, b + 1); // 递增 b
+        rightTree(a, b + 1);
+        leftTree(a, b + 1);
+    }
+
+    private static void printEdge(int a1, int b1, int a2, int b2) {
+        String start = NumberToLetterMapping.mapToLetters(a1, b1, random);
+        String end = NumberToLetterMapping.mapToLetters(a2, b2, random);
+
+        count++;
+        System.out.println(start + '-->' + end + '[' + a2 + ',' + b2 + ']');
+    }
+
+    private static void printLeaf(int a, int b, boolean isATerminal) {
+        String start = NumberToLetterMapping.mapToLetters(a, b, random);
+        count++;
+        count1++;
+
+        // 终止条件输出不同格式
+        if (isATerminal) {
+            System.out.println(start + '--> end0[' + a + ', True]');
+        } else {
+            System.out.println(start + '--> end0[' + b + ', False]');
+        }
+    }
+
+    public static class NumberToLetterMapping {
+
+        public static String mapToLetters(int M, int N, int random) {
+            long combinedValue = cantorPairing(M, N);
+            return numberToLetters(combinedValue);
+        }
+
+        private static long cantorPairing(int M, int N) {
+            return (M + N) * (M + N + 1) / 2 + N;
+        }
+
+        private static String numberToLetters(long number) {
+            StringBuilder result = new StringBuilder();
+            while (number >= 0) {
+                int remainder = (int) (number % 26);
+                result.insert(0, (char) ('A' + remainder));
+                number = number / 26 - 1;
+                if (number < 0) break;
+            }
+            return result.toString();
+        }
+    }
+}
+
+
+```
+
+#### 示例：（3,5）问题方程组织顺序
+
+![export (6)](https://github.com/user-attachments/assets/5d6c86bb-4b41-428c-8357-7d06b4edcc53)
 。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://wangjiawenmath.github.io/das-sein.github.io/post/lun-wen-%EF%BC%9A-nai-niu-shu-zhi-he-wei-hao-qi-shu.html">
@@ -189,7 +403,12 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p><a href="https://github.com/user-attachments/files/17791176/v0.5.pdf">奶牛数中的好奇数 v0.5.pdf</a></p>
+<div class="markdown-body" id="postBody"><p><a href="###%E4%B8%8B%E8%BD%BD"> 下载 </a><br>
+<a href="###%E9%A2%84%E8%A7%88">预览</a><br>
+<a href="###%E6%8E%A8%E5%B9%BF">推广</a></p>
+<h3>下载</h3>
+<p><a href="https://github.com/user-attachments/files/17823523/7.pdf">奶牛数中的好奇数 v0.6(精简版).pdf</a></p>
+<h3>预览</h3>
 <p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/4e105d59-ec11-4c47-a0fb-f80f03fb9db5"><img src="https://github.com/user-attachments/assets/4e105d59-ec11-4c47-a0fb-f80f03fb9db5" alt="奶牛数中的好奇数 (5)_00" style="max-width: 100%;"></a><br>
 <a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/43328412-49f5-4a9e-ba10-3d6f93d54f03"><img src="https://github.com/user-attachments/assets/43328412-49f5-4a9e-ba10-3d6f93d54f03" alt="奶牛数中的好奇数 (5)_01" style="max-width: 100%;"></a><br>
 <a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/0c855b31-2ddb-41cd-be8f-80653edf2db6"><img src="https://github.com/user-attachments/assets/0c855b31-2ddb-41cd-be8f-80653edf2db6" alt="奶牛数中的好奇数 (5)_02" style="max-width: 100%;"></a><br>
@@ -244,7 +463,103 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/08b35776-cf51-46c0-9045-227f7fc1f2ee"><img src="https://github.com/user-attachments/assets/08b35776-cf51-46c0-9045-227f7fc1f2ee" alt="奶牛数中的好奇数 (5)_51" style="max-width: 100%;"></a><br>
 <a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/805f82a2-5aaa-46ad-85d4-35dcdaf63a24"><img src="https://github.com/user-attachments/assets/805f82a2-5aaa-46ad-85d4-35dcdaf63a24" alt="奶牛数中的好奇数 (5)_52" style="max-width: 100%;"></a><br>
 <a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/7df07fba-2a2e-4ec9-b6e7-eacc4763b761"><img src="https://github.com/user-attachments/assets/7df07fba-2a2e-4ec9-b6e7-eacc4763b761" alt="奶牛数中的好奇数 (5)_53" style="max-width: 100%;"></a><br>
-<a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/762bb898-cb64-47af-9120-4f96d932de1b"><img src="https://github.com/user-attachments/assets/762bb898-cb64-47af-9120-4f96d932de1b" alt="奶牛数中的好奇数 (5)_54" style="max-width: 100%;"></a></p></div>
+<a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/762bb898-cb64-47af-9120-4f96d932de1b"><img src="https://github.com/user-attachments/assets/762bb898-cb64-47af-9120-4f96d932de1b" alt="奶牛数中的好奇数 (5)_54" style="max-width: 100%;"></a></p>
+<h3>记录1 关于推广原问题为（2,3）为（n,m）的方程组织顺序</h3>
+<p>####方程组织顺序</p>
+<pre lang="javapublic" data-meta="class Test6 {" class="notranslate"><code class="notranslate">    public static int random = 0;  // 随机变量预留
+    public static int count = 0;   // 边数计数
+    public static int count0 = 0;  // 方程数（节点数）计数
+    public static int count1 = 0;  // 路径数（叶子数）计数
+
+    // 动态设置终止目标
+    public static int targetA = 2;  // 目标 a 值
+    public static int targetB = 4;  // 目标 b 值
+
+    public static void main(String[] args) {
+        int a = 1;  // 初始值 (1,1)
+        int b = 1;
+        count0 = targetA * targetB; // 方程数
+
+        String startLabel = NumberToLetterMapping.mapToLetters(a, b, random);
+        System.out.println("graph TD\n" + startLabel + "[" + b + "," + a + "]");
+
+        // 调用递归树
+        leftTree(a, b);
+        rightTree(a, b);
+
+        System.out.println("count: " + count);
+        System.out.println("count0: " + count0);
+        System.out.println("count1: " + count1);
+    }
+
+    public static void leftTree(int a, int b) {
+        // 若 a 达到 targetA，则输出 (a, True) 并停止递归
+        if (a == targetA) {
+            printLeaf(a, b, true);
+            return;
+        }
+        printEdge(a, b, a + 1, b); // 递增 a
+        leftTree(a + 1, b);
+        rightTree(a + 1, b);
+    }
+
+    public static void rightTree(int a, int b) {
+        // 若 b 达到 targetB，则停止递归
+        if (b == targetB) return;
+        printEdge(a, b, a, b + 1); // 递增 b
+        rightTree(a, b + 1);
+        leftTree(a, b + 1);
+    }
+
+    private static void printEdge(int a1, int b1, int a2, int b2) {
+        String start = NumberToLetterMapping.mapToLetters(a1, b1, random);
+        String end = NumberToLetterMapping.mapToLetters(a2, b2, random);
+
+        count++;
+        System.out.println(start + "--&gt;" + end + "[" + a2 + "," + b2 + "]");
+    }
+
+    private static void printLeaf(int a, int b, boolean isATerminal) {
+        String start = NumberToLetterMapping.mapToLetters(a, b, random);
+        count++;
+        count1++;
+
+        // 终止条件输出不同格式
+        if (isATerminal) {
+            System.out.println(start + "--&gt; end0[" + a + ", True]");
+        } else {
+            System.out.println(start + "--&gt; end0[" + b + ", False]");
+        }
+    }
+
+    public static class NumberToLetterMapping {
+
+        public static String mapToLetters(int M, int N, int random) {
+            long combinedValue = cantorPairing(M, N);
+            return numberToLetters(combinedValue);
+        }
+
+        private static long cantorPairing(int M, int N) {
+            return (M + N) * (M + N + 1) / 2 + N;
+        }
+
+        private static String numberToLetters(long number) {
+            StringBuilder result = new StringBuilder();
+            while (number &gt;= 0) {
+                int remainder = (int) (number % 26);
+                result.insert(0, (char) ('A' + remainder));
+                number = number / 26 - 1;
+                if (number &lt; 0) break;
+            }
+            return result.toString();
+        }
+    }
+}
+
+
+</code></pre>
+<h4>示例：（3,5）问题方程组织顺序</h4>
+<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/5d6c86bb-4b41-428c-8357-7d06b4edcc53"><img src="https://github.com/user-attachments/assets/5d6c86bb-4b41-428c-8357-7d06b4edcc53" alt="export (6)" style="max-width: 100%;"></a></p></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
