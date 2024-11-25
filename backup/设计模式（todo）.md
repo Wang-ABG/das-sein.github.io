@@ -1,5 +1,8 @@
 ![页面提取自－13、 设计模式](https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64)
 [13、 设计模式.pdf](https://github.com/user-attachments/files/17894059/13.pdf)
+[TOC]
+
+
 
 [TOC]
 
@@ -99,7 +102,7 @@ public class Main {
 ```
 
 **(4) 类图：**
-![export (8)]https://blog.das-sein.top/export(8).svg
+![export (8)]<img src="https://blog.das-sein.top/export(8).svg">
 
 **(5) 共性论：**
  与**单例模式**结合可确保全局唯一实例；与**抽象工厂模式**配合实现多级分类产品。
@@ -162,7 +165,7 @@ public class Main {
 ```
 
 **(4) 类图**：
- ![export (9)]https://blog.das-sein.top/export(9).svg
+ ![export (9)]<img src="https://blog.das-sein.top/export(9).svg">
 
 ```
 classDiagram
@@ -258,7 +261,7 @@ public class Main {
 
 **(4) 类图：**
 
-![export (10)]https://blog.das-sein.top/export(10).svg
+![export (10)]<img src="https://blog.das-sein.top/export(10).svg">
 
 ```
 classDiagram
@@ -348,7 +351,7 @@ public class Main {
 ```
 
 **(4) 类图：**
-![export (12)]https://blog.das-sein.top/export(12).svg
+![export (12)]<img src="https://blog.das-sein.top/export(12).svg">
 
 ```
 classDiagram
@@ -520,7 +523,7 @@ public class Main {
 
 **(4) 类图：**
 
-![export (13)]https://blog.das-sein.top/export(13).svg
+![export (13)]<img src="https://blog.das-sein.top/export(13).svg">
 
 ```
 classDiagram
@@ -631,7 +634,7 @@ public class Main {
 
 
 
-https://blog.das-sein.top/export (14).svg
+<img src="https://blog.das-sein.top/export (14).svg">
 
 
 
@@ -1004,7 +1007,7 @@ public class ImgMsgHandler extends AbstractMsgHandler<ImgMsgDTO> {
 
 ```
 
-![export (15)](E:\aInputSources\技术文章export (15).svg
+![export (15)](E:\aInputSources\技术文章export (15).svg">
 
 #### （一）设计模式分析
 
@@ -1429,7 +1432,7 @@ public enum Singleton {
 
 ### 三、利用Redis+策略模式实现限流
 
-![export (7)]https://blog.das-sein.top/export(7).svg
+![export (7)]<img src="https://blog.das-sein.top/export(7).svg">
 
 ### 番外、如何选用适用的设计模式
 
