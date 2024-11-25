@@ -5,6 +5,10 @@
 
 
 
+[TOC]
+
+
+
 ## 第一篇：23种设计模式
 
 23种设计模式是面向对象编程中常用的设计思想，它们被分为三大类：创建型模式、结构型模式和行为型模式。以下是这三种模式及其具体分类的详细介绍：
@@ -99,7 +103,7 @@ public class Main {
 ```
 
 **(4) 类图：**
-![export (8)](13、 设计模式.assets\export (8).svg
+![export (8)](https://blog.das-sein.top/export (8).svg
 
 **(5) 共性论：**
  与**单例模式**结合可确保全局唯一实例；与**抽象工厂模式**配合实现多级分类产品。
@@ -162,7 +166,7 @@ public class Main {
 ```
 
 **(4) 类图**：
- ![export (9)](13、 设计模式.assets\export (9).svg
+ ![export (9)](https://blog.das-sein.top/export (9).svg
 
 ```
 classDiagram
@@ -258,7 +262,7 @@ public class Main {
 
 **(4) 类图：**
 
-![export (10)](13、 设计模式.assets\export (10).svg
+![export (10)](https://blog.das-sein.top/export (10).svg
 
 ```
 classDiagram
@@ -348,7 +352,7 @@ public class Main {
 ```
 
 **(4) 类图：**
-![export (12)](13、 设计模式.assets\export (12).svg
+![export (12)](https://blog.das-sein.top/export (12).svg
 
 ```
 classDiagram
@@ -520,7 +524,7 @@ public class Main {
 
 **(4) 类图：**
 
-![export (13)](13、 设计模式.assets\export (13).svg
+![export (13)](https://blog.das-sein.top/export (13).svg
 
 ```
 classDiagram
@@ -1425,11 +1429,11 @@ public enum Singleton {
 
 
 
-![img](13、 设计模式.assets\oli9z0imbc.gif)
+![img](https://blog.das-sein.topoli9z0imbc.gif)
 
 ### 三、利用Redis+策略模式实现限流
 
-![export (7)](13、 设计模式.assets\export (7).svg
+![export (7)](https://blog.das-sein.top/export (7).svg
 
 ### 番外、如何选用适用的设计模式
 
@@ -1463,7 +1467,7 @@ Java语言是对C语言的进一步发展，关注点在于对象与类，继承
 
 多态：补充。
 
-![graph](13、 设计模式.assets\graph.svg
+![graph](https://blog.das-sein.topgraph.svg
 
 ```
 digraph LanguageHierarchy {
