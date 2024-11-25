@@ -17,20 +17,12 @@
 
 
 
-[TOC]
-
-
-
 ## 第一篇：23种设计模式
 
 23种设计模式是面向对象编程中常用的设计思想，它们被分为三大类：创建型模式、结构型模式和行为型模式。">
 <meta property="og:title" content="设计模式（todo）">
 <meta property="og:description" content="![页面提取自－13、 设计模式](https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64)
 [13、 设计模式.pdf](https://github.com/user-attachments/files/17894059/13.pdf)
-
-[TOC]
-
-
 
 [TOC]
 
@@ -105,7 +97,6 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64"><img src="https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64" alt="页面提取自－13、 设计模式" style="max-width: 100%;"></a><br>
 <a href="https://github.com/user-attachments/files/17894059/13.pdf">13、 设计模式.pdf</a></p>
-<p>[TOC]</p>
 <p>[TOC]</p>
 <h2>第一篇：23种设计模式</h2>
 <p>23种设计模式是面向对象编程中常用的设计思想，它们被分为三大类：创建型模式、结构型模式和行为型模式。以下是这三种模式及其具体分类的详细介绍：</p>
@@ -189,7 +180,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 }</pre></div>
 <p><strong>(4) 类图：</strong><br>
-![export (8)](<a href="https://blog.das-sein.top/export" rel="nofollow">https://blog.das-sein.top/export</a> (8).svg</p>
+![export (8)]<a href="https://blog.das-sein.top/export(8).svg" rel="nofollow">https://blog.das-sein.top/export(8).svg</a></p>
 <p><strong>(5) 共性论：</strong><br>
 与<strong>单例模式</strong>结合可确保全局唯一实例；与<strong>抽象工厂模式</strong>配合实现多级分类产品。</p>
 <p><strong>(6) 利弊论与边界论：</strong></p>
@@ -244,7 +235,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 }</pre></div>
 <p><strong>(4) 类图</strong>：<br>
-![export (9)](<a href="https://blog.das-sein.top/export" rel="nofollow">https://blog.das-sein.top/export</a> (9).svg</p>
+![export (9)]<a href="https://blog.das-sein.top/export(9).svg" rel="nofollow">https://blog.das-sein.top/export(9).svg</a></p>
 <pre class="notranslate"><code class="notranslate">classDiagram
     class PromotionStrategy {
         &lt;&lt;interface&gt;&gt;
@@ -329,7 +320,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 }</pre></div>
 <p><strong>(4) 类图：</strong></p>
-<p>![export (10)](<a href="https://blog.das-sein.top/export" rel="nofollow">https://blog.das-sein.top/export</a> (10).svg</p>
+<p>![export (10)]<a href="https://blog.das-sein.top/export(10).svg" rel="nofollow">https://blog.das-sein.top/export(10).svg</a></p>
 <pre class="notranslate"><code class="notranslate">classDiagram
     class DataProcessor {
         &lt;&lt;abstract&gt;&gt;
@@ -409,7 +400,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 }</pre></div>
 <p><strong>(4) 类图：</strong><br>
-![export (12)](<a href="https://blog.das-sein.top/export" rel="nofollow">https://blog.das-sein.top/export</a> (12).svg</p>
+![export (12)]<a href="https://blog.das-sein.top/export(12).svg" rel="nofollow">https://blog.das-sein.top/export(12).svg</a></p>
 <pre class="notranslate"><code class="notranslate">classDiagram
     class Approver {
         &lt;&lt;abstract&gt;&gt;
@@ -562,7 +553,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 }</pre></div>
 <p><strong>(4) 类图：</strong></p>
-<p>![export (13)](<a href="https://blog.das-sein.top/export" rel="nofollow">https://blog.das-sein.top/export</a> (13).svg</p>
+<p>![export (13)]<a href="https://blog.das-sein.top/export(13).svg" rel="nofollow">https://blog.das-sein.top/export(13).svg</a></p>
 <pre class="notranslate"><code class="notranslate">classDiagram
     class TreeType {
         -color : String
@@ -1370,7 +1361,7 @@ Additional processing completed.
 <p><strong>注意</strong>：这是实现单例模式的最佳方法。它更简洁，自动支持序列化机制，绝对防止多次实例化，即使在面对复杂的序列化或者反射攻击的时候，这种单例的类型仍然可以安全地保证只有一个实例。</p>
 <p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/0da40075883e51200aa2215917e0d727a3f3770593ca405163936e922e459de1/68747470733a2f2f626c6f672e6461732d7365696e2e746f706f6c69397a30696d62632e676966"><img src="https://camo.githubusercontent.com/0da40075883e51200aa2215917e0d727a3f3770593ca405163936e922e459de1/68747470733a2f2f626c6f672e6461732d7365696e2e746f706f6c69397a30696d62632e676966" alt="img" data-canonical-src="https://blog.das-sein.topoli9z0imbc.gif" style="max-width: 100%;"></a></p>
 <h3>三、利用Redis+策略模式实现限流</h3>
-<p>![export (7)](<a href="https://blog.das-sein.top/export" rel="nofollow">https://blog.das-sein.top/export</a> (7).svg</p>
+<p>![export (7)]<a href="https://blog.das-sein.top/export(7).svg" rel="nofollow">https://blog.das-sein.top/export(7).svg</a></p>
 <h3>番外、如何选用适用的设计模式</h3>
 <h4>(零) 基础：指令.过程.对象（TODO）</h4>
 <p>我们从高级语言、中级语言、低级语言中各自取出一种，进行讨论：</p>
