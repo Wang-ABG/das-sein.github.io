@@ -3,9 +3,11 @@
 
 [TOC]
 
-## 第一篇：23 种设计模式
 
-23 种设计模式是面向对象编程中常用的设计思想，它们被分为三大类：创建型模式、结构型模式和行为型模式。以下是这三种模式及其具体分类的详细介绍：
+
+## 第一篇：23种设计模式
+
+23种设计模式是面向对象编程中常用的设计思想，它们被分为三大类：创建型模式、结构型模式和行为型模式。以下是这三种模式及其具体分类的详细介绍：
 
 ### 1. 创建型模式（Creational Patterns）
 
@@ -22,7 +24,7 @@
 
 - **适配器模式（Adapter Pattern）**：将一个类的接口转换成客户端所期待的另一种接口形式，从而使原本因接口不匹配而无法一起工作的类能够一起工作。
 - **桥接模式（Bridge Pattern）**：将抽象部分与实现部分分离，使它们都可以独立地变化。
-- **过滤器模式（Filter Pattern）**：注意，这个模式在 GoF 的 23 种经典设计模式中并未直接列出，但类似的思想在如责任链模式等中有所体现。在结构型模式的范畴内，可以视为一种通过链式处理请求的结构模式。
+- **过滤器模式（Filter Pattern）**：注意，这个模式在GoF的23种经典设计模式中并未直接列出，但类似的思想在如责任链模式等中有所体现。在结构型模式的范畴内，可以视为一种通过链式处理请求的结构模式。
 - **组合模式（Composite Pattern）**：将对象组合成树形结构以表示“部分-整体”的层次结构，使得用户对单个对象和组合对象的使用具有一致性。
 - **装饰器模式（Decorator Pattern）**：动态地给一个对象添加一些额外的职责，就增加功能来说，装饰器模式比生成子类更加灵活。
 - **外观模式（Facade Pattern）**：为子系统中的一组接口提供一个一致的界面，此模式定义了一个高层接口，这个接口使得这一子系统更加容易使用。
@@ -41,12 +43,12 @@
 - **备忘录模式（Memento Pattern）**：在不破坏封装性的前提下，捕获一个对象的内部状态，并在该对象之外保存这个状态。这样以后就可将该对象恢复到原先保存的状态。
 - **观察者模式（Observer Pattern）**：定义对象间的一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都得到通知并被自动更新。
 - **状态模式（State Pattern）**：允许一个对象在其内部状态改变时改变它的行为。对象看起来似乎修改了它的类。
-- **空对象模式（Null Object Pattern）**：注意，这个模式并非 GoF 的 23 种经典设计模式之一，但它是面向对象编程中常用的设计模式之一，用于解决在调用可能返回 null 的对象方法时可能出现的空指针异常问题。
+- **空对象模式（Null Object Pattern）**：注意，这个模式并非GoF的23种经典设计模式之一，但它是面向对象编程中常用的设计模式之一，用于解决在调用可能返回null的对象方法时可能出现的空指针异常问题。
 - **策略模式（Strategy Pattern）**：定义一系列的算法，把它们一个个封装起来，并且使它们可相互替换。此模式让算法的变化独立于使用算法的客户。
 - **模板方法模式（Template Method Pattern）**：定义一个操作中的算法的骨架，而将一些步骤延迟到子类中。模板方法使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。
 - **访问者模式（Visitor Pattern）**：表示一个作用于某对象结构中的各元素的操作。它使你可以在不改变各元素的类的前提下定义作用于这些元素的新操作。
 
-这 23 种设计模式在软件开发中被广泛使用，通过应用这些模式可以提高代码的可复用性、灵活性、可扩展性等方面的特性，帮助开发人员更快地构建出高质量的软件系统。
+这23种设计模式在软件开发中被广泛使用，通过应用这些模式可以提高代码的可复用性、灵活性、可扩展性等方面的特性，帮助开发人员更快地构建出高质量的软件系统。
 
 ## 第二篇：常用的设计模式
 
@@ -58,7 +60,7 @@
 - 当需要控制对象创建过程（如初始化某些状态）。
 - 例如：支付系统中，按支付方式（微信、支付宝、银行卡）创建支付处理对象，通过工厂方法返回特定的支付类。
 
-  **(3) 代码示例：**
+ **(3) 代码示例：**
 
 ```java
 // 抽象产品
@@ -100,7 +102,7 @@ public class Main {
 ![export (8)](13、 设计模式.assets\export (8).svg)
 
 **(5) 共性论：**
-与**单例模式**结合可确保全局唯一实例；与**抽象工厂模式**配合实现多级分类产品。
+ 与**单例模式**结合可确保全局唯一实例；与**抽象工厂模式**配合实现多级分类产品。
 
 **(6) 利弊论与边界论：**
 
@@ -160,7 +162,7 @@ public class Main {
 ```
 
 **(4) 类图**：
-![export (9)](13、 设计模式.assets\export (9).svg)
+ ![export (9)](13、 设计模式.assets\export (9).svg)
 
 ```
 classDiagram
@@ -198,7 +200,7 @@ classDiagram
 ```
 
 **(5) 共性论：**
-与**模板方法**相比，策略模式更注重算法动态切换；与**工厂模式**结合可以动态生成策略对象。
+ 与**模板方法**相比，策略模式更注重算法动态切换；与**工厂模式**结合可以动态生成策略对象。
 
 **(6) 利弊论与边界论：**
 
@@ -206,12 +208,12 @@ classDiagram
 - **弊：** 策略类增多；客户端需明确选择策略。
 - **边界：** 适用于多变算法逻辑，差异大但流程一致的场景。
 
----
+------
 
 ### **模板方法 (Template Method Pattern)**
 
 **(1) 目的：** 定义一个算法框架，将具体步骤延迟到子类实现，以复用公共逻辑并允许局部自定义。
-**(2) 编码场景：**
+ **(2) 编码场景：**
 
 - 需在不同实现中保留相同算法流程但允许由子类定制局部逻辑的场景。
 - 例如：数据处理流程中，不同格式（CSV、JSON、XML）文件的读取和解析逻辑。
@@ -280,7 +282,7 @@ classDiagram
 ```
 
 **(5) 共性论：**
-与**策略模式**相比，模板方法更注重固定流程和局部实现差异；与**责任链模式**配合可实现动态链式模板。
+ 与**策略模式**相比，模板方法更注重固定流程和局部实现差异；与**责任链模式**配合可实现动态链式模板。
 
 **(6) 利弊论与边界论：**
 
@@ -375,7 +377,7 @@ classDiagram
 ```
 
 **(5) 共性论：**
-与**装饰器模式**相比，责任链模式更注重传递请求，而非增强功能；与**观察者模式**相比，责任链模式只有一个最终处理者，而观察者模式会通知所有观察者。
+ 与**装饰器模式**相比，责任链模式更注重传递请求，而非增强功能；与**观察者模式**相比，责任链模式只有一个最终处理者，而观察者模式会通知所有观察者。
 
 **(6) 利弊论与边界论：**
 
@@ -453,10 +455,10 @@ public class Main {
 ```
 
 **(4) 类图：**
-略
+ 略
 
 **(5) 共性论：**
-与**工厂模式**相比，建筑者模式更适合复杂对象；与**原型模式**结合可用于复制并修改已有对象。
+ 与**工厂模式**相比，建筑者模式更适合复杂对象；与**原型模式**结合可用于复制并修改已有对象。
 
 **(6) 利弊论与边界论：**
 
@@ -541,7 +543,7 @@ classDiagram
 ```
 
 **(5) 共性论：**
-与**单例模式**相比，享元模式允许多个共享对象；与**代理模式**结合时，可延迟共享对象的创建。
+ 与**单例模式**相比，享元模式允许多个共享对象；与**代理模式**结合时，可延迟共享对象的创建。
 
 **(6) 利弊论与边界论：**
 
@@ -725,7 +727,7 @@ public class Main {
 ```
 
 **(4) 类图：**
-如数据库连接池，`getInstance` 方法通过标识符确保每个数据库实例唯一，同时实现共享访问。
+ 如数据库连接池，`getInstance` 方法通过标识符确保每个数据库实例唯一，同时实现共享访问。
 
 **(5) 共性论：**
 
@@ -740,7 +742,7 @@ public class Main {
 
 ## 第三篇：最佳实践
 
-### 一、不同的类型的消息
+### 一、不同的类型的消息 
 
 ```java
 public abstract class AbstractMsgHandler<Req> {
@@ -1010,7 +1012,7 @@ public class ImgMsgHandler extends AbstractMsgHandler<ImgMsgDTO> {
 4. 泛型模式：使用泛型提供类型安全性
 5. 单例模式：通过 Spring 的依赖注入确保处理器的单例性
 
-##### 1. 模板方法模式
+##### 1. 模板方法模式 
 
 `AbstractMsgHandler` 抽象类中使用了模板方法模式，它定义了消息处理的骨架流程：
 
@@ -1036,7 +1038,7 @@ public class ImgMsgHandler extends AbstractMsgHandler<ImgMsgDTO> {
   - `public abstract Object showReplyMsg(Message msg)`
   - `public abstract String showContactMsg(Message msg)`
 
-##### 2. 策略模式
+##### 2. 策略模式 
 
 通过 `MsgHandlerFactory` 和不同的消息处理器实现了策略模式：
 
@@ -1052,7 +1054,7 @@ public class ImgMsgHandler extends AbstractMsgHandler<ImgMsgDTO> {
   }
   ```
 
-##### 3. 工厂模式
+##### 3. 工厂模式 
 
 `MsgHandlerFactory` 实现了简单工厂模式：
 
@@ -1067,7 +1069,7 @@ public class ImgMsgHandler extends AbstractMsgHandler<ImgMsgDTO> {
 ```java
 public abstract class AbstractMsgHandler<Req> {
     private Class<Req> bodyClass;
-
+    
     private Req toBean(Object body) {
         if (bodyClass.isAssignableFrom(body.getClass())) {
             return (Req) body;
@@ -1077,7 +1079,7 @@ public abstract class AbstractMsgHandler<Req> {
 }
 ```
 
-##### 5. 单例模式
+##### 5. 单例模式 
 
 通过 Spring 的 `@Component` 注解，每个具体的消息处理器都是单例的：
 
@@ -1088,25 +1090,22 @@ public abstract class AbstractMsgHandler<Req> {
 #### （二）设计模式的优点
 
 1. **可扩展性**：
-
    - 新增消息类型只需添加新的处理器类
    - 不需要修改现有代码，符合开闭原则
 
 2. **代码复用**：
-
    - 通过抽象类复用通用逻辑
    - 减少重复代码
 
 3. **维护性**：
-
    - 各个消息类型的处理逻辑独立
    - 职责明确，易于维护和测试
 
 4. **类型安全**：
-   - 使用泛型确保类型安全（泛型的一个重要作用，诸如 List、HashMap 都有所体现）
+   - 使用泛型确保类型安全（泛型的一个重要作用，诸如List、HashMap都有所体现）
    - 编译时即可发现类型错误
 
-#### （三）改进：责任链模式
+#### （三）改进：责任链模式 
 
 ##### 1. **分析上面的代码**
 
@@ -1213,10 +1212,10 @@ public class MsgHandlerChain {
 为了将当前代码架构转换为责任链模式，我们需要明确以下几个要点：
 
 - **责任链的核心思想**：
-  将多个处理步骤串联起来，当一个请求进入时，由链上的节点逐步处理，直到请求被完全处理或链结束。
+   将多个处理步骤串联起来，当一个请求进入时，由链上的节点逐步处理，直到请求被完全处理或链结束。
 
 - **改造目标**：
-  使校验 (`checkMsg`) 和保存 (`saveMsg`) 等逻辑成为链条上的独立节点，每个节点完成自己的职责并决定是否传递给下一个节点。
+   使校验 (`checkMsg`) 和保存 (`saveMsg`) 等逻辑成为链条上的独立节点，每个节点完成自己的职责并决定是否传递给下一个节点。
 
 ##### 1. 定义责任链节点接口
 
@@ -1326,22 +1325,22 @@ Additional processing completed.
 
 ### 二、单例模式
 
-单例模式（Singleton Pattern）是一种常用的软件设计模式，用于确保一个类仅有一个实例，并提供一个全局访问点。以下是使用 Java 语言实现单例模式的几种常见方式：
+单例模式（Singleton Pattern）是一种常用的软件设计模式，用于确保一个类仅有一个实例，并提供一个全局访问点。以下是使用Java语言实现单例模式的几种常见方式：
 
 ##### 1. 懒汉式（线程不安全）
 
 ```java
-public class Singleton {
-    private static Singleton instance;
-
-    private Singleton() {}
-
-    public static Singleton getInstance() {
-        if (instance == null) {
-            instance = new Singleton();
-        }
-        return instance;
-    }
+public class Singleton {  
+    private static Singleton instance;  
+  
+    private Singleton() {}  
+  
+    public static Singleton getInstance() {  
+        if (instance == null) {  
+            instance = new Singleton();  
+        }  
+        return instance;  
+    }  
 }
 ```
 
@@ -1350,17 +1349,17 @@ public class Singleton {
 ##### 2. 懒汉式（线程安全）
 
 ```java
-public class Singleton {
-    private static Singleton instance;
-
-    private Singleton() {}
-
-    public static synchronized Singleton getInstance() {
-        if (instance == null) {
-            instance = new Singleton();
-        }
-        return instance;
-    }
+public class Singleton {  
+    private static Singleton instance;  
+  
+    private Singleton() {}  
+  
+    public static synchronized Singleton getInstance() {  
+        if (instance == null) {  
+            instance = new Singleton();  
+        }  
+        return instance;  
+    }  
 }
 ```
 
@@ -1369,21 +1368,21 @@ public class Singleton {
 ##### 3. 双重检查锁定（Double-Checked Locking）
 
 ```java
-public class Singleton {
-    private static volatile Singleton instance;
-
-    private Singleton() {}
-
-    public static Singleton getInstance() {
-        if (instance == null) {
-            synchronized (Singleton.class) {
-                if (instance == null) {
-                    instance = new Singleton();
-                }
-            }
-        }
-        return instance;
-    }
+public class Singleton {  
+    private static volatile Singleton instance;  
+  
+    private Singleton() {}  
+  
+    public static Singleton getInstance() {  
+        if (instance == null) {  
+            synchronized (Singleton.class) {  
+                if (instance == null) {  
+                    instance = new Singleton();  
+                }  
+            }  
+        }  
+        return instance;  
+    }  
 }
 ```
 
@@ -1392,37 +1391,39 @@ public class Singleton {
 ##### 4. 静态内部类
 
 ```java
-public class Singleton {
-    private Singleton() {}
-
-    private static class SingletonHolder {
-        private static final Singleton INSTANCE = new Singleton();
-    }
-
-    public static final Singleton getInstance() {
-        return SingletonHolder.INSTANCE;
-    }
+public class Singleton {  
+    private Singleton() {}  
+  
+    private static class SingletonHolder {  
+        private static final Singleton INSTANCE = new Singleton();  
+    }  
+  
+    public static final Singleton getInstance() {  
+        return SingletonHolder.INSTANCE;  
+    }  
 }
 ```
 
-**注意**：这种方式利用了 classloder 的机制来保证初始化`Singleton`类时只有一个线程能创建`SingletonHolder`类，从而保证了`INSTANCE`的唯一性。同时，这种方式也实现了懒加载。
+**注意**：这种方式利用了classloder的机制来保证初始化`Singleton`类时只有一个线程能创建`SingletonHolder`类，从而保证了`INSTANCE`的唯一性。同时，这种方式也实现了懒加载。
 
 ##### 5. 枚举
 
 ```java
-public enum Singleton {
-    INSTANCE;
-
-    public void whateverMethod() {
-    }
+public enum Singleton {  
+    INSTANCE;  
+  
+    public void whateverMethod() {  
+    }  
 }
 ```
 
 **注意**：这是实现单例模式的最佳方法。它更简洁，自动支持序列化机制，绝对防止多次实例化，即使在面对复杂的序列化或者反射攻击的时候，这种单例的类型仍然可以安全地保证只有一个实例。
 
+
+
 ![img](13、 设计模式.assets\oli9z0imbc.gif)
 
-### 三、利用 Redis+策略模式实现限流
+### 三、利用Redis+策略模式实现限流
 
 ![export (7)](13、 设计模式.assets\export (7).svg)
 
@@ -1432,21 +1433,21 @@ public enum Singleton {
 
 我们从高级语言、中级语言、低级语言中各自取出一种，进行讨论：
 
-- **Java 语言的定义**：Java 是一种完全**面向对象**的**高级编程语言**。
-- **C 语言的定义**：C 语言是一种通用的、**面向过程**的高级编程语言，同时也具有一些接近底层硬件的特性，介于高级语言和低级语言之间，常被看作是**中级语言**。
+- **Java语言的定义**：Java 是一种完全**面向对象**的**高级编程语言**。
+- **C语言的定义**：C 语言是一种通用的、**面向过程**的高级编程语言，同时也具有一些接近底层硬件的特性，介于高级语言和低级语言之间，常被看作是**中级语言**。
 - **机器语言的定义**：机器语言是计算机能够直接识别和执行的二进制**指令**代码，是最底层的计算机语言。
 
 机器语言由指令组成，关注点在于：
 
-C 语言是对机器语言的封装，关注点在于：分支控制（for/if）、函数、结构体、指针；
+C语言是对机器语言的封装，关注点在于：分支控制（for/if）、函数、结构体、指针；
 
-Java 语言是对 C 语言的进一步发展，关注点在于对象与类，继承封装多态。
+Java语言是对C语言的进一步发展，关注点在于对象与类，继承封装多态。
 
 后者是对前者的封装和发展，前者是后者的基础。所以理论上，前者的形式化是后者，后者可还原为前者。
 
 故而，我们作出如下理解：
 
-（从中级语言到低级语言）一切程序都是指令，指令按顺序执行。单纯 for()是同样的指令段重复执行，单纯 if()是可以消失指令段。
+（从中级语言到低级语言）一切程序都是指令，指令按顺序执行。单纯for()是同样的指令段重复执行，单纯if()是可以消失指令段。
 
 （从高级语言到低级语言）类包含属性 函数和方法，类 是指令篇，对象是类的实现，具体来说，补充了类的属性，是指令篇。
 
@@ -1508,7 +1509,7 @@ digraph LanguageHierarchy {
     // 设置节点的布局方向为从左到右（'LR'）
     //attr(rankdir='LR');
 
-
+   
 }
 ```
 
@@ -1518,13 +1519,13 @@ digraph LanguageHierarchy {
 
 1. **低级语言：机器语言**
    - 关注点：**指令**
-     机器语言是直接与硬件交互的二进制代码，所有操作以指令为单位执行。
-2. **中级语言：C 语言**
+      机器语言是直接与硬件交互的二进制代码，所有操作以指令为单位执行。
+2. **中级语言：C语言**
    - 关注点：**过程**
-     C 语言通过分支控制（如 `for`、`if`）、函数和指针等抽象特性，为指令的组织提供了灵活性和可复用性。
-3. **高级语言：Java 语言**
+      C语言通过分支控制（如 `for`、`if`）、函数和指针等抽象特性，为指令的组织提供了灵活性和可复用性。
+3. **高级语言：Java语言**
    - 关注点：**对象与类**
-     Java 进一步引入面向对象特性（如继承、封装、多态），将代码抽象到类与对象的层次，使得程序逻辑更具可读性和扩展性。
+      Java进一步引入面向对象特性（如继承、封装、多态），将代码抽象到类与对象的层次，使得程序逻辑更具可读性和扩展性。
 
 #### (二) **设计模式的分类与选择**
 
@@ -1617,11 +1618,11 @@ digraph LanguageHierarchy {
 
   - 示例：文件读取器的模板逻辑。
 
-#### (三) **从问题到模式的选择**
+#### (三)  **从问题到模式的选择**
 
 ##### **问：有类 A、B、C，三者有一方法逻辑相同，也有异处，以何兼共拓异？**
 
-**答曰：** 构建一辅助抽象类 AB，共性逻辑写入其方法；A、B、C 继承 AB，重写各自的方法以实现差异化。
+**答曰：** 构建一辅助抽象类 AB，共性逻辑写入其方法；A、B、C继承 AB，重写各自的方法以实现差异化。
 
 ##### **选择示例**
 
@@ -1648,7 +1649,7 @@ digraph LanguageHierarchy {
 6. **链式处理：** 选择责任链模式。
 7. **一对多通知：** 选择观察者模式。
 
-> **实践建议：** 在具体业务场景中，仔细分析需求的共性与差异性，从而选择合适的设计模式为系统设计赋能。r 如：
+> **实践建议：** 在具体业务场景中，仔细分析需求的共性与差异性，从而选择合适的设计模式为系统设计赋能。r如：
 >
 > 需要对对象实例进行创建和存储和管理，涉及到的可能是创建型模式。
 >
@@ -1662,51 +1663,51 @@ digraph LanguageHierarchy {
 >
 > 如果一些类代表了不同职责，并且以链表形式组织在一起，外层循环传递责任，那么可能是责任链模式。责任链模式分为三种：分工合作责任链（没个节点都负责一部分），分工单干平级责任链（找到一个符合的，功业务非递进关系），分工单干非平级级责任链（找到一个符合的，功业务递进关系）。
 >
-> 如果一个类改变，需要对其他多个类也进行改变(list 组合)，循环通知，可能是观察者模式。
+> 如果一个类改变，需要对其他多个类也进行改变(list组合)，循环通知，可能是观察者模式。
 >
-> 还有一些可能是组合，策略模式+单例工厂（map），key 取出策略。策略模式+多例工厂（new）。
+> 还有一些可能是组合，策略模式+单例工厂（map），key取出策略。策略模式+多例工厂（new）。
 
 ## 第四篇：Spring 中设计模式（TODO）
 
-Spring 框架中广泛运用了多种设计模式，以实现其强大的功能和灵活性。以下是一些 Spring 框架中常见的设计模式：
+Spring框架中广泛运用了多种设计模式，以实现其强大的功能和灵活性。以下是一些Spring框架中常见的设计模式：
 
 1. 单例模式（Singleton Pattern）
 
-   - 在 Spring 的默认作用域中，每个 Bean 都是单例的，即在整个 Spring IoC 容器中，每个 Bean 只会有一个实例。这有助于节省资源并提高性能。
+   - 在Spring的默认作用域中，每个Bean都是单例的，即在整个Spring IoC容器中，每个Bean只会有一个实例。这有助于节省资源并提高性能。
 
 2. 工厂模式（Factory Pattern）
 
-   - Spring 通过 BeanFactory 和 ApplicationContext 等接口创建并管理对象实例。这种方式将对象的创建与使用解耦，使得程序更加灵活和可扩展。
+   - Spring通过BeanFactory和ApplicationContext等接口创建并管理对象实例。这种方式将对象的创建与使用解耦，使得程序更加灵活和可扩展。
 
 3. 代理模式（Proxy Pattern）
 
-   - Spring 的 AOP（面向切面编程）功能大量使用了代理模式。AOP 通过在目标方法执行前后添加额外的行为（如日志、事务管理等），而这些额外的行为是通过代理对象来实现的。Spring 提供了两种代理方式：JDK 动态代理和 CGLIB 代理。
+   - Spring的AOP（面向切面编程）功能大量使用了代理模式。AOP通过在目标方法执行前后添加额外的行为（如日志、事务管理等），而这些额外的行为是通过代理对象来实现的。Spring提供了两种代理方式：JDK动态代理和CGLIB代理。
 
 4. 模板方法模式（Template Method Pattern）
 
-   - 在 Spring 的 JdbcTemplate、HibernateTemplate 等类中，使用了模板方法模式。这些类定义了一个操作中的算法骨架，而将一些步骤延迟到子类中实现。这种方式使得 Spring 可以为不同的数据库操作提供统一的接口，同时允许用户根据自己的需求进行定制。
+   - 在Spring的JdbcTemplate、HibernateTemplate等类中，使用了模板方法模式。这些类定义了一个操作中的算法骨架，而将一些步骤延迟到子类中实现。这种方式使得Spring可以为不同的数据库操作提供统一的接口，同时允许用户根据自己的需求进行定制。
 
 5. 观察者模式（Observer Pattern）
 
-   - Spring 的事件处理机制就是观察者模式的一个应用。当某个事件发生时，所有注册的观察者都会自动收到通知并作出相应的处理。这种方式使得事件的处理更加解耦和灵活。
+   - Spring的事件处理机制就是观察者模式的一个应用。当某个事件发生时，所有注册的观察者都会自动收到通知并作出相应的处理。这种方式使得事件的处理更加解耦和灵活。
 
 6. 适配器模式（Adapter Pattern）
 
-   - Spring MVC 中的 Controller 适配器，以及 AOP 模块中的适配器，都使用了适配器模式。适配器模式用于将一个接口转换为客户希望的另一个接口，使得不同的类或对象能够协同工作。
+   - Spring MVC中的Controller适配器，以及AOP模块中的适配器，都使用了适配器模式。适配器模式用于将一个接口转换为客户希望的另一个接口，使得不同的类或对象能够协同工作。
 
 7. 装饰器模式（Decorator Pattern）
 
-   - 在 Spring AOP 中，代理对象（代理类）就是对目标对象的增强（装饰），可以动态地为目标对象添加新的行为（如方法拦截、日志记录、事务管理等）。
+   - 在Spring AOP中，代理对象（代理类）就是对目标对象的增强（装饰），可以动态地为目标对象添加新的行为（如方法拦截、日志记录、事务管理等）。
 
 8. 策略模式（Strategy Pattern）
 
-   - 在 Spring 中，策略模式主要用于实现不同的算法或策略。例如，Spring 的 TaskScheduler 接口就定义了不同的任务调度策略，如同步执行、异步执行等。
+   - 在Spring中，策略模式主要用于实现不同的算法或策略。例如，Spring的TaskScheduler接口就定义了不同的任务调度策略，如同步执行、异步执行等。
 
 9. 依赖注入（Dependency Injection, DI）和控制反转（Inversion of Control, IoC）
 
-   - 这两个设计模式是 Spring 框架的核心。通过依赖注入，Spring 负责管理和注入组件之间的依赖关系，降低了组件之间的耦合度。控制反转则是指将对象的创建和依赖关系的管理交给 Spring 容器，从而实现了对象的解耦。
+   - 这两个设计模式是Spring框架的核心。通过依赖注入，Spring负责管理和注入组件之间的依赖关系，降低了组件之间的耦合度。控制反转则是指将对象的创建和依赖关系的管理交给Spring容器，从而实现了对象的解耦。
 
-此外，Spring 框架还使用了其他设计模式，如组合模式、建造者模式、委托模式、空对象模式等，以实现各种功能和组件。这些设计模式的运用使得 Spring 框架更加灵活、可扩展和易于维护。
+此外，Spring框架还使用了其他设计模式，如组合模式、建造者模式、委托模式、空对象模式等，以实现各种功能和组件。这些设计模式的运用使得Spring框架更加灵活、可扩展和易于维护。
 
 ## 参考文献
 

@@ -10,17 +10,23 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="
-![页面提取自－13、 设计模式](https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64)
+<meta name="description" content="![页面提取自－13、 设计模式](https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64)
 [13、 设计模式.pdf](https://github.com/user-attachments/files/17894059/13.pdf)
+
+[TOC]
+
+
 
 ## 第一篇：23种设计模式
 
 23种设计模式是面向对象编程中常用的设计思想，它们被分为三大类：创建型模式、结构型模式和行为型模式。">
 <meta property="og:title" content="设计模式（todo）">
-<meta property="og:description" content="
-![页面提取自－13、 设计模式](https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64)
+<meta property="og:description" content="![页面提取自－13、 设计模式](https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64)
 [13、 设计模式.pdf](https://github.com/user-attachments/files/17894059/13.pdf)
+
+[TOC]
+
+
 
 ## 第一篇：23种设计模式
 
@@ -91,6 +97,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64"><img src="https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64" alt="页面提取自－13、 设计模式" style="max-width: 100%;"></a><br>
 <a href="https://github.com/user-attachments/files/17894059/13.pdf">13、 设计模式.pdf</a></p>
+<p>[TOC]</p>
 <h2>第一篇：23种设计模式</h2>
 <p>23种设计模式是面向对象编程中常用的设计思想，它们被分为三大类：创建型模式、结构型模式和行为型模式。以下是这三种模式及其具体分类的详细介绍：</p>
 <h3>1. 创建型模式（Creational Patterns）</h3>
@@ -173,7 +180,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 }</pre></div>
 <p><strong>(4) 类图：</strong><br>
-![export (8)](E:\hOutputSources\TyporaNote\面试\13、 设计模式.assets\export (8).svg)</p>
+![export (8)](13、 设计模式.assets\export (8).svg)</p>
 <p><strong>(5) 共性论：</strong><br>
 与<strong>单例模式</strong>结合可确保全局唯一实例；与<strong>抽象工厂模式</strong>配合实现多级分类产品。</p>
 <p><strong>(6) 利弊论与边界论：</strong></p>
@@ -228,7 +235,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 }</pre></div>
 <p><strong>(4) 类图</strong>：<br>
-![export (9)](E:\hOutputSources\TyporaNote\面试\13、 设计模式.assets\export (9).svg)</p>
+![export (9)](13、 设计模式.assets\export (9).svg)</p>
 <pre class="notranslate"><code class="notranslate">classDiagram
     class PromotionStrategy {
         &lt;&lt;interface&gt;&gt;
@@ -313,7 +320,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 }</pre></div>
 <p><strong>(4) 类图：</strong></p>
-<p>![export (10)](E:\hOutputSources\TyporaNote\面试\13、 设计模式.assets\export (10).svg)</p>
+<p>![export (10)](13、 设计模式.assets\export (10).svg)</p>
 <pre class="notranslate"><code class="notranslate">classDiagram
     class DataProcessor {
         &lt;&lt;abstract&gt;&gt;
@@ -393,7 +400,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 }</pre></div>
 <p><strong>(4) 类图：</strong><br>
-![export (12)](E:\hOutputSources\TyporaNote\面试\13、 设计模式.assets\export (12).svg)</p>
+![export (12)](13、 设计模式.assets\export (12).svg)</p>
 <pre class="notranslate"><code class="notranslate">classDiagram
     class Approver {
         &lt;&lt;abstract&gt;&gt;
@@ -546,7 +553,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 }</pre></div>
 <p><strong>(4) 类图：</strong></p>
-<p>![export (13)](E:\hOutputSources\TyporaNote\面试\13、 设计模式.assets\export (13).svg)</p>
+<p>![export (13)](13、 设计模式.assets\export (13).svg)</p>
 <pre class="notranslate"><code class="notranslate">classDiagram
     class TreeType {
         -color : String
@@ -644,7 +651,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 }</pre></div>
 <p><strong>(4) 类图：</strong></p>
-<p>![export (14)](E:\hOutputSources\TyporaNote\面试\13、 设计模式.assets\export (14).svg)</p>
+<p>![export (14)](13、 设计模式.assets\export (14).svg)</p>
 <pre class="notranslate"><code class="notranslate">classDiagram
     class Observer {
         &lt;&lt;interface&gt;&gt;
@@ -1352,9 +1359,9 @@ Additional processing completed.
     }  
 }</pre></div>
 <p><strong>注意</strong>：这是实现单例模式的最佳方法。它更简洁，自动支持序列化机制，绝对防止多次实例化，即使在面对复杂的序列化或者反射攻击的时候，这种单例的类型仍然可以安全地保证只有一个实例。</p>
-<p>![img](E:\hOutputSources\TyporaNote\面试\13、 设计模式.assets\oli9z0imbc.gif)</p>
+<p>![img](13、 设计模式.assets\oli9z0imbc.gif)</p>
 <h3>三、利用Redis+策略模式实现限流</h3>
-<p>![export (7)](E:\hOutputSources\TyporaNote\面试\13、 设计模式.assets\export (7).svg)</p>
+<p>![export (7)](13、 设计模式.assets\export (7).svg)</p>
 <h3>番外、如何选用适用的设计模式</h3>
 <h4>(零) 基础：指令.过程.对象（TODO）</h4>
 <p>我们从高级语言、中级语言、低级语言中各自取出一种，进行讨论：</p>
@@ -1374,7 +1381,7 @@ Additional processing completed.
 <p>封装：过程封装为类的方法，补充。</p>
 <p>继承：指令段的复用，重复的指令段变为父类。</p>
 <p>多态：补充。</p>
-<p>![graph](E:\hOutputSources\TyporaNote\面试\13、 设计模式.assets\graph.svg)</p>
+<p>![graph](13、 设计模式.assets\graph.svg)</p>
 <pre class="notranslate"><code class="notranslate">digraph LanguageHierarchy {
     // 设置节点的通用样式，这里设置形状为矩形，字体大小等
     node [shape=box, fontsize=10];
