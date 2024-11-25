@@ -1,4 +1,4 @@
-name: build Gmeek
+name: Build and Deploy Gmeek Blog
 
 on:
   workflow_dispatch:
@@ -6,71 +6,97 @@ on:
     types: [opened, edited]
   schedule:
     - cron: "0 16 * * *"
-    
+
 jobs:
   build:
-    name: Generate blog
+    name: Generate Blog
     runs-on: ubuntu-20.04
     if: ${{ github.event.repository.owner.id == github.event.sender.id || github.event_name == 'schedule' }}
     permissions: write-all
+
     steps:
-      - name: Checkout
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # Step 2: Setup GitHub Pages
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
 
-      - name: Get config.json
+      # Step 3: Verify config.json
+      - name: Validate Config File
         run: |
-          echo "====== check config.josn file ======"
+          echo "Checking config.json..."
+          if [ ! -f config.json ]; then
+            echo "Error: config.json file is missing!"
+            exit 1
+          fi
           cat config.json
-          echo "====== check config.josn end  ======"
-          sudo apt-get install jq
+          sudo apt-get install -y jq
 
-      - name: Set up Python
+      # Step 4: Setup Python environment
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: 3.8
 
-      - name: Clone source code
+      # Step 5: Clone the Gmeek Source Code
+      - name: Clone Gmeek Source
         run: |
           GMEEK_VERSION=$(jq -r ".GMEEK_VERSION" config.json)
-          git clone https://github.com/Meekdai/Gmeek.git /opt/Gmeek;
-          cd /opt/Gmeek/
-          lastTag=$(git describe --tags `git rev-list --tags --max-count=1`)
-          if [ $GMEEK_VERSION == 'last' ]; then git checkout $lastTag; else git checkout $GMEEK_VERSION; fi;
+          echo "Selected Gmeek version: $GMEEK_VERSION"
+          git clone https://github.com/Meekdai/Gmeek.git /opt/Gmeek
+          cd /opt/Gmeek || exit
+          lastTag=$(git describe --tags $(git rev-list --tags --max-count=1))
+          if [ "$GMEEK_VERSION" == "last" ]; then
+            git checkout "$lastTag"
+          else
+            git checkout "$GMEEK_VERSION"
+          fi
 
-      - name: Install dependencies
+      # Step 6: Install Python Dependencies
+      - name: Install Dependencies
         run: |
+          echo "Installing dependencies..."
           pip install --upgrade pip
-          pip install -r /opt/Gmeek/requirements.txt
+          pip install -r /opt/Gmeek/requirements.txt || {
+            echo "Dependency installation failed!"
+            exit 1
+          }
 
-      - name: Generate new html
+      # Step 7: Generate Static HTML
+      - name: Generate Static HTML
         run: |
+          echo "Generating HTML files..."
           cp -r ./* /opt/Gmeek/
-          cd /opt/Gmeek/
-          python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}'
-          cp -a /opt/Gmeek/docs ${{ github.workspace }} 
-          cp -a /opt/Gmeek/backup ${{ github.workspace }} 
-          cp /opt/Gmeek/blogBase.json ${{ github.workspace }} 
-          
-      - name: update html
+          cd /opt/Gmeek || exit
+          python Gmeek.py ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} --issue_number '${{ github.event.issue.number }}' || {
+            echo "HTML generation failed!"
+            exit 1
+          }
+          cp -a /opt/Gmeek/docs ${{ github.workspace }}
+          cp -a /opt/Gmeek/backup ${{ github.workspace }}
+          cp /opt/Gmeek/blogBase.json ${{ github.workspace }}
+
+      # Step 8: Commit and Push Updates
+      - name: Commit and Push Changes
         run: |
+          echo "Committing changes..."
           git config --local user.email "$(jq -r ".email" config.json)"
           git config --local user.name "${{ github.repository_owner }}"
           git add .
-          git commit -a -m '🎉auto update by Gmeek action' || echo "nothing to commit"
-          git push || echo "nothing to push"
-          sleep 3
-          
-      - name: Upload artifact
+          git commit -m "🎉 Auto update by Gmeek Action" || echo "Nothing to commit."
+          git push || echo "Nothing to push."
+
+      # Step 9: Upload Artifact to GitHub Pages
+      - name: Upload to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: 'docs/.'
-          
+
   deploy:
-    name: Deploy blog
+    name: Deploy Blog
     runs-on: ubuntu-20.04
     needs: build
     permissions:
@@ -83,7 +109,9 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
+      # Step 10: Deploy Generated Content
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
