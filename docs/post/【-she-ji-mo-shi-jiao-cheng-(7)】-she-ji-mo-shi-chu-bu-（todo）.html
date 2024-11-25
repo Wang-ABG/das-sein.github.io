@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    <script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script>
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/101440642?s=400&u=06c88f077afc7b58938225692af72f3644e8b1ba&v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="![页面提取自－13、 设计模式](https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64)
+[13、 设计模式.pdf](https://github.com/user-attachments/files/17894059/13.pdf)
+[TOC]
+
+
+
+[TOC]
+
+
+
+## 第一篇：23种设计模式
+
+23种设计模式是面向对象编程中常用的设计思想，它们被分为三大类：创建型模式、结构型模式和行为型模式。">
+<meta property="og:title" content="【设计模式教程(7)】设计模式初步（todo）">
+<meta property="og:description" content="![页面提取自－13、 设计模式](https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64)
+[13、 设计模式.pdf](https://github.com/user-attachments/files/17894059/13.pdf)
+[TOC]
+
+
+
+[TOC]
+
+
+
+## 第一篇：23种设计模式
+
+23种设计模式是面向对象编程中常用的设计思想，它们被分为三大类：创建型模式、结构型模式和行为型模式。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://Wang-ABG.github.io/das-sein.github.io/post/%E3%80%90-she-ji-mo-shi-jiao-cheng-%287%29%E3%80%91-she-ji-mo-shi-chu-bu-%EF%BC%88todo%EF%BC%89.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/101440642?s=400&u=06c88f077afc7b58938225692af72f3644e8b1ba&v=4">
+<title>【设计模式教程(7)】设计模式初步（todo）</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">【设计模式教程(7)】设计模式初步（todo）</h1>
+<div class="title-right">
+    <a href="https://Wang-ABG.github.io/das-sein.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64"><img src="https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64" alt="页面提取自－13、 设计模式" style="max-width: 100%;"></a><br>
+<a href="https://github.com/user-attachments/files/17894059/13.pdf">13、 设计模式.pdf</a><br>
+[TOC]</p>
+<p>[TOC]</p>
+<h2>第一篇：23种设计模式</h2>
+<p>23种设计模式是面向对象编程中常用的设计思想，它们被分为三大类：创建型模式、结构型模式和行为型模式。以下是这三种模式及其具体分类的详细介绍：</p>
+<h3>1. 创建型模式（Creational Patterns）</h3>
+<p>创建型模式关注于对象的创建过程，旨在通过不同的方式来创建对象，从而增加代码的灵活性和复用性。</p>
+<ul>
+<li><strong>工厂模式（Factory Pattern）</strong>：定义一个用于创建对象的接口，让子类决定实例化哪一个类。工厂方法让类的实例化推迟到子类中进行。具体包括简单工厂模式、工厂方法模式和抽象工厂模式。</li>
+<li><strong>单例模式（Singleton Pattern）</strong>：确保一个类仅有一个实例，并提供一个全局访问点。</li>
+<li><strong>建造者模式（Builder Pattern）</strong>：将一个复杂对象的构建与它的表示分离，使得同样的构建过程可以创建不同的表示。</li>
+<li><strong>原型模式（Prototype Pattern）</strong>：用原型实例指定创建对象的种类，并且通过复制这些原型来创建新的对象。</li>
+</ul>
+<h3>2. 结构型模式（Structural Patterns）</h3>
+<p>结构型模式关注于类与类之间的组合关系，通过组合不同的类或对象来获得更大的结构。</p>
+<ul>
+<li><strong>适配器模式（Adapter Pattern）</strong>：将一个类的接口转换成客户端所期待的另一种接口形式，从而使原本因接口不匹配而无法一起工作的类能够一起工作。</li>
+<li><strong>桥接模式（Bridge Pattern）</strong>：将抽象部分与实现部分分离，使它们都可以独立地变化。</li>
+<li><strong>过滤器模式（Filter Pattern）</strong>：注意，这个模式在GoF的23种经典设计模式中并未直接列出，但类似的思想在如责任链模式等中有所体现。在结构型模式的范畴内，可以视为一种通过链式处理请求的结构模式。</li>
+<li><strong>组合模式（Composite Pattern）</strong>：将对象组合成树形结构以表示“部分-整体”的层次结构，使得用户对单个对象和组合对象的使用具有一致性。</li>
+<li><strong>装饰器模式（Decorator Pattern）</strong>：动态地给一个对象添加一些额外的职责，就增加功能来说，装饰器模式比生成子类更加灵活。</li>
+<li><strong>外观模式（Facade Pattern）</strong>：为子系统中的一组接口提供一个一致的界面，此模式定义了一个高层接口，这个接口使得这一子系统更加容易使用。</li>
+<li><strong>享元模式（Flyweight Pattern）</strong>：运用共享技术有效地支持大量细粒度的对象。</li>
+<li><strong>代理模式（Proxy Pattern）</strong>：为其他对象提供一种代理以控制对这个对象的访问。</li>
+</ul>
+<h3>3. 行为型模式（Behavioral Patterns）</h3>
+<p>行为型模式关注于对象之间的交互和职责分配，以更好地设计软件的行为。</p>
+<ul>
+<li><strong>责任链模式（Chain of Responsibility Pattern）</strong>：使多个对象都有机会处理请求，从而避免请求的发送者和接收者之间的耦合关系。</li>
+<li><strong>命令模式（Command Pattern）</strong>：将一个请求封装为一个对象，从而使你可用不同的请求对客户进行参数化；对请求排队或记录请求日志，以及支持可取消的操作。</li>
+<li><strong>解释器模式（Interpreter Pattern）</strong>：给定一个语言，定义它的文法的一种表示，并定义一个解释器，这个解释器使用该表示来解释语言中的句子。</li>
+<li><strong>迭代器模式（Iterator Pattern）</strong>：提供一种方法顺序访问一个聚合对象中的各个元素，而又不暴露该对象的内部表示。</li>
+<li><strong>中介者模式（Mediator Pattern）</strong>：用一个中介对象来封装一系列的对象交互。中介者使各个对象不需要显式地相互引用，从而使其耦合松散，而且可以独立地改变它们之间的交互。</li>
+<li><strong>备忘录模式（Memento Pattern）</strong>：在不破坏封装性的前提下，捕获一个对象的内部状态，并在该对象之外保存这个状态。这样以后就可将该对象恢复到原先保存的状态。</li>
+<li><strong>观察者模式（Observer Pattern）</strong>：定义对象间的一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都得到通知并被自动更新。</li>
+<li><strong>状态模式（State Pattern）</strong>：允许一个对象在其内部状态改变时改变它的行为。对象看起来似乎修改了它的类。</li>
+<li><strong>空对象模式（Null Object Pattern）</strong>：注意，这个模式并非GoF的23种经典设计模式之一，但它是面向对象编程中常用的设计模式之一，用于解决在调用可能返回null的对象方法时可能出现的空指针异常问题。</li>
+<li><strong>策略模式（Strategy Pattern）</strong>：定义一系列的算法，把它们一个个封装起来，并且使它们可相互替换。此模式让算法的变化独立于使用算法的客户。</li>
+<li><strong>模板方法模式（Template Method Pattern）</strong>：定义一个操作中的算法的骨架，而将一些步骤延迟到子类中。模板方法使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。</li>
+<li><strong>访问者模式（Visitor Pattern）</strong>：表示一个作用于某对象结构中的各元素的操作。它使你可以在不改变各元素的类的前提下定义作用于这些元素的新操作。</li>
+</ul>
+<p>这23种设计模式在软件开发中被广泛使用，通过应用这些模式可以提高代码的可复用性、灵活性、可扩展性等方面的特性，帮助开发人员更快地构建出高质量的软件系统。</p>
+<h2>第二篇：常用的设计模式</h2>
+<h3><strong>工厂模式 (Factory Pattern)</strong></h3>
+<p><strong>(1) 目的：</strong> 提供一个接口或方法，负责创建特定类的实例，而不公开实例化的具体逻辑，帮助解耦对象的创建和使用。<br>
+<strong>(2) 编码场景：</strong></p>
+<ul>
+<li>当需要控制对象创建过程（如初始化某些状态）。</li>
+<li>例如：支付系统中，按支付方式（微信、支付宝、银行卡）创建支付处理对象，通过工厂方法返回特定的支付类。</li>
+</ul>
+<p><strong>(3) 代码示例：</strong></p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 抽象产品</span>
+<span class="pl-k">interface</span> <span class="pl-smi">Payment</span> {
+    <span class="pl-smi">void</span> <span class="pl-en">pay</span>();
+}
+
+<span class="pl-c">// 具体产品</span>
+<span class="pl-k">class</span> <span class="pl-smi">WeChatPay</span> <span class="pl-k">implements</span> <span class="pl-smi">Payment</span> {
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">pay</span>() {
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"WeChat Payment"</span>);
+    }
+}
+<span class="pl-k">class</span> <span class="pl-smi">AliPay</span> <span class="pl-k">implements</span> <span class="pl-smi">Payment</span> {
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">pay</span>() {
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"AliPay Payment"</span>);
+    }
+}
+
+<span class="pl-c">// 工厂类</span>
+<span class="pl-k">class</span> <span class="pl-smi">PaymentFactory</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">Payment</span> <span class="pl-en">createPayment</span>(<span class="pl-smi">String</span> <span class="pl-s1">type</span>) {
+        <span class="pl-k">if</span> (<span class="pl-s1">type</span>.<span class="pl-en">equals</span>(<span class="pl-s">"WeChat"</span>)) <span class="pl-k">return</span> <span class="pl-k">new</span> <span class="pl-smi">WeChatPay</span>();
+        <span class="pl-k">else</span> <span class="pl-k">if</span> (<span class="pl-s1">type</span>.<span class="pl-en">equals</span>(<span class="pl-s">"Ali"</span>)) <span class="pl-k">return</span> <span class="pl-k">new</span> <span class="pl-smi">AliPay</span>();
+        <span class="pl-k">else</span> <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">IllegalArgumentException</span>(<span class="pl-s">"Unknown Payment Type"</span>);
+    }
+}
+
+<span class="pl-c">// 调用代码</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Payment</span> <span class="pl-s1">payment</span> = <span class="pl-smi">PaymentFactory</span>.<span class="pl-en">createPayment</span>(<span class="pl-s">"WeChat"</span>);
+        <span class="pl-s1">payment</span>.<span class="pl-en">pay</span>(); <span class="pl-c">// 输出：WeChat Payment</span>
+    }
+}</pre></div>
+<p><strong>(4) 类图：</strong><br>
+![export (8)]<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/655e8683eb6d0ee57e0da9b1e054f3c7c5c37085636e1b7badb033e1a6d245cb/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f6578706f72742838292e737667"><img src="https://camo.githubusercontent.com/655e8683eb6d0ee57e0da9b1e054f3c7c5c37085636e1b7badb033e1a6d245cb/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f6578706f72742838292e737667" data-canonical-src="https://blog.das-sein.top/export(8).svg" style="max-width: 100%;"></a></p>
+<p><strong>(5) 共性论：</strong><br>
+与<strong>单例模式</strong>结合可确保全局唯一实例；与<strong>抽象工厂模式</strong>配合实现多级分类产品。</p>
+<p><strong>(6) 利弊论与边界论：</strong></p>
+<ul>
+<li><strong>利：</strong> 提高代码灵活性，符合开闭原则。</li>
+<li><strong>弊：</strong> 工厂逻辑易变复杂；对简单场景略显冗余。</li>
+<li><strong>边界：</strong> 适用于类种类多、实例化逻辑复杂、需求频繁变化的场景。</li>
+</ul>
+<h3><strong>策略模式 (Strategy Pattern)</strong></h3>
+<p><strong>(1) 目的：</strong> 定义一系列算法，将每种算法封装成独立的策略类，允许动态选择算法，而不影响客户端逻辑。</p>
+<p><strong>(2) 编码场景：</strong></p>
+<ul>
+<li>替代 <code class="notranslate">if-else</code> 或 <code class="notranslate">switch</code> 判断，动态选择处理逻辑。</li>
+<li>例如：电商系统中，促销活动（满减、折扣、返现）根据用户选择动态应用对应策略。</li>
+</ul>
+<p><strong>(3) 代码实现：</strong></p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 抽象策略</span>
+<span class="pl-k">interface</span> <span class="pl-smi">PromotionStrategy</span> {
+    <span class="pl-smi">void</span> <span class="pl-en">execute</span>();
+}
+
+<span class="pl-c">// 具体策略</span>
+<span class="pl-k">class</span> <span class="pl-smi">DiscountStrategy</span> <span class="pl-k">implements</span> <span class="pl-smi">PromotionStrategy</span> {
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">execute</span>() {
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Applying Discount Promotion"</span>);
+    }
+}
+<span class="pl-k">class</span> <span class="pl-smi">CashbackStrategy</span> <span class="pl-k">implements</span> <span class="pl-smi">PromotionStrategy</span> {
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">execute</span>() {
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Applying Cashback Promotion"</span>);
+    }
+}
+
+<span class="pl-c">// 策略上下文</span>
+<span class="pl-k">class</span> <span class="pl-smi">PromotionContext</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">PromotionStrategy</span> <span class="pl-s1">strategy</span>;
+
+    <span class="pl-k">public</span> <span class="pl-smi">PromotionContext</span>(<span class="pl-smi">PromotionStrategy</span> <span class="pl-s1">strategy</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">strategy</span> = <span class="pl-s1">strategy</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">applyStrategy</span>() {
+        <span class="pl-s1">strategy</span>.<span class="pl-en">execute</span>();
+    }
+}
+
+<span class="pl-c">// 调用代码</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">PromotionContext</span> <span class="pl-s1">context</span> = <span class="pl-k">new</span> <span class="pl-smi">PromotionContext</span>(<span class="pl-k">new</span> <span class="pl-smi">DiscountStrategy</span>());
+        <span class="pl-s1">context</span>.<span class="pl-en">applyStrategy</span>(); <span class="pl-c">// 输出：Applying Discount Promotion</span>
+    }
+}</pre></div>
+<p><strong>(4) 类图</strong>：<br>
+![export (9)]<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/7fa3a83b67fb2176eb87fc4fb54d2d77712f0f5b9fd281427c9fc7c6f98ce913/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f6578706f72742839292e737667"><img src="https://camo.githubusercontent.com/7fa3a83b67fb2176eb87fc4fb54d2d77712f0f5b9fd281427c9fc7c6f98ce913/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f6578706f72742839292e737667" data-canonical-src="https://blog.das-sein.top/export(9).svg" style="max-width: 100%;"></a></p>
+<pre class="notranslate"><code class="notranslate">classDiagram
+    class PromotionStrategy {
+        &lt;&lt;interface&gt;&gt;
+        +execute() : void
+        &lt;&lt;description&gt;&gt; "定义所有促销策略需实现的执行方法，是具体促销策略的抽象。"
+    }
+
+    class DiscountStrategy {
+        +execute() : void
+        &lt;&lt;description&gt;&gt; "实现折扣促销策略，执行时输出折扣促销相关信息，如'Applying Discount Promotion: 8折优惠！'。"
+    }
+
+    class CashbackStrategy {
+        +execute() : void
+        &lt;&lt;description&gt;&gt; "实现返现促销策略，执行时输出返现促销相关信息，如'Applying Cashback Promotion: 每满100元返现20元！'。"
+    }
+
+    class PromotionContext {
+        -strategy : PromotionStrategy
+        +PromotionContext(strategy : PromotionStrategy)
+        +applyStrategy() : void
+        &lt;&lt;description&gt;&gt; "策略上下文类，持有具体促销策略实例，并提供方法执行该策略。"
+    }
+
+    class Main {
+        &lt;&lt;description&gt;&gt; "客户端代码所在类，用于创建不同促销策略的上下文并执行相应策略。"
+    }
+
+    Main --&gt; PromotionContext : creates and calls
+    PromotionContext --&gt; PromotionStrategy : holds
+    DiscountStrategy..|&gt; PromotionStrategy
+    CashbackStrategy..|&gt; PromotionStrategy
+</code></pre>
+<p><strong>(5) 共性论：</strong><br>
+与<strong>模板方法</strong>相比，策略模式更注重算法动态切换；与<strong>工厂模式</strong>结合可以动态生成策略对象。</p>
+<p><strong>(6) 利弊论与边界论：</strong></p>
+<ul>
+<li><strong>利：</strong> 避免硬编码，符合开闭原则；便于复用策略类。</li>
+<li><strong>弊：</strong> 策略类增多；客户端需明确选择策略。</li>
+<li><strong>边界：</strong> 适用于多变算法逻辑，差异大但流程一致的场景。</li>
+</ul>
+<hr>
+<h3><strong>模板方法 (Template Method Pattern)</strong></h3>
+<p><strong>(1) 目的：</strong> 定义一个算法框架，将具体步骤延迟到子类实现，以复用公共逻辑并允许局部自定义。<br>
+<strong>(2) 编码场景：</strong></p>
+<ul>
+<li>需在不同实现中保留相同算法流程但允许由子类定制局部逻辑的场景。</li>
+<li>例如：数据处理流程中，不同格式（CSV、JSON、XML）文件的读取和解析逻辑。</li>
+</ul>
+<p><strong>(3) 代码实现：</strong></p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 抽象模板</span>
+<span class="pl-k">abstract</span> <span class="pl-k">class</span> <span class="pl-smi">DataProcessor</span> {
+    <span class="pl-c">// 模板方法</span>
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">process</span>() {
+        <span class="pl-en">readData</span>();
+        <span class="pl-en">processData</span>();
+        <span class="pl-en">saveData</span>();
+    }
+
+    <span class="pl-k">protected</span> <span class="pl-k">abstract</span> <span class="pl-smi">void</span> <span class="pl-en">readData</span>(); <span class="pl-c">// 由子类实现</span>
+    <span class="pl-k">protected</span> <span class="pl-k">abstract</span> <span class="pl-smi">void</span> <span class="pl-en">processData</span>();
+    <span class="pl-k">protected</span> <span class="pl-smi">void</span> <span class="pl-en">saveData</span>() {
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Data saved to database"</span>);
+    }
+}
+
+<span class="pl-c">// 具体子类</span>
+<span class="pl-k">class</span> <span class="pl-smi">CsvProcessor</span> <span class="pl-k">extends</span> <span class="pl-smi">DataProcessor</span> {
+    <span class="pl-k">protected</span> <span class="pl-smi">void</span> <span class="pl-en">readData</span>() {
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Reading CSV data"</span>);
+    }
+    <span class="pl-k">protected</span> <span class="pl-smi">void</span> <span class="pl-en">processData</span>() {
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Processing CSV data"</span>);
+    }
+}
+
+<span class="pl-c">// 调用代码</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">DataProcessor</span> <span class="pl-s1">processor</span> = <span class="pl-k">new</span> <span class="pl-smi">CsvProcessor</span>();
+        <span class="pl-s1">processor</span>.<span class="pl-en">process</span>();
+    }
+}</pre></div>
+<p><strong>(4) 类图：</strong></p>
+<p>![export (10)]<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/65f1bf7be665dc168ad7569ec70defd0b904282317f166c91d711b98b3772de8/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f6578706f7274283130292e737667"><img src="https://camo.githubusercontent.com/65f1bf7be665dc168ad7569ec70defd0b904282317f166c91d711b98b3772de8/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f6578706f7274283130292e737667" data-canonical-src="https://blog.das-sein.top/export(10).svg" style="max-width: 100%;"></a></p>
+<pre class="notranslate"><code class="notranslate">classDiagram
+    class DataProcessor {
+        &lt;&lt;abstract&gt;&gt;
+        +process() : void
+        #readData() : void
+        #processData() : void
+        +saveData() : void
+        &lt;&lt;description&gt;&gt; "抽象模板类，定义了数据处理的模板方法process()，包含读取、处理和保存数据的步骤。其中读取和处理数据的方法由子类实现，保存数据方法有默认实现。"
+    }
+
+    class CsvProcessor {
+        +readData() : void
+        +processData() : void
+        &lt;&lt;description&gt;&gt; "具体子类，继承自DataProcessor，实现了抽象的读取数据和处理数据的方法，用于处理CSV格式数据。"
+    }
+
+    Main --&gt; DataProcessor : creates
+    CsvProcessor..|&gt; DataProcessor
+</code></pre>
+<p><strong>(5) 共性论：</strong><br>
+与<strong>策略模式</strong>相比，模板方法更注重固定流程和局部实现差异；与<strong>责任链模式</strong>配合可实现动态链式模板。</p>
+<p><strong>(6) 利弊论与边界论：</strong></p>
+<ul>
+<li><strong>利：</strong> 提高代码复用性；固定框架易于维护。</li>
+<li><strong>弊：</strong> 子类依赖父类实现，增加继承关系。</li>
+<li><strong>边界：</strong> 适用于流程固定、部分逻辑差异明确的场景。</li>
+</ul>
+<h3><strong>责任链模式 (Chain of Responsibility Pattern)</strong></h3>
+<p><strong>(1) 目的：</strong> 通过将请求沿着一条链传递，使多个对象有机会处理请求，从而解耦请求发送者和接收者。</p>
+<p><strong>(2) 编码场景：</strong></p>
+<ul>
+<li>当有多个对象可处理同一请求，但具体处理者不确定，且需动态决定谁来处理时。</li>
+<li>例如：审批系统中，订单需按层级（组长、经理、总监）审批，但审批层级由金额决定。</li>
+</ul>
+<p><strong>(3) 代码实现：</strong></p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 抽象处理者</span>
+<span class="pl-k">abstract</span> <span class="pl-k">class</span> <span class="pl-smi">Approver</span> {
+    <span class="pl-k">protected</span> <span class="pl-smi">Approver</span> <span class="pl-s1">nextApprover</span>;
+
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">setNextApprover</span>(<span class="pl-smi">Approver</span> <span class="pl-s1">nextApprover</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">nextApprover</span> = <span class="pl-s1">nextApprover</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">abstract</span> <span class="pl-smi">void</span> <span class="pl-en">approveRequest</span>(<span class="pl-smi">int</span> <span class="pl-s1">amount</span>);
+}
+
+<span class="pl-c">// 具体处理者</span>
+<span class="pl-k">class</span> <span class="pl-smi">Manager</span> <span class="pl-k">extends</span> <span class="pl-smi">Approver</span> {
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">approveRequest</span>(<span class="pl-smi">int</span> <span class="pl-s1">amount</span>) {
+        <span class="pl-k">if</span> (<span class="pl-s1">amount</span> &lt;= <span class="pl-c1">1000</span>) {
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Manager approved the request"</span>);
+        } <span class="pl-k">else</span> <span class="pl-k">if</span> (<span class="pl-s1">nextApprover</span> != <span class="pl-c1">null</span>) {
+            <span class="pl-s1">nextApprover</span>.<span class="pl-en">approveRequest</span>(<span class="pl-s1">amount</span>);
+        }
+    }
+}
+
+<span class="pl-k">class</span> <span class="pl-smi">Director</span> <span class="pl-k">extends</span> <span class="pl-smi">Approver</span> {
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">approveRequest</span>(<span class="pl-smi">int</span> <span class="pl-s1">amount</span>) {
+        <span class="pl-k">if</span> (<span class="pl-s1">amount</span> &lt;= <span class="pl-c1">5000</span>) {
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Director approved the request"</span>);
+        } <span class="pl-k">else</span> <span class="pl-k">if</span> (<span class="pl-s1">nextApprover</span> != <span class="pl-c1">null</span>) {
+            <span class="pl-s1">nextApprover</span>.<span class="pl-en">approveRequest</span>(<span class="pl-s1">amount</span>);
+        }
+    }
+}
+
+<span class="pl-c">// 调用代码</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Manager</span> <span class="pl-s1">manager</span> = <span class="pl-k">new</span> <span class="pl-smi">Manager</span>();
+        <span class="pl-smi">Director</span> <span class="pl-s1">director</span> = <span class="pl-k">new</span> <span class="pl-smi">Director</span>();
+
+        <span class="pl-s1">manager</span>.<span class="pl-en">setNextApprover</span>(<span class="pl-s1">director</span>);
+
+        <span class="pl-s1">manager</span>.<span class="pl-en">approveRequest</span>(<span class="pl-c1">3000</span>); <span class="pl-c">// 输出：Director approved the request</span>
+    }
+}</pre></div>
+<p><strong>(4) 类图：</strong><br>
+![export (12)]<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/6ddcaecc730afb58936a80ddc7252c0974da5ab3349b1a141b111c0f07526429/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f6578706f7274283132292e737667"><img src="https://camo.githubusercontent.com/6ddcaecc730afb58936a80ddc7252c0974da5ab3349b1a141b111c0f07526429/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f6578706f7274283132292e737667" data-canonical-src="https://blog.das-sein.top/export(12).svg" style="max-width: 100%;"></a></p>
+<pre class="notranslate"><code class="notranslate">classDiagram
+    class Approver {
+        &lt;&lt;abstract&gt;&gt;
+        -nextApprover : Approver
+        +setNextApprover(nextApprover : Approver) : void
+        +approveRequest(amount : int) : void
+        &lt;&lt;description&gt;&gt; "抽象处理者类，定义了设置下一个处理者的方法以及审批请求的抽象方法，是具体处理者类的抽象基类。"
+    }
+
+    class Manager {
+        +approveRequest(amount : int) : void
+        &lt;&lt;description&gt;&gt; "具体处理者类，继承自Approver，负责审批金额不超过1000的请求，若金额超过则传递给下一个处理者。"
+    }
+
+    class Director {
+        +approveRequest(amount : int) : void
+        &lt;&lt;description&gt;&gt; "具体处理者类，继承自Approver，负责审批金额不超过5000的请求，若金额超过则传递给下一个处理者。"
+    }
+
+    Main --&gt; Manager : creates
+    Manager --&gt; Director : sets next approver
+    Manager..|&gt; Approver
+    Director..|&gt; Approver
+</code></pre>
+<p><strong>(5) 共性论：</strong><br>
+与<strong>装饰器模式</strong>相比，责任链模式更注重传递请求，而非增强功能；与<strong>观察者模式</strong>相比，责任链模式只有一个最终处理者，而观察者模式会通知所有观察者。</p>
+<p><strong>(6) 利弊论与边界论：</strong></p>
+<ul>
+<li><strong>利：</strong> 动态灵活地组合处理者；符合开闭原则，新增处理者只需扩展类并插入链条。</li>
+<li><strong>弊：</strong> 可能造成链条过长，影响性能；不易排查问题源。</li>
+<li><strong>边界：</strong> 适用于多个对象依次处理请求、且处理逻辑有顺序的场景。</li>
+</ul>
+<h3><strong>建筑者模式 (Builder Pattern)</strong></h3>
+<p><strong>(1) 目的：</strong> 分步构建复杂对象，允许按需灵活配置其组成部分，同时屏蔽细节实现。</p>
+<p><strong>(2) 编码场景：</strong></p>
+<ul>
+<li>需灵活构造对象，且对象包含多个可选或必选属性时。</li>
+<li>例如：创建包含标题、内容、页脚的报告，不同场景需组合不同的属性。</li>
+</ul>
+<p><strong>(3) 代码实现：</strong></p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 产品类</span>
+<span class="pl-k">class</span> <span class="pl-smi">Report</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> <span class="pl-s1">title</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> <span class="pl-s1">content</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> <span class="pl-s1">footer</span>;
+
+    <span class="pl-k">public</span> <span class="pl-smi">Report</span>(<span class="pl-smi">String</span> <span class="pl-s1">title</span>, <span class="pl-smi">String</span> <span class="pl-s1">content</span>, <span class="pl-smi">String</span> <span class="pl-s1">footer</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">title</span> = <span class="pl-s1">title</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">content</span> = <span class="pl-s1">content</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">footer</span> = <span class="pl-s1">footer</span>;
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">toString</span>() {
+        <span class="pl-k">return</span> <span class="pl-s">"Title: "</span> + <span class="pl-s1">title</span> + <span class="pl-s">", Content: "</span> + <span class="pl-s1">content</span> + <span class="pl-s">", Footer: "</span> + <span class="pl-s1">footer</span>;
+    }
+}
+
+<span class="pl-c">// 建造者类</span>
+<span class="pl-k">class</span> <span class="pl-smi">ReportBuilder</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> <span class="pl-s1">title</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> <span class="pl-s1">content</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> <span class="pl-s1">footer</span>;
+
+    <span class="pl-k">public</span> <span class="pl-smi">ReportBuilder</span> <span class="pl-en">setTitle</span>(<span class="pl-smi">String</span> <span class="pl-s1">title</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">title</span> = <span class="pl-s1">title</span>;
+        <span class="pl-k">return</span> <span class="pl-smi">this</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">ReportBuilder</span> <span class="pl-en">setContent</span>(<span class="pl-smi">String</span> <span class="pl-s1">content</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">content</span> = <span class="pl-s1">content</span>;
+        <span class="pl-k">return</span> <span class="pl-smi">this</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">ReportBuilder</span> <span class="pl-en">setFooter</span>(<span class="pl-smi">String</span> <span class="pl-s1">footer</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">footer</span> = <span class="pl-s1">footer</span>;
+        <span class="pl-k">return</span> <span class="pl-smi">this</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">Report</span> <span class="pl-en">build</span>() {
+        <span class="pl-k">return</span> <span class="pl-k">new</span> <span class="pl-smi">Report</span>(<span class="pl-s1">title</span>, <span class="pl-s1">content</span>, <span class="pl-s1">footer</span>);
+    }
+}
+
+<span class="pl-c">// 调用代码</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">Report</span> <span class="pl-s1">report</span> = <span class="pl-k">new</span> <span class="pl-smi">ReportBuilder</span>()
+                            .<span class="pl-en">setTitle</span>(<span class="pl-s">"Annual Report"</span>)
+                            .<span class="pl-en">setContent</span>(<span class="pl-s">"Financial Overview"</span>)
+                            .<span class="pl-en">setFooter</span>(<span class="pl-s">"Confidential"</span>)
+                            .<span class="pl-en">build</span>();
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">report</span>); <span class="pl-c">// 输出完整的报告内容</span>
+    }
+}</pre></div>
+<p><strong>(4) 类图：</strong><br>
+略</p>
+<p><strong>(5) 共性论：</strong><br>
+与<strong>工厂模式</strong>相比，建筑者模式更适合复杂对象；与<strong>原型模式</strong>结合可用于复制并修改已有对象。</p>
+<p><strong>(6) 利弊论与边界论：</strong></p>
+<ul>
+<li><strong>利：</strong> 清晰分步构建，易于阅读与扩展；避免重载构造器的复杂性。</li>
+<li><strong>弊：</strong> 对简单对象略显繁琐；需要额外的建造者类。</li>
+<li><strong>边界：</strong> 适用于复杂对象构建、配置多且灵活变化的场景。</li>
+</ul>
+<h3><strong>享元模式 (Flyweight Pattern)</strong></h3>
+<p><strong>(1) 目的：</strong> 通过共享技术减少大量相似对象的内存占用，优化性能。</p>
+<p><strong>(2) 编码场景：</strong></p>
+<ul>
+<li>对象数量庞大、但大部分状态重复时，通过共享重复部分减少内存。</li>
+<li>例如：绘图程序中绘制重复的树对象，每棵树共享其外观属性（如颜色、形状）。</li>
+</ul>
+<p><strong>(3) 代码实现：</strong></p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 享元对象</span>
+<span class="pl-k">class</span> <span class="pl-smi">TreeType</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> <span class="pl-s1">color</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> <span class="pl-s1">shape</span>;
+
+    <span class="pl-k">public</span> <span class="pl-smi">TreeType</span>(<span class="pl-smi">String</span> <span class="pl-s1">color</span>, <span class="pl-smi">String</span> <span class="pl-s1">shape</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">color</span> = <span class="pl-s1">color</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">shape</span> = <span class="pl-s1">shape</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">draw</span>(<span class="pl-smi">int</span> <span class="pl-s1">x</span>, <span class="pl-smi">int</span> <span class="pl-s1">y</span>) {
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Drawing "</span> + <span class="pl-s1">color</span> + <span class="pl-s">" "</span> + <span class="pl-s1">shape</span> + <span class="pl-s">" at ("</span> + <span class="pl-s1">x</span> + <span class="pl-s">","</span> + <span class="pl-s1">y</span> + <span class="pl-s">")"</span>);
+    }
+}
+
+<span class="pl-c">// 享元工厂</span>
+<span class="pl-k">class</span> <span class="pl-smi">TreeFactory</span> {
+    <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Map</span>&lt;<span class="pl-smi">String</span>, <span class="pl-smi">TreeType</span>&gt; <span class="pl-s1">treeTypes</span> = <span class="pl-k">new</span> <span class="pl-smi">HashMap</span>&lt;&gt;();
+
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">TreeType</span> <span class="pl-en">getTreeType</span>(<span class="pl-smi">String</span> <span class="pl-s1">color</span>, <span class="pl-smi">String</span> <span class="pl-s1">shape</span>) {
+        <span class="pl-smi">String</span> <span class="pl-s1">key</span> = <span class="pl-s1">color</span> + <span class="pl-s">"-"</span> + <span class="pl-s1">shape</span>;
+        <span class="pl-k">if</span> (!<span class="pl-s1">treeTypes</span>.<span class="pl-en">containsKey</span>(<span class="pl-s1">key</span>)) {
+            <span class="pl-s1">treeTypes</span>.<span class="pl-en">put</span>(<span class="pl-s1">key</span>, <span class="pl-k">new</span> <span class="pl-smi">TreeType</span>(<span class="pl-s1">color</span>, <span class="pl-s1">shape</span>));
+        }
+        <span class="pl-k">return</span> <span class="pl-s1">treeTypes</span>.<span class="pl-en">get</span>(<span class="pl-s1">key</span>);
+    }
+}
+
+<span class="pl-c">// 调用代码</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">TreeType</span> <span class="pl-s1">tree1</span> = <span class="pl-smi">TreeFactory</span>.<span class="pl-en">getTreeType</span>(<span class="pl-s">"Green"</span>, <span class="pl-s">"Oak"</span>);
+        <span class="pl-s1">tree1</span>.<span class="pl-en">draw</span>(<span class="pl-c1">10</span>, <span class="pl-c1">20</span>);
+
+        <span class="pl-smi">TreeType</span> <span class="pl-s1">tree2</span> = <span class="pl-smi">TreeFactory</span>.<span class="pl-en">getTreeType</span>(<span class="pl-s">"Green"</span>, <span class="pl-s">"Oak"</span>);
+        <span class="pl-s1">tree2</span>.<span class="pl-en">draw</span>(<span class="pl-c1">30</span>, <span class="pl-c1">40</span>);
+    }
+}</pre></div>
+<p><strong>(4) 类图：</strong></p>
+<p>![export (13)]<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/41c0e8e8202297c4464a20611d4fb065acc469d3813a837320e41e5288ec06aa/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f6578706f7274283133292e737667"><img src="https://camo.githubusercontent.com/41c0e8e8202297c4464a20611d4fb065acc469d3813a837320e41e5288ec06aa/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f6578706f7274283133292e737667" data-canonical-src="https://blog.das-sein.top/export(13).svg" style="max-width: 100%;"></a></p>
+<pre class="notranslate"><code class="notranslate">classDiagram
+    class TreeType {
+        -color : String
+        -shape : String
+        +TreeType(color : String, shape : String)
+        +draw(x : int, y : int) : void
+        &lt;&lt;description&gt;&gt; "享元对象类，代表树的类型，包含颜色和形状属性，通过draw方法可在指定坐标绘制该类型的树。"
+    }
+
+    class TreeFactory {
+        -treeTypes : Map&lt;String, TreeType&gt;
+        +getTreeType(color : String, shape : String) : TreeType
+        &lt;&lt;description&gt;&gt; "享元工厂类，用于创建和管理享元对象（TreeType），通过维护一个Map来存储已创建的TreeType对象，根据传入的颜色和形状获取或创建对应的TreeType对象。"
+    }
+
+    Main --&gt; TreeFactory : calls getTreeType
+    TreeFactory --&gt; TreeType : creates or retrieves
+</code></pre>
+<p><strong>(5) 共性论：</strong><br>
+与<strong>单例模式</strong>相比，享元模式允许多个共享对象；与<strong>代理模式</strong>结合时，可延迟共享对象的创建。</p>
+<p><strong>(6) 利弊论与边界论：</strong></p>
+<ul>
+<li><strong>利：</strong> 大幅减少内存占用；共享对象可统一管理。</li>
+<li><strong>弊：</strong> 共享对象状态难以扩展；非共享部分仍需独立管理。</li>
+<li><strong>边界：</strong> 适用于状态多重复、对象数极大的场景。</li>
+</ul>
+<h3><strong>观察者模式 (Observer Pattern)</strong></h3>
+<p><strong>(1) 目的：</strong> 定义对象间一种一对多的依赖关系，当一个对象状态发生改变时，其所有依赖者都会收到通知并自动更新。</p>
+<p><strong>(2) 编码场景：</strong></p>
+<ul>
+<li>系统中对象之间存在触发关系，需确保相关对象能自动响应变化。</li>
+<li>例如：新闻发布系统中，发布新闻后，订阅者会自动接收更新。</li>
+</ul>
+<p><strong>(3) 代码实现：</strong></p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 观察者接口</span>
+<span class="pl-k">interface</span> <span class="pl-smi">Observer</span> {
+    <span class="pl-smi">void</span> <span class="pl-en">update</span>(<span class="pl-smi">String</span> <span class="pl-s1">message</span>);
+}
+
+<span class="pl-c">// 具体观察者</span>
+<span class="pl-k">class</span> <span class="pl-smi">Subscriber</span> <span class="pl-k">implements</span> <span class="pl-smi">Observer</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> <span class="pl-s1">name</span>;
+
+    <span class="pl-k">public</span> <span class="pl-smi">Subscriber</span>(<span class="pl-smi">String</span> <span class="pl-s1">name</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">name</span> = <span class="pl-s1">name</span>;
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">update</span>(<span class="pl-smi">String</span> <span class="pl-s1">message</span>) {
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">name</span> + <span class="pl-s">" received update: "</span> + <span class="pl-s1">message</span>);
+    }
+}
+
+<span class="pl-c">// 被观察者接口</span>
+<span class="pl-k">interface</span> <span class="pl-smi">Subject</span> {
+    <span class="pl-smi">void</span> <span class="pl-en">addObserver</span>(<span class="pl-smi">Observer</span> <span class="pl-s1">o</span>);
+    <span class="pl-smi">void</span> <span class="pl-en">removeObserver</span>(<span class="pl-smi">Observer</span> <span class="pl-s1">o</span>);
+    <span class="pl-smi">void</span> <span class="pl-en">notifyObservers</span>(<span class="pl-smi">String</span> <span class="pl-s1">message</span>);
+}
+
+<span class="pl-c">// 具体被观察者</span>
+<span class="pl-k">class</span> <span class="pl-smi">NewsPublisher</span> <span class="pl-k">implements</span> <span class="pl-smi">Subject</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">List</span>&lt;<span class="pl-smi">Observer</span>&gt; <span class="pl-s1">observers</span> = <span class="pl-k">new</span> <span class="pl-smi">ArrayList</span>&lt;&gt;();
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">addObserver</span>(<span class="pl-smi">Observer</span> <span class="pl-s1">o</span>) {
+        <span class="pl-s1">observers</span>.<span class="pl-en">add</span>(<span class="pl-s1">o</span>);
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">removeObserver</span>(<span class="pl-smi">Observer</span> <span class="pl-s1">o</span>) {
+        <span class="pl-s1">observers</span>.<span class="pl-en">remove</span>(<span class="pl-s1">o</span>);
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">notifyObservers</span>(<span class="pl-smi">String</span> <span class="pl-s1">message</span>) {
+        <span class="pl-k">for</span> (<span class="pl-smi">Observer</span> <span class="pl-s1">observer</span> : <span class="pl-s1">observers</span>) {
+            <span class="pl-s1">observer</span>.<span class="pl-en">update</span>(<span class="pl-s1">message</span>);
+        }
+    }
+}
+
+<span class="pl-c">// 调用代码</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">NewsPublisher</span> <span class="pl-s1">publisher</span> = <span class="pl-k">new</span> <span class="pl-smi">NewsPublisher</span>();
+
+        <span class="pl-smi">Observer</span> <span class="pl-s1">subscriber1</span> = <span class="pl-k">new</span> <span class="pl-smi">Subscriber</span>(<span class="pl-s">"Alice"</span>);
+        <span class="pl-smi">Observer</span> <span class="pl-s1">subscriber2</span> = <span class="pl-k">new</span> <span class="pl-smi">Subscriber</span>(<span class="pl-s">"Bob"</span>);
+
+        <span class="pl-s1">publisher</span>.<span class="pl-en">addObserver</span>(<span class="pl-s1">subscriber1</span>);
+        <span class="pl-s1">publisher</span>.<span class="pl-en">addObserver</span>(<span class="pl-s1">subscriber2</span>);
+
+        <span class="pl-s1">publisher</span>.<span class="pl-en">notifyObservers</span>(<span class="pl-s">"Breaking news: Observer Pattern in action!"</span>);
+    }
+}</pre></div>
+<p><strong>(4) 类图：</strong></p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/16ae84e3d2d1b37d3102cbbb94b9696098b1ca89c0146a2c6952fa919724dce1/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f6578706f727420283134292e737667"><img src="https://camo.githubusercontent.com/16ae84e3d2d1b37d3102cbbb94b9696098b1ca89c0146a2c6952fa919724dce1/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f6578706f727420283134292e737667" data-canonical-src="https://blog.das-sein.top/export (14).svg" style="max-width: 100%;"></a></p>
+<pre class="notranslate"><code class="notranslate">classDiagram
+    class Observer {
+        &lt;&lt;interface&gt;&gt;
+        +update(message : String) : void
+        &lt;&lt;description&gt;&gt; "观察者接口，定义了更新方法，当被观察者状态改变并通知时，具体观察者通过此方法接收并处理更新信息。"
+    }
+
+    class Subscriber {
+        -name : String
+        +Subscriber(name : String)
+        +update(message : String) : void
+        &lt;&lt;description&gt;&gt; "具体观察者类，实现了Observer接口，持有观察者的名称属性，在update方法中根据接收到的消息输出相应的提示信息，表明该观察者已收到更新。"
+    }
+
+    class Subject {
+        &lt;&lt;interface&gt;&gt;
+        +addObserver(o : Observer) : void
+        +removeObserver(o : Observer) : void
+        +notifyObservers(message : String) : void
+        &lt;&lt;description&gt;&gt; "被观察者接口，定义了添加、删除观察者以及通知所有观察者的方法，用于管理观察者列表并在状态变化时通知观察者。"
+    }
+
+    class NewsPublisher {
+        -observers : List&lt;Observer&gt;
+        +addObserver(o : Observer) : void
+        +removeObserver(o : Observer) : void
+        +notifyObservers(message : String) : void
+        &lt;&lt;description&gt;&gt; "具体被观察者类，实现了Subject接口，内部维护一个观察者列表，通过实现接口中的方法来管理观察者，并在通知观察者时遍历列表调用每个观察者的update方法。"
+    }
+
+    Main --&gt; NewsPublisher : creates and calls
+    NewsPublisher --&gt; Observer : manages
+    Subscriber..|&gt; Observer
+    NewsPublisher..|&gt; Subject
+</code></pre>
+<p><strong>(5) 共性论：</strong></p>
+<ul>
+<li>与<strong>责任链模式</strong>相比，观察者模式会通知所有订阅者，而责任链模式只有一个最终处理者。</li>
+<li>与<strong>发布-订阅模式</strong>相比，观察者模式更简单，直接依赖于对象间关系；发布-订阅模式常依赖消息队列实现。</li>
+</ul>
+<p><strong>(6) 利弊论与边界论：</strong></p>
+<ul>
+<li><strong>利：</strong> 解耦观察者与被观察者；支持动态增加观察者。</li>
+<li><strong>弊：</strong> 当观察者过多时，通知可能耗费时间；观察者更新逻辑可能影响性能。</li>
+<li><strong>边界：</strong> 适用于一对多依赖关系，且对象间需解耦的场景。</li>
+</ul>
+<h3><strong>多例模式 (Multiton Pattern)</strong></h3>
+<p><strong>(1) 目的：</strong> 确保一个类仅有有限数量的实例，且这些实例能被系统全局共享和访问。</p>
+<p><strong>(2) 编码场景：</strong></p>
+<ul>
+<li>当需要在系统中限制类实例的数量，并能通过标识符访问这些实例时。</li>
+<li>例如：数据库连接池中，每个数据库对应一个连接实例。</li>
+</ul>
+<p><strong>(3) 代码实现：</strong></p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 多例模式实现</span>
+<span class="pl-k">class</span> <span class="pl-smi">DatabaseConnection</span> {
+    <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Map</span>&lt;<span class="pl-smi">String</span>, <span class="pl-smi">DatabaseConnection</span>&gt; <span class="pl-s1">instances</span> = <span class="pl-k">new</span> <span class="pl-smi">HashMap</span>&lt;&gt;();
+    <span class="pl-k">private</span> <span class="pl-smi">String</span> <span class="pl-s1">dbName</span>;
+
+    <span class="pl-k">private</span> <span class="pl-smi">DatabaseConnection</span>(<span class="pl-smi">String</span> <span class="pl-s1">dbName</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">dbName</span> = <span class="pl-s1">dbName</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">synchronized</span> <span class="pl-smi">DatabaseConnection</span> <span class="pl-en">getInstance</span>(<span class="pl-smi">String</span> <span class="pl-s1">dbName</span>) {
+        <span class="pl-k">if</span> (!<span class="pl-s1">instances</span>.<span class="pl-en">containsKey</span>(<span class="pl-s1">dbName</span>)) {
+            <span class="pl-s1">instances</span>.<span class="pl-en">put</span>(<span class="pl-s1">dbName</span>, <span class="pl-k">new</span> <span class="pl-smi">DatabaseConnection</span>(<span class="pl-s1">dbName</span>));
+        }
+        <span class="pl-k">return</span> <span class="pl-s1">instances</span>.<span class="pl-en">get</span>(<span class="pl-s1">dbName</span>);
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">getDbName</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">dbName</span>;
+    }
+}
+
+<span class="pl-c">// 调用代码</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-smi">DatabaseConnection</span> <span class="pl-s1">db1</span> = <span class="pl-smi">DatabaseConnection</span>.<span class="pl-en">getInstance</span>(<span class="pl-s">"db1"</span>);
+        <span class="pl-smi">DatabaseConnection</span> <span class="pl-s1">db2</span> = <span class="pl-smi">DatabaseConnection</span>.<span class="pl-en">getInstance</span>(<span class="pl-s">"db2"</span>);
+        <span class="pl-smi">DatabaseConnection</span> <span class="pl-s1">db1Again</span> = <span class="pl-smi">DatabaseConnection</span>.<span class="pl-en">getInstance</span>(<span class="pl-s">"db1"</span>);
+
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">db1</span>.<span class="pl-en">getDbName</span>()); <span class="pl-c">// 输出：db1</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">db1</span> == <span class="pl-s1">db1Again</span>); <span class="pl-c">// 输出：true</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s1">db1</span> == <span class="pl-s1">db2</span>); <span class="pl-c">// 输出：false</span>
+    }
+}</pre></div>
+<p><strong>(4) 类图：</strong><br>
+如数据库连接池，<code class="notranslate">getInstance</code> 方法通过标识符确保每个数据库实例唯一，同时实现共享访问。</p>
+<p><strong>(5) 共性论：</strong></p>
+<ul>
+<li>与<strong>单例模式</strong>相比，多例模式支持多个实例，每个实例与一个特定标识符绑定。</li>
+<li>与<strong>享元模式</strong>相比，多例模式更注重通过标识符管理有限实例，而享元模式更关注内存优化和共享状态。</li>
+</ul>
+<p><strong>(6) 利弊论与边界论：</strong></p>
+<ul>
+<li><strong>利：</strong> 控制实例数量；支持实例全局访问。</li>
+<li><strong>弊：</strong> 需要管理实例的生命周期；可能导致系统复杂性增加。</li>
+<li><strong>边界：</strong> 适用于实例有限且需共享访问的场景，如资源池管理。</li>
+</ul>
+<h2>第三篇：最佳实践</h2>
+<h3>一、不同的类型的消息</h3>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">abstract</span> <span class="pl-k">class</span> <span class="pl-smi">AbstractMsgHandler</span>&lt;<span class="pl-smi">Req</span>&gt; {
+    <span class="pl-c1">@</span><span class="pl-c1">Autowired</span>
+    <span class="pl-k">private</span> <span class="pl-smi">MessageDao</span> <span class="pl-s1">messageDao</span>;
+    <span class="pl-k">private</span> <span class="pl-smi">Class</span>&lt;<span class="pl-smi">Req</span>&gt; <span class="pl-s1">bodyClass</span>;
+
+    <span class="pl-c1">@</span><span class="pl-c1">PostConstruct</span>
+    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-en">init</span>() {
+        <span class="pl-smi">ParameterizedType</span> <span class="pl-s1">genericSuperclass</span> = (<span class="pl-smi">ParameterizedType</span>) <span class="pl-smi">this</span>.<span class="pl-en">getClass</span>().<span class="pl-en">getGenericSuperclass</span>();
+        <span class="pl-smi">this</span>.<span class="pl-s1">bodyClass</span> = (<span class="pl-smi">Class</span>&lt;<span class="pl-smi">Req</span>&gt;) <span class="pl-s1">genericSuperclass</span>.<span class="pl-en">getActualTypeArguments</span>()[<span class="pl-c1">0</span>];
+        <span class="pl-smi">MsgHandlerFactory</span>.<span class="pl-en">register</span>(<span class="pl-en">getMsgTypeEnum</span>().<span class="pl-en">getType</span>(), <span class="pl-smi">this</span>);
+    }
+
+    <span class="pl-c">/**</span>
+<span class="pl-c">     * 消息类型</span>
+<span class="pl-c">     */</span>
+    <span class="pl-k">abstract</span> <span class="pl-smi">MessageTypeEnum</span> <span class="pl-en">getMsgTypeEnum</span>();
+
+    <span class="pl-k">protected</span> <span class="pl-smi">void</span> <span class="pl-en">checkMsg</span>(<span class="pl-smi">Req</span> <span class="pl-s1">body</span>, <span class="pl-smi">Long</span> <span class="pl-s1">roomId</span>, <span class="pl-smi">Long</span> <span class="pl-s1">uid</span>) {
+
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Transactional</span>
+    <span class="pl-k">public</span> <span class="pl-smi">Long</span> <span class="pl-en">checkAndSaveMsg</span>(<span class="pl-smi">ChatMessageReq</span> <span class="pl-s1">request</span>, <span class="pl-smi">Long</span> <span class="pl-s1">uid</span>) {
+        <span class="pl-smi">Req</span> <span class="pl-s1">body</span> = <span class="pl-smi">this</span>.<span class="pl-en">toBean</span>(<span class="pl-s1">request</span>.<span class="pl-en">getBody</span>());
+        <span class="pl-c">//统一校验</span>
+        <span class="pl-smi">AssertUtil</span>.<span class="pl-en">allCheckValidateThrow</span>(<span class="pl-s1">body</span>);
+        <span class="pl-c">//子类扩展校验</span>
+        <span class="pl-en">checkMsg</span>(<span class="pl-s1">body</span>, <span class="pl-s1">request</span>.<span class="pl-en">getRoomId</span>(), <span class="pl-s1">uid</span>);
+        <span class="pl-smi">Message</span> <span class="pl-s1">insert</span> = <span class="pl-smi">MessageAdapter</span>.<span class="pl-en">buildMsgSave</span>(<span class="pl-s1">request</span>, <span class="pl-s1">uid</span>);
+        <span class="pl-c">//统一保存</span>
+        <span class="pl-s1">messageDao</span>.<span class="pl-en">save</span>(<span class="pl-s1">insert</span>);
+        <span class="pl-c">//子类扩展保存</span>
+        <span class="pl-en">saveMsg</span>(<span class="pl-s1">insert</span>, <span class="pl-s1">body</span>);
+        <span class="pl-k">return</span> <span class="pl-s1">insert</span>.<span class="pl-en">getId</span>();
+    }
+
+    <span class="pl-k">private</span> <span class="pl-smi">Req</span> <span class="pl-en">toBean</span>(<span class="pl-smi">Object</span> <span class="pl-s1">body</span>) {
+        <span class="pl-k">if</span> (<span class="pl-s1">bodyClass</span>.<span class="pl-en">isAssignableFrom</span>(<span class="pl-s1">body</span>.<span class="pl-en">getClass</span>())) {
+            <span class="pl-k">return</span> (<span class="pl-smi">Req</span>) <span class="pl-s1">body</span>;
+        }
+        <span class="pl-k">return</span> <span class="pl-smi">BeanUtil</span>.<span class="pl-en">toBean</span>(<span class="pl-s1">body</span>, <span class="pl-s1">bodyClass</span>);
+    }
+
+    <span class="pl-k">protected</span> <span class="pl-k">abstract</span> <span class="pl-smi">void</span> <span class="pl-en">saveMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">message</span>, <span class="pl-smi">Req</span> <span class="pl-s1">body</span>);
+
+    <span class="pl-c">/**</span>
+<span class="pl-c">     * 展示消息</span>
+<span class="pl-c">     */</span>
+    <span class="pl-k">public</span> <span class="pl-k">abstract</span> <span class="pl-smi">Object</span> <span class="pl-en">showMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">msg</span>);
+
+    <span class="pl-c">/**</span>
+<span class="pl-c">     * 被回复时——展示的消息</span>
+<span class="pl-c">     */</span>
+    <span class="pl-k">public</span> <span class="pl-k">abstract</span> <span class="pl-smi">Object</span> <span class="pl-en">showReplyMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">msg</span>);
+
+    <span class="pl-c">/**</span>
+<span class="pl-c">     * 会话列表——展示的消息</span>
+<span class="pl-c">     */</span>
+    <span class="pl-k">public</span> <span class="pl-k">abstract</span> <span class="pl-smi">String</span> <span class="pl-en">showContactMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">msg</span>);
+
+}
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">MsgHandlerFactory</span> {
+    <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Map</span>&lt;<span class="pl-smi">Integer</span>, <span class="pl-smi">AbstractMsgHandler</span>&gt; <span class="pl-c1">STRATEGY_MAP</span> = <span class="pl-k">new</span> <span class="pl-smi">HashMap</span>&lt;&gt;();
+
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">register</span>(<span class="pl-smi">Integer</span> <span class="pl-s1">code</span>, <span class="pl-smi">AbstractMsgHandler</span> <span class="pl-s1">strategy</span>) {
+        <span class="pl-smi">STRATEGY_MAP</span>.<span class="pl-en">put</span>(<span class="pl-s1">code</span>, <span class="pl-s1">strategy</span>);
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">AbstractMsgHandler</span> <span class="pl-en">getStrategyNoNull</span>(<span class="pl-smi">Integer</span> <span class="pl-s1">code</span>) {
+        <span class="pl-smi">AbstractMsgHandler</span> <span class="pl-s1">strategy</span> = <span class="pl-smi">STRATEGY_MAP</span>.<span class="pl-en">get</span>(<span class="pl-s1">code</span>);
+        <span class="pl-smi">AssertUtil</span>.<span class="pl-en">isNotEmpty</span>(<span class="pl-s1">strategy</span>, <span class="pl-smi">CommonErrorEnum</span>.<span class="pl-c1">PARAM_VALID</span>);
+        <span class="pl-k">return</span> <span class="pl-s1">strategy</span>;
+    }
+}
+<span class="pl-c1">@</span><span class="pl-c1">Component</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">TextMsgHandler</span> <span class="pl-k">extends</span> <span class="pl-smi">AbstractMsgHandler</span>&lt;<span class="pl-smi">TextMsgReq</span>&gt; {
+    <span class="pl-c1">@</span><span class="pl-c1">Autowired</span>
+    <span class="pl-k">private</span> <span class="pl-smi">MessageDao</span> <span class="pl-s1">messageDao</span>;
+    <span class="pl-c1">@</span><span class="pl-c1">Autowired</span>
+    <span class="pl-k">private</span> <span class="pl-smi">MsgCache</span> <span class="pl-s1">msgCache</span>;
+    <span class="pl-c1">@</span><span class="pl-c1">Autowired</span>
+    <span class="pl-k">private</span> <span class="pl-smi">UserCache</span> <span class="pl-s1">userCache</span>;
+    <span class="pl-c1">@</span><span class="pl-c1">Autowired</span>
+    <span class="pl-k">private</span> <span class="pl-smi">UserInfoCache</span> <span class="pl-s1">userInfoCache</span>;
+    <span class="pl-c1">@</span><span class="pl-c1">Autowired</span>
+    <span class="pl-k">private</span> <span class="pl-smi">IRoleService</span> <span class="pl-s1">iRoleService</span>;
+    <span class="pl-c1">@</span><span class="pl-c1">Autowired</span>
+    <span class="pl-k">private</span> <span class="pl-smi">SensitiveWordBs</span> <span class="pl-s1">sensitiveWordBs</span>;
+
+    <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">PrioritizedUrlDiscover</span> <span class="pl-c1">URL_TITLE_DISCOVER</span> = <span class="pl-k">new</span> <span class="pl-smi">PrioritizedUrlDiscover</span>();
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-smi">MessageTypeEnum</span> <span class="pl-en">getMsgTypeEnum</span>() {
+        <span class="pl-k">return</span> <span class="pl-smi">MessageTypeEnum</span>.<span class="pl-c1">TEXT</span>;
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">protected</span> <span class="pl-smi">void</span> <span class="pl-en">checkMsg</span>(<span class="pl-smi">TextMsgReq</span> <span class="pl-s1">body</span>, <span class="pl-smi">Long</span> <span class="pl-s1">roomId</span>, <span class="pl-smi">Long</span> <span class="pl-s1">uid</span>) {
+        <span class="pl-c">//校验下回复消息</span>
+        <span class="pl-k">if</span> (<span class="pl-smi">Objects</span>.<span class="pl-en">nonNull</span>(<span class="pl-s1">body</span>.<span class="pl-en">getReplyMsgId</span>())) {
+            <span class="pl-smi">Message</span> <span class="pl-s1">replyMsg</span> = <span class="pl-s1">messageDao</span>.<span class="pl-en">getById</span>(<span class="pl-s1">body</span>.<span class="pl-en">getReplyMsgId</span>());
+            <span class="pl-smi">AssertUtil</span>.<span class="pl-en">isNotEmpty</span>(<span class="pl-s1">replyMsg</span>, <span class="pl-s">"回复消息不存在"</span>);
+            <span class="pl-smi">AssertUtil</span>.<span class="pl-en">equal</span>(<span class="pl-s1">replyMsg</span>.<span class="pl-en">getRoomId</span>(), <span class="pl-s1">roomId</span>, <span class="pl-s">"只能回复相同会话内的消息"</span>);
+        }
+        <span class="pl-k">if</span> (<span class="pl-smi">CollectionUtil</span>.<span class="pl-en">isNotEmpty</span>(<span class="pl-s1">body</span>.<span class="pl-en">getAtUidList</span>())) {
+            <span class="pl-c">//前端传入的@用户列表可能会重复，需要去重</span>
+            <span class="pl-smi">List</span>&lt;<span class="pl-smi">Long</span>&gt; <span class="pl-s1">atUidList</span> = <span class="pl-s1">body</span>.<span class="pl-en">getAtUidList</span>().<span class="pl-en">stream</span>().<span class="pl-en">distinct</span>().<span class="pl-en">collect</span>(<span class="pl-smi">Collectors</span>.<span class="pl-en">toList</span>());
+            <span class="pl-smi">Map</span>&lt;<span class="pl-smi">Long</span>, <span class="pl-smi">User</span>&gt; <span class="pl-s1">batch</span> = <span class="pl-s1">userInfoCache</span>.<span class="pl-en">getBatch</span>(<span class="pl-s1">atUidList</span>);
+            <span class="pl-c">//如果@用户不存在，userInfoCache 返回的map中依然存在该key，但是value为null，需要过滤掉再校验</span>
+            <span class="pl-smi">long</span> <span class="pl-s1">batchCount</span> = <span class="pl-s1">batch</span>.<span class="pl-en">values</span>().<span class="pl-en">stream</span>().<span class="pl-en">filter</span>(<span class="pl-smi">Objects</span>::<span class="pl-s1">nonNull</span>).<span class="pl-en">count</span>();
+            <span class="pl-smi">AssertUtil</span>.<span class="pl-en">equal</span>((<span class="pl-smi">long</span>)<span class="pl-s1">atUidList</span>.<span class="pl-en">size</span>(), <span class="pl-s1">batchCount</span>, <span class="pl-s">"@用户不存在"</span>);
+            <span class="pl-smi">boolean</span> <span class="pl-s1">atAll</span> = <span class="pl-s1">body</span>.<span class="pl-en">getAtUidList</span>().<span class="pl-en">contains</span>(<span class="pl-c1">0L</span>);
+            <span class="pl-k">if</span> (<span class="pl-s1">atAll</span>) {
+                <span class="pl-smi">AssertUtil</span>.<span class="pl-en">isTrue</span>(<span class="pl-s1">iRoleService</span>.<span class="pl-en">hasPower</span>(<span class="pl-s1">uid</span>, <span class="pl-smi">RoleEnum</span>.<span class="pl-c1">CHAT_MANAGER</span>), <span class="pl-s">"没有权限"</span>);
+            }
+        }
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">saveMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">msg</span>, <span class="pl-smi">TextMsgReq</span> <span class="pl-s1">body</span>) {<span class="pl-c">//插入文本内容</span>
+        <span class="pl-smi">MessageExtra</span> <span class="pl-s1">extra</span> = <span class="pl-smi">Optional</span>.<span class="pl-en">ofNullable</span>(<span class="pl-s1">msg</span>.<span class="pl-en">getExtra</span>()).<span class="pl-en">orElse</span>(<span class="pl-k">new</span> <span class="pl-smi">MessageExtra</span>());
+        <span class="pl-smi">Message</span> <span class="pl-s1">update</span> = <span class="pl-k">new</span> <span class="pl-smi">Message</span>();
+        <span class="pl-s1">update</span>.<span class="pl-en">setId</span>(<span class="pl-s1">msg</span>.<span class="pl-en">getId</span>());
+        <span class="pl-s1">update</span>.<span class="pl-en">setContent</span>(<span class="pl-s1">sensitiveWordBs</span>.<span class="pl-en">filter</span>(<span class="pl-s1">body</span>.<span class="pl-en">getContent</span>()));
+        <span class="pl-s1">update</span>.<span class="pl-en">setExtra</span>(<span class="pl-s1">extra</span>);
+        <span class="pl-c">//如果有回复消息</span>
+        <span class="pl-k">if</span> (<span class="pl-smi">Objects</span>.<span class="pl-en">nonNull</span>(<span class="pl-s1">body</span>.<span class="pl-en">getReplyMsgId</span>())) {
+            <span class="pl-smi">Integer</span> <span class="pl-s1">gapCount</span> = <span class="pl-s1">messageDao</span>.<span class="pl-en">getGapCount</span>(<span class="pl-s1">msg</span>.<span class="pl-en">getRoomId</span>(), <span class="pl-s1">body</span>.<span class="pl-en">getReplyMsgId</span>(), <span class="pl-s1">msg</span>.<span class="pl-en">getId</span>());
+            <span class="pl-s1">update</span>.<span class="pl-en">setGapCount</span>(<span class="pl-s1">gapCount</span>);
+            <span class="pl-s1">update</span>.<span class="pl-en">setReplyMsgId</span>(<span class="pl-s1">body</span>.<span class="pl-en">getReplyMsgId</span>());
+
+        }
+        <span class="pl-c">//判断消息url跳转</span>
+        <span class="pl-smi">Map</span>&lt;<span class="pl-smi">String</span>, <span class="pl-smi">UrlInfo</span>&gt; <span class="pl-s1">urlContentMap</span> = <span class="pl-smi">URL_TITLE_DISCOVER</span>.<span class="pl-en">getUrlContentMap</span>(<span class="pl-s1">body</span>.<span class="pl-en">getContent</span>());
+        <span class="pl-s1">extra</span>.<span class="pl-en">setUrlContentMap</span>(<span class="pl-s1">urlContentMap</span>);
+        <span class="pl-c">//艾特功能</span>
+        <span class="pl-k">if</span> (<span class="pl-smi">CollectionUtil</span>.<span class="pl-en">isNotEmpty</span>(<span class="pl-s1">body</span>.<span class="pl-en">getAtUidList</span>())) {
+            <span class="pl-s1">extra</span>.<span class="pl-en">setAtUidList</span>(<span class="pl-s1">body</span>.<span class="pl-en">getAtUidList</span>());
+
+        }
+
+        <span class="pl-s1">messageDao</span>.<span class="pl-en">updateById</span>(<span class="pl-s1">update</span>);
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">Object</span> <span class="pl-en">showMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">msg</span>) {
+        <span class="pl-smi">TextMsgResp</span> <span class="pl-s1">resp</span> = <span class="pl-k">new</span> <span class="pl-smi">TextMsgResp</span>();
+        <span class="pl-s1">resp</span>.<span class="pl-en">setContent</span>(<span class="pl-s1">msg</span>.<span class="pl-en">getContent</span>());
+        <span class="pl-s1">resp</span>.<span class="pl-en">setUrlContentMap</span>(<span class="pl-smi">Optional</span>.<span class="pl-en">ofNullable</span>(<span class="pl-s1">msg</span>.<span class="pl-en">getExtra</span>()).<span class="pl-en">map</span>(<span class="pl-smi">MessageExtra</span>::<span class="pl-s1">getUrlContentMap</span>).<span class="pl-en">orElse</span>(<span class="pl-c1">null</span>));
+        <span class="pl-s1">resp</span>.<span class="pl-en">setAtUidList</span>(<span class="pl-smi">Optional</span>.<span class="pl-en">ofNullable</span>(<span class="pl-s1">msg</span>.<span class="pl-en">getExtra</span>()).<span class="pl-en">map</span>(<span class="pl-smi">MessageExtra</span>::<span class="pl-s1">getAtUidList</span>).<span class="pl-en">orElse</span>(<span class="pl-c1">null</span>));
+        <span class="pl-c">//回复消息</span>
+        <span class="pl-smi">Optional</span>&lt;<span class="pl-smi">Message</span>&gt; <span class="pl-s1">reply</span> = <span class="pl-smi">Optional</span>.<span class="pl-en">ofNullable</span>(<span class="pl-s1">msg</span>.<span class="pl-en">getReplyMsgId</span>())
+                .<span class="pl-en">map</span>(<span class="pl-s1">msgCache</span>::<span class="pl-s1">getMsg</span>)
+                .<span class="pl-en">filter</span>(<span class="pl-s1">a</span> -&gt; <span class="pl-smi">Objects</span>.<span class="pl-en">equals</span>(<span class="pl-s1">a</span>.<span class="pl-en">getStatus</span>(), <span class="pl-smi">MessageStatusEnum</span>.<span class="pl-c1">NORMAL</span>.<span class="pl-en">getStatus</span>()));
+        <span class="pl-k">if</span> (<span class="pl-s1">reply</span>.<span class="pl-en">isPresent</span>()) {
+            <span class="pl-smi">Message</span> <span class="pl-s1">replyMessage</span> = <span class="pl-s1">reply</span>.<span class="pl-en">get</span>();
+            <span class="pl-smi">TextMsgResp</span>.<span class="pl-smi">ReplyMsg</span> <span class="pl-s1">replyMsgVO</span> = <span class="pl-k">new</span> <span class="pl-smi">TextMsgResp</span>.<span class="pl-smi">ReplyMsg</span>();
+            <span class="pl-s1">replyMsgVO</span>.<span class="pl-en">setId</span>(<span class="pl-s1">replyMessage</span>.<span class="pl-en">getId</span>());
+            <span class="pl-s1">replyMsgVO</span>.<span class="pl-en">setUid</span>(<span class="pl-s1">replyMessage</span>.<span class="pl-en">getFromUid</span>());
+            <span class="pl-s1">replyMsgVO</span>.<span class="pl-en">setType</span>(<span class="pl-s1">replyMessage</span>.<span class="pl-en">getType</span>());
+            <span class="pl-s1">replyMsgVO</span>.<span class="pl-en">setBody</span>(<span class="pl-smi">MsgHandlerFactory</span>.<span class="pl-en">getStrategyNoNull</span>(<span class="pl-s1">replyMessage</span>.<span class="pl-en">getType</span>()).<span class="pl-en">showReplyMsg</span>(<span class="pl-s1">replyMessage</span>));
+            <span class="pl-smi">User</span> <span class="pl-s1">replyUser</span> = <span class="pl-s1">userCache</span>.<span class="pl-en">getUserInfo</span>(<span class="pl-s1">replyMessage</span>.<span class="pl-en">getFromUid</span>());
+            <span class="pl-s1">replyMsgVO</span>.<span class="pl-en">setUsername</span>(<span class="pl-s1">replyUser</span>.<span class="pl-en">getName</span>());
+            <span class="pl-s1">replyMsgVO</span>.<span class="pl-en">setCanCallback</span>(<span class="pl-smi">YesOrNoEnum</span>.<span class="pl-en">toStatus</span>(<span class="pl-smi">Objects</span>.<span class="pl-en">nonNull</span>(<span class="pl-s1">msg</span>.<span class="pl-en">getGapCount</span>()) &amp;&amp; <span class="pl-s1">msg</span>.<span class="pl-en">getGapCount</span>() &lt;= <span class="pl-smi">MessageAdapter</span>.<span class="pl-c1">CAN_CALLBACK_GAP_COUNT</span>));
+            <span class="pl-s1">replyMsgVO</span>.<span class="pl-en">setGapCount</span>(<span class="pl-s1">msg</span>.<span class="pl-en">getGapCount</span>());
+            <span class="pl-s1">resp</span>.<span class="pl-en">setReply</span>(<span class="pl-s1">replyMsgVO</span>);
+        }
+        <span class="pl-k">return</span> <span class="pl-s1">resp</span>;
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">Object</span> <span class="pl-en">showReplyMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">msg</span>) {
+        <span class="pl-k">return</span> <span class="pl-s1">msg</span>.<span class="pl-en">getContent</span>();
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">showContactMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">msg</span>) {
+        <span class="pl-k">return</span> <span class="pl-s1">msg</span>.<span class="pl-en">getContent</span>();
+    }
+}
+
+<span class="pl-c1">@</span><span class="pl-c1">Component</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">VideoMsgHandler</span> <span class="pl-k">extends</span> <span class="pl-smi">AbstractMsgHandler</span>&lt;<span class="pl-smi">VideoMsgDTO</span>&gt; {
+    <span class="pl-c1">@</span><span class="pl-c1">Autowired</span>
+    <span class="pl-k">private</span> <span class="pl-smi">MessageDao</span> <span class="pl-s1">messageDao</span>;
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-smi">MessageTypeEnum</span> <span class="pl-en">getMsgTypeEnum</span>() {
+        <span class="pl-k">return</span> <span class="pl-smi">MessageTypeEnum</span>.<span class="pl-c1">VIDEO</span>;
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">saveMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">msg</span>, <span class="pl-smi">VideoMsgDTO</span> <span class="pl-s1">body</span>) {
+        <span class="pl-smi">MessageExtra</span> <span class="pl-s1">extra</span> = <span class="pl-smi">Optional</span>.<span class="pl-en">ofNullable</span>(<span class="pl-s1">msg</span>.<span class="pl-en">getExtra</span>()).<span class="pl-en">orElse</span>(<span class="pl-k">new</span> <span class="pl-smi">MessageExtra</span>());
+        <span class="pl-smi">Message</span> <span class="pl-s1">update</span> = <span class="pl-k">new</span> <span class="pl-smi">Message</span>();
+        <span class="pl-s1">update</span>.<span class="pl-en">setId</span>(<span class="pl-s1">msg</span>.<span class="pl-en">getId</span>());
+        <span class="pl-s1">update</span>.<span class="pl-en">setExtra</span>(<span class="pl-s1">extra</span>);
+        <span class="pl-s1">extra</span>.<span class="pl-en">setVideoMsgDTO</span>(<span class="pl-s1">body</span>);
+        <span class="pl-s1">messageDao</span>.<span class="pl-en">updateById</span>(<span class="pl-s1">update</span>);
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">Object</span> <span class="pl-en">showMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">msg</span>) {
+        <span class="pl-k">return</span> <span class="pl-s1">msg</span>.<span class="pl-en">getExtra</span>().<span class="pl-en">getVideoMsgDTO</span>();
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">Object</span> <span class="pl-en">showReplyMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">msg</span>) {
+        <span class="pl-k">return</span> <span class="pl-s">"视频"</span>;
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">showContactMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">msg</span>) {
+        <span class="pl-k">return</span> <span class="pl-s">"[视频]"</span>;
+    }
+}
+
+<span class="pl-c1">@</span><span class="pl-c1">Component</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">ImgMsgHandler</span> <span class="pl-k">extends</span> <span class="pl-smi">AbstractMsgHandler</span>&lt;<span class="pl-smi">ImgMsgDTO</span>&gt; {
+    <span class="pl-c1">@</span><span class="pl-c1">Autowired</span>
+    <span class="pl-k">private</span> <span class="pl-smi">MessageDao</span> <span class="pl-s1">messageDao</span>;
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-smi">MessageTypeEnum</span> <span class="pl-en">getMsgTypeEnum</span>() {
+        <span class="pl-k">return</span> <span class="pl-smi">MessageTypeEnum</span>.<span class="pl-c1">IMG</span>;
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">saveMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">msg</span>, <span class="pl-smi">ImgMsgDTO</span> <span class="pl-s1">body</span>) {
+        <span class="pl-smi">MessageExtra</span> <span class="pl-s1">extra</span> = <span class="pl-smi">Optional</span>.<span class="pl-en">ofNullable</span>(<span class="pl-s1">msg</span>.<span class="pl-en">getExtra</span>()).<span class="pl-en">orElse</span>(<span class="pl-k">new</span> <span class="pl-smi">MessageExtra</span>());
+        <span class="pl-smi">Message</span> <span class="pl-s1">update</span> = <span class="pl-k">new</span> <span class="pl-smi">Message</span>();
+        <span class="pl-s1">update</span>.<span class="pl-en">setId</span>(<span class="pl-s1">msg</span>.<span class="pl-en">getId</span>());
+        <span class="pl-s1">update</span>.<span class="pl-en">setExtra</span>(<span class="pl-s1">extra</span>);
+        <span class="pl-s1">extra</span>.<span class="pl-en">setImgMsgDTO</span>(<span class="pl-s1">body</span>);
+        <span class="pl-s1">messageDao</span>.<span class="pl-en">updateById</span>(<span class="pl-s1">update</span>);
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">Object</span> <span class="pl-en">showMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">msg</span>) {
+        <span class="pl-k">return</span> <span class="pl-s1">msg</span>.<span class="pl-en">getExtra</span>().<span class="pl-en">getImgMsgDTO</span>();
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">Object</span> <span class="pl-en">showReplyMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">msg</span>) {
+        <span class="pl-k">return</span> <span class="pl-s">"图片"</span>;
+    }
+
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">String</span> <span class="pl-en">showContactMsg</span>(<span class="pl-smi">Message</span> <span class="pl-s1">msg</span>) {
+        <span class="pl-k">return</span> <span class="pl-s">"[图片]"</span>;
+    }
+}</pre></div>
+<p>![export (15)](E:\aInputSources\技术文章export (15).svg"&gt;</p>
+<h4>（一）设计模式分析</h4>
+<p>这段代码主要使用了五种设计模式。主要的设计模式包括：</p>
+<ol>
+<li>模板方法模式：通过 AbstractMsgHandler 定义消息处理的框架</li>
+<li>策略模式：使用不同的消息处理器处理不同类型的消息</li>
+<li>工厂模式：通过 MsgHandlerFactory 管理和创建消息处理器</li>
+<li>泛型模式：使用泛型提供类型安全性</li>
+<li>单例模式：通过 Spring 的依赖注入确保处理器的单例性</li>
+</ol>
+<h5>1. 模板方法模式</h5>
+<p><code class="notranslate">AbstractMsgHandler</code> 抽象类中使用了模板方法模式，它定义了消息处理的骨架流程：</p>
+<ul>
+<li>
+<p>抽象类定义了算法的骨架：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">Long</span> <span class="pl-s1">checkAndSaveMsg</span>(<span class="pl-smi">ChatMessageReq</span> <span class="pl-s1">request</span>, <span class="pl-smi">Long</span> <span class="pl-s1">uid</span>) {
+    <span class="pl-smi">Req</span> <span class="pl-s1">body</span> = <span class="pl-smi">this</span>.<span class="pl-en">toBean</span>(<span class="pl-s1">request</span>.<span class="pl-en">getBody</span>());
+    <span class="pl-smi">AssertUtil</span>.<span class="pl-en">allCheckValidateThrow</span>(<span class="pl-s1">body</span>);
+    <span class="pl-en">checkMsg</span>(<span class="pl-s1">body</span>, <span class="pl-s1">request</span>.<span class="pl-en">getRoomId</span>(), <span class="pl-s1">uid</span>);
+    <span class="pl-smi">Message</span> <span class="pl-s1">insert</span> = <span class="pl-smi">MessageAdapter</span>.<span class="pl-en">buildMsgSave</span>(<span class="pl-s1">request</span>, <span class="pl-s1">uid</span>);
+    <span class="pl-s1">messageDao</span>.<span class="pl-en">save</span>(<span class="pl-s1">insert</span>);
+    <span class="pl-en">saveMsg</span>(<span class="pl-s1">insert</span>, <span class="pl-s1">body</span>);
+    <span class="pl-k">return</span> <span class="pl-s1">insert</span>.<span class="pl-en">getId</span>();
+}</pre></div>
+</li>
+<li>
+<p>子类必须实现的抽象方法：</p>
+<ul>
+<li><code class="notranslate">abstract MessageTypeEnum getMsgTypeEnum()</code></li>
+<li><code class="notranslate">protected abstract void saveMsg(Message message, Req body)</code></li>
+<li><code class="notranslate">public abstract Object showMsg(Message msg)</code></li>
+<li><code class="notranslate">public abstract Object showReplyMsg(Message msg)</code></li>
+<li><code class="notranslate">public abstract String showContactMsg(Message msg)</code></li>
+</ul>
+</li>
+</ul>
+<h5>2. 策略模式</h5>
+<p>通过 <code class="notranslate">MsgHandlerFactory</code> 和不同的消息处理器实现了策略模式：</p>
+<ul>
+<li>
+<p><code class="notranslate">TextMsgHandler</code>、<code class="notranslate">VideoMsgHandler</code>、<code class="notranslate">ImgMsgHandler</code> 都是具体的策略实现</p>
+</li>
+<li>
+<p><code class="notranslate">MsgHandlerFactory</code> 用于管理和选择具体的策略：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">AbstractMsgHandler</span> <span class="pl-s1">getStrategyNoNull</span>(<span class="pl-smi">Integer</span> <span class="pl-s1">code</span>) {
+    <span class="pl-smi">AbstractMsgHandler</span> <span class="pl-s1">strategy</span> = <span class="pl-smi">STRATEGY_MAP</span>.<span class="pl-en">get</span>(<span class="pl-s1">code</span>);
+    <span class="pl-smi">AssertUtil</span>.<span class="pl-en">isNotEmpty</span>(<span class="pl-s1">strategy</span>, <span class="pl-smi">CommonErrorEnum</span>.<span class="pl-c1">PARAM_VALID</span>);
+    <span class="pl-k">return</span> <span class="pl-s1">strategy</span>;
+}</pre></div>
+</li>
+</ul>
+<h5>3. 工厂模式</h5>
+<p><code class="notranslate">MsgHandlerFactory</code> 实现了简单工厂模式：</p>
+<ul>
+<li>通过 <code class="notranslate">register</code> 方法注册不同类型的消息处理器</li>
+<li>通过 <code class="notranslate">getStrategyNoNull</code> 方法获取具体的处理器实例</li>
+<li>使用 Map 存储不同类型的处理器实例</li>
+</ul>
+<h5>4. 泛型模式</h5>
+<p>使用了泛型来增强类型安全性和代码复用：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">abstract</span> <span class="pl-k">class</span> <span class="pl-smi">AbstractMsgHandler</span>&lt;<span class="pl-smi">Req</span>&gt; {
+    <span class="pl-k">private</span> <span class="pl-smi">Class</span>&lt;<span class="pl-smi">Req</span>&gt; <span class="pl-s1">bodyClass</span>;
+    
+    <span class="pl-k">private</span> <span class="pl-smi">Req</span> <span class="pl-en">toBean</span>(<span class="pl-smi">Object</span> <span class="pl-s1">body</span>) {
+        <span class="pl-k">if</span> (<span class="pl-s1">bodyClass</span>.<span class="pl-en">isAssignableFrom</span>(<span class="pl-s1">body</span>.<span class="pl-en">getClass</span>())) {
+            <span class="pl-k">return</span> (<span class="pl-smi">Req</span>) <span class="pl-s1">body</span>;
+        }
+        <span class="pl-k">return</span> <span class="pl-smi">BeanUtil</span>.<span class="pl-en">toBean</span>(<span class="pl-s1">body</span>, <span class="pl-s1">bodyClass</span>);
+    }
+}</pre></div>
+<h5>5. 单例模式</h5>
+<p>通过 Spring 的 <code class="notranslate">@Component</code> 注解，每个具体的消息处理器都是单例的：</p>
+<ul>
+<li><code class="notranslate">TextMsgHandler</code></li>
+<li><code class="notranslate">VideoMsgHandler</code></li>
+<li><code class="notranslate">ImgMsgHandler</code></li>
+</ul>
+<h4>（二）设计模式的优点</h4>
+<ol>
+<li>
+<p><strong>可扩展性</strong>：</p>
+<ul>
+<li>新增消息类型只需添加新的处理器类</li>
+<li>不需要修改现有代码，符合开闭原则</li>
+</ul>
+</li>
+<li>
+<p><strong>代码复用</strong>：</p>
+<ul>
+<li>通过抽象类复用通用逻辑</li>
+<li>减少重复代码</li>
+</ul>
+</li>
+<li>
+<p><strong>维护性</strong>：</p>
+<ul>
+<li>各个消息类型的处理逻辑独立</li>
+<li>职责明确，易于维护和测试</li>
+</ul>
+</li>
+<li>
+<p><strong>类型安全</strong>：</p>
+<ul>
+<li>使用泛型确保类型安全（泛型的一个重要作用，诸如List、HashMap都有所体现）</li>
+<li>编译时即可发现类型错误</li>
+</ul>
+</li>
+</ol>
+<h4>（三）改进：责任链模式</h4>
+<h5>1. <strong>分析上面的代码</strong></h5>
+<ul>
+<li>消息的校验 (<code class="notranslate">checkMsg</code>) 和保存 (<code class="notranslate">saveMsg</code>) 逻辑可以被视为一种责任链，多个步骤（通用校验、子类扩展校验、消息保存、附加信息保存）以层层调用的形式实现。</li>
+</ul>
+<p>在当前代码中，我们需要对消息进行校验、保存、额外处理（例如敏感词过滤或记录日志）。如果未来需求变化，比如新增或调整处理流程，现有代码会遇到什么问题？</p>
+<ul>
+<li>校验和保存逻辑耦合在一起，不容易拆分和扩展。</li>
+<li>增加功能时会在现有代码中插入新的逻辑，导致代码膨胀。</li>
+<li>随着需求复杂化，代码的阅读和维护难度会大幅提升。</li>
+</ul>
+<p>这正是我们要解决的问题。当前的代码结构就像修建在沙滩上的房子，短期内能住人，但无法应对风暴。我们需要一套更灵活、更模块化的架构，而责任链模式正是为此设计的。</p>
+<h5>2. <strong>责任链模式的核心思想</strong></h5>
+<p>责任链模式的核心思想是<strong>分离职责，链式传递</strong>。每个处理步骤都由独立的节点实现，这些节点通过链表串联，依次处理请求。你可以将它类比为一个生产线，每个工位专注于一个功能。如果新增或调整某个工位，只需改变链条，而不会影响其他部分。</p>
+<p><strong>定义</strong>：将多个对象串联成一条链，当请求到来时，链中的对象依次处理，直到某个对象能够完全处理该请求。</p>
+<p>想象一下，一条消息生产线上：</p>
+<ul>
+<li>第一个工位检查原材料质量（校验消息）。</li>
+<li>第二个工位进行加工（保存消息）。</li>
+<li>第三个工位负责后续处理（例如敏感词过滤）。</li>
+</ul>
+<p>如果有一天需要在加工前增加清洗步骤（敏感词过滤），责任链模式只需在链条中插入一个“清洗工位”，而不用大改原有逻辑。</p>
+<h5>3. <strong>用责任链模式改造现有逻辑</strong></h5>
+<p>在责任链模式中，如何定义每个处理节点？它们之间如何协作？</p>
+<ul>
+<li>每个节点可以实现一个通用接口，例如 <code class="notranslate">MsgHandlerNode</code>。</li>
+<li>通过链表或数组维护节点顺序。</li>
+<li>每个节点处理后，决定是否将请求传递给下一个节点。</li>
+</ul>
+<p>接下来，我们用代码实现这个逻辑：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">interface</span> <span class="pl-smi">MsgHandlerNode</span> {
+    <span class="pl-smi">boolean</span> <span class="pl-en">handle</span>(<span class="pl-smi">Message</span> <span class="pl-s1">message</span>);
+}
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">CheckMessageNode</span> <span class="pl-k">implements</span> <span class="pl-smi">MsgHandlerNode</span> {
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">handle</span>(<span class="pl-smi">Message</span> <span class="pl-s1">message</span>) {
+        <span class="pl-k">if</span> (!<span class="pl-s1">message</span>.<span class="pl-en">isValid</span>()) {
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"校验失败！"</span>);
+            <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+        }
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"校验通过！"</span>);
+        <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+    }
+}
+
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">SaveMessageNode</span> <span class="pl-k">implements</span> <span class="pl-smi">MsgHandlerNode</span> {
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">handle</span>(<span class="pl-smi">Message</span> <span class="pl-s1">message</span>) {
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"保存消息："</span> + <span class="pl-s1">message</span>.<span class="pl-en">getContent</span>());
+        <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+    }
+}</pre></div>
+<p>通过 <code class="notranslate">MsgHandlerChain</code> 管理这些节点：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">MsgHandlerChain</span> {
+    <span class="pl-k">private</span> <span class="pl-k">final</span> <span class="pl-smi">List</span>&lt;<span class="pl-smi">MsgHandlerNode</span>&gt; <span class="pl-s1">nodes</span> = <span class="pl-k">new</span> <span class="pl-smi">ArrayList</span>&lt;&gt;();
+    <span class="pl-k">public</span> <span class="pl-smi">MsgHandlerChain</span> <span class="pl-en">addNode</span>(<span class="pl-smi">MsgHandlerNode</span> <span class="pl-s1">node</span>) {
+        <span class="pl-s1">nodes</span>.<span class="pl-en">add</span>(<span class="pl-s1">node</span>);
+        <span class="pl-k">return</span> <span class="pl-smi">this</span>;
+    }
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">process</span>(<span class="pl-smi">Message</span> <span class="pl-s1">message</span>) {
+        <span class="pl-k">for</span> (<span class="pl-smi">MsgHandlerNode</span> <span class="pl-s1">node</span> : <span class="pl-s1">nodes</span>) {
+            <span class="pl-k">if</span> (!<span class="pl-s1">node</span>.<span class="pl-en">handle</span>(<span class="pl-s1">message</span>)) {
+                <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"处理被中断！"</span>);
+                <span class="pl-k">break</span>;
+            }
+        }
+    }
+}</pre></div>
+<h5>4. <strong>喝一口茶</strong></h5>
+<p>如果我们现在要新增一个日志记录功能，该如何添加？</p>
+<ul>
+<li>定义一个新的 <code class="notranslate">LogMessageNode</code> 实现 <code class="notranslate">MsgHandlerNode</code> 接口。</li>
+<li>将它插入到 <code class="notranslate">MsgHandlerChain</code> 中的合适位置。</li>
+</ul>
+<h5>5. <strong>再反思：适用场景与边界条件</strong></h5>
+<p>责任链模式适用于什么样的场景？它的边界在哪里？</p>
+<ul>
+<li><strong>适用场景</strong>：需要按照固定流程处理的逻辑（如校验、权限检查、日志记录等）。</li>
+<li><strong>边界条件</strong>：处理流程不能过于简单，否则责任链会增加不必要的复杂性。</li>
+</ul>
+<p><strong>需要注意的是</strong>：在实际项目中，如果只有两三步简单逻辑，不需要引入责任链模式。责任链的价值在于复杂流程的管理和扩展。</p>
+<h4>（四）改进后的代码</h4>
+<p>所以就目前来说，我们并不需要改进这段代码，但是出于学习目的，我们还是进行了代码的重构。</p>
+<p>为了将当前代码架构转换为责任链模式，我们需要明确以下几个要点：</p>
+<ul>
+<li>
+<p><strong>责任链的核心思想</strong>：<br>
+将多个处理步骤串联起来，当一个请求进入时，由链上的节点逐步处理，直到请求被完全处理或链结束。</p>
+</li>
+<li>
+<p><strong>改造目标</strong>：<br>
+使校验 (<code class="notranslate">checkMsg</code>) 和保存 (<code class="notranslate">saveMsg</code>) 等逻辑成为链条上的独立节点，每个节点完成自己的职责并决定是否传递给下一个节点。</p>
+</li>
+</ul>
+<h5>1. 定义责任链节点接口</h5>
+<p>每个节点负责一个处理步骤，通过实现以下接口加入链中：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">interface</span> <span class="pl-smi">MsgHandlerNode</span> {
+    <span class="pl-smi">boolean</span> <span class="pl-en">handle</span>(<span class="pl-smi">Message</span> <span class="pl-s1">message</span>);
+}</pre></div>
+<h5>2. 实现校验和保存节点</h5>
+<p>将 <code class="notranslate">checkMsg</code> 和 <code class="notranslate">saveMsg</code> 等逻辑拆分为单独的节点：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 校验节点</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">CheckMessageNode</span> <span class="pl-k">implements</span> <span class="pl-smi">MsgHandlerNode</span> {
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">handle</span>(<span class="pl-smi">Message</span> <span class="pl-s1">message</span>) {
+        <span class="pl-c">// 校验逻辑</span>
+        <span class="pl-k">if</span> (!<span class="pl-s1">message</span>.<span class="pl-en">isValid</span>()) {
+            <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Message validation failed."</span>);
+            <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+        }
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Message validation passed."</span>);
+        <span class="pl-k">return</span> <span class="pl-c1">true</span>; <span class="pl-c">// 继续传递</span>
+    }
+}
+
+<span class="pl-c">// 保存节点</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">SaveMessageNode</span> <span class="pl-k">implements</span> <span class="pl-smi">MsgHandlerNode</span> {
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">handle</span>(<span class="pl-smi">Message</span> <span class="pl-s1">message</span>) {
+        <span class="pl-c">// 保存逻辑</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Message saved: "</span> + <span class="pl-s1">message</span>.<span class="pl-en">getContent</span>());
+        <span class="pl-k">return</span> <span class="pl-c1">true</span>; <span class="pl-c">// 继续传递</span>
+    }
+}
+
+<span class="pl-c">// 扩展：附加功能节点</span>
+<span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">AdditionalProcessingNode</span> <span class="pl-k">implements</span> <span class="pl-smi">MsgHandlerNode</span> {
+    <span class="pl-c1">@</span><span class="pl-c1">Override</span>
+    <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">handle</span>(<span class="pl-smi">Message</span> <span class="pl-s1">message</span>) {
+        <span class="pl-c">// 执行附加逻辑</span>
+        <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Additional processing completed."</span>);
+        <span class="pl-k">return</span> <span class="pl-c1">true</span>; <span class="pl-c">// 继续传递</span>
+    }
+}</pre></div>
+<h5>3. 构建责任链</h5>
+<p>通过链式调用组织节点的执行顺序：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">MsgHandlerChain</span> {
+    <span class="pl-k">private</span> <span class="pl-k">final</span> <span class="pl-smi">List</span>&lt;<span class="pl-smi">MsgHandlerNode</span>&gt; <span class="pl-s1">nodes</span> = <span class="pl-k">new</span> <span class="pl-smi">ArrayList</span>&lt;&gt;();
+
+    <span class="pl-k">public</span> <span class="pl-smi">MsgHandlerChain</span> <span class="pl-en">addNode</span>(<span class="pl-smi">MsgHandlerNode</span> <span class="pl-s1">node</span>) {
+        <span class="pl-s1">nodes</span>.<span class="pl-en">add</span>(<span class="pl-s1">node</span>);
+        <span class="pl-k">return</span> <span class="pl-smi">this</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">process</span>(<span class="pl-smi">Message</span> <span class="pl-s1">message</span>) {
+        <span class="pl-k">for</span> (<span class="pl-smi">MsgHandlerNode</span> <span class="pl-s1">node</span> : <span class="pl-s1">nodes</span>) {
+            <span class="pl-k">if</span> (!<span class="pl-s1">node</span>.<span class="pl-en">handle</span>(<span class="pl-s1">message</span>)) {
+                <span class="pl-smi">System</span>.<span class="pl-s1">out</span>.<span class="pl-en">println</span>(<span class="pl-s">"Processing stopped at: "</span> + <span class="pl-s1">node</span>.<span class="pl-en">getClass</span>().<span class="pl-en">getSimpleName</span>());
+                <span class="pl-k">break</span>;
+            }
+        }
+    }
+}</pre></div>
+<h5>4. 客户端调用示例</h5>
+<p>通过链式结构调用处理逻辑：</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Main</span> {
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+        <span class="pl-c">// 构建责任链</span>
+        <span class="pl-smi">MsgHandlerChain</span> <span class="pl-s1">chain</span> = <span class="pl-k">new</span> <span class="pl-smi">MsgHandlerChain</span>()
+            .<span class="pl-en">addNode</span>(<span class="pl-k">new</span> <span class="pl-smi">CheckMessageNode</span>())
+            .<span class="pl-en">addNode</span>(<span class="pl-k">new</span> <span class="pl-smi">SaveMessageNode</span>())
+            .<span class="pl-en">addNode</span>(<span class="pl-k">new</span> <span class="pl-smi">AdditionalProcessingNode</span>());
+
+        <span class="pl-c">// 模拟消息处理</span>
+        <span class="pl-smi">Message</span> <span class="pl-s1">message</span> = <span class="pl-k">new</span> <span class="pl-smi">Message</span>(<span class="pl-s">"Hello, Chain of Responsibility!"</span>);
+        <span class="pl-s1">chain</span>.<span class="pl-en">process</span>(<span class="pl-s1">message</span>);
+    }
+}</pre></div>
+<h5>5. 示例运行结果</h5>
+<p>假设输入消息 <code class="notranslate">Hello, Chain of Responsibility!</code>，输出可能如下：</p>
+<pre class="notranslate"><code class="notranslate">Message validation passed.
+Message saved: Hello, Chain of Responsibility!
+Additional processing completed.
+</code></pre>
+<p>如需进一步优化或扩展，可以结合 <strong>责任链模式与工厂模式</strong> 生成链条，动态配置链的节点顺序。</p>
+<h3>二、单例模式</h3>
+<p>单例模式（Singleton Pattern）是一种常用的软件设计模式，用于确保一个类仅有一个实例，并提供一个全局访问点。以下是使用Java语言实现单例模式的几种常见方式：</p>
+<h5>1. 懒汉式（线程不安全）</h5>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Singleton</span> {  
+    <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-smi">Singleton</span> <span class="pl-s1">instance</span>;  
+  
+    <span class="pl-k">private</span> <span class="pl-smi">Singleton</span>() {}  
+  
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">Singleton</span> <span class="pl-en">getInstance</span>() {  
+        <span class="pl-k">if</span> (<span class="pl-s1">instance</span> == <span class="pl-c1">null</span>) {  
+            <span class="pl-s1">instance</span> = <span class="pl-k">new</span> <span class="pl-smi">Singleton</span>();  
+        }  
+        <span class="pl-k">return</span> <span class="pl-s1">instance</span>;  
+    }  
+}</pre></div>
+<p><strong>注意</strong>：这种方式在多线程环境下是不安全的，可能会创建多个实例。</p>
+<h5>2. 懒汉式（线程安全）</h5>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Singleton</span> {  
+    <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-smi">Singleton</span> <span class="pl-s1">instance</span>;  
+  
+    <span class="pl-k">private</span> <span class="pl-smi">Singleton</span>() {}  
+  
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">synchronized</span> <span class="pl-smi">Singleton</span> <span class="pl-en">getInstance</span>() {  
+        <span class="pl-k">if</span> (<span class="pl-s1">instance</span> == <span class="pl-c1">null</span>) {  
+            <span class="pl-s1">instance</span> = <span class="pl-k">new</span> <span class="pl-smi">Singleton</span>();  
+        }  
+        <span class="pl-k">return</span> <span class="pl-s1">instance</span>;  
+    }  
+}</pre></div>
+<p><strong>注意</strong>：虽然这种方式是线程安全的，但每次调用<code class="notranslate">getInstance()</code>方法时都会进行同步，这会影响性能。</p>
+<h5>3. 双重检查锁定（Double-Checked Locking）</h5>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Singleton</span> {  
+    <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-k">volatile</span> <span class="pl-smi">Singleton</span> <span class="pl-s1">instance</span>;  
+  
+    <span class="pl-k">private</span> <span class="pl-smi">Singleton</span>() {}  
+  
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">Singleton</span> <span class="pl-en">getInstance</span>() {  
+        <span class="pl-k">if</span> (<span class="pl-s1">instance</span> == <span class="pl-c1">null</span>) {  
+            <span class="pl-k">synchronized</span> (<span class="pl-smi">Singleton</span>.<span class="pl-k">class</span>) {  
+                <span class="pl-k">if</span> (<span class="pl-s1">instance</span> == <span class="pl-c1">null</span>) {  
+                    <span class="pl-s1">instance</span> = <span class="pl-k">new</span> <span class="pl-smi">Singleton</span>();  
+                }  
+            }  
+        }  
+        <span class="pl-k">return</span> <span class="pl-s1">instance</span>;  
+    }  
+}</pre></div>
+<p><strong>注意</strong>：这种方式既保证了线程安全，又避免了每次调用<code class="notranslate">getInstance()</code>方法时都进行同步，提高了性能。<code class="notranslate">volatile</code>关键字确保了多线程环境下<code class="notranslate">instance</code>变量的可见性和禁止指令重排序。</p>
+<h5>4. 静态内部类</h5>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-smi">Singleton</span> {  
+    <span class="pl-k">private</span> <span class="pl-smi">Singleton</span>() {}  
+  
+    <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-k">class</span> <span class="pl-smi">SingletonHolder</span> {  
+        <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Singleton</span> <span class="pl-c1">INSTANCE</span> = <span class="pl-k">new</span> <span class="pl-smi">Singleton</span>();  
+    }  
+  
+    <span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Singleton</span> <span class="pl-en">getInstance</span>() {  
+        <span class="pl-k">return</span> <span class="pl-smi">SingletonHolder</span>.<span class="pl-c1">INSTANCE</span>;  
+    }  
+}</pre></div>
+<p><strong>注意</strong>：这种方式利用了classloder的机制来保证初始化<code class="notranslate">Singleton</code>类时只有一个线程能创建<code class="notranslate">SingletonHolder</code>类，从而保证了<code class="notranslate">INSTANCE</code>的唯一性。同时，这种方式也实现了懒加载。</p>
+<h5>5. 枚举</h5>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">enum</span> <span class="pl-smi">Singleton</span> {  
+    <span class="pl-c1">INSTANCE</span>;  
+  
+    <span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">whateverMethod</span>() {  
+    }  
+}</pre></div>
+<p><strong>注意</strong>：这是实现单例模式的最佳方法。它更简洁，自动支持序列化机制，绝对防止多次实例化，即使在面对复杂的序列化或者反射攻击的时候，这种单例的类型仍然可以安全地保证只有一个实例。</p>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/0da40075883e51200aa2215917e0d727a3f3770593ca405163936e922e459de1/68747470733a2f2f626c6f672e6461732d7365696e2e746f706f6c69397a30696d62632e676966"><img src="https://camo.githubusercontent.com/0da40075883e51200aa2215917e0d727a3f3770593ca405163936e922e459de1/68747470733a2f2f626c6f672e6461732d7365696e2e746f706f6c69397a30696d62632e676966" alt="img" data-canonical-src="https://blog.das-sein.topoli9z0imbc.gif" style="max-width: 100%;"></a></p>
+<h3>三、利用Redis+策略模式实现限流</h3>
+<p>![export (7)]<a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/0f03746e29015724aadcee83353538676a2254e5ee129c433c419639c6545bce/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f6578706f72742837292e737667"><img src="https://camo.githubusercontent.com/0f03746e29015724aadcee83353538676a2254e5ee129c433c419639c6545bce/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f6578706f72742837292e737667" data-canonical-src="https://blog.das-sein.top/export(7).svg" style="max-width: 100%;"></a></p>
+<h3>番外、如何选用适用的设计模式</h3>
+<h4>(零) 基础：指令.过程.对象（TODO）</h4>
+<p>我们从高级语言、中级语言、低级语言中各自取出一种，进行讨论：</p>
+<ul>
+<li><strong>Java语言的定义</strong>：Java 是一种完全<strong>面向对象</strong>的<strong>高级编程语言</strong>。</li>
+<li><strong>C语言的定义</strong>：C 语言是一种通用的、<strong>面向过程</strong>的高级编程语言，同时也具有一些接近底层硬件的特性，介于高级语言和低级语言之间，常被看作是<strong>中级语言</strong>。</li>
+<li><strong>机器语言的定义</strong>：机器语言是计算机能够直接识别和执行的二进制<strong>指令</strong>代码，是最底层的计算机语言。</li>
+</ul>
+<p>机器语言由指令组成，关注点在于：</p>
+<p>C语言是对机器语言的封装，关注点在于：分支控制（for/if）、函数、结构体、指针；</p>
+<p>Java语言是对C语言的进一步发展，关注点在于对象与类，继承封装多态。</p>
+<p>后者是对前者的封装和发展，前者是后者的基础。所以理论上，前者的形式化是后者，后者可还原为前者。</p>
+<p>故而，我们作出如下理解：</p>
+<p>（从中级语言到低级语言）一切程序都是指令，指令按顺序执行。单纯for()是同样的指令段重复执行，单纯if()是可以消失指令段。</p>
+<p>（从高级语言到低级语言）类包含属性 函数和方法，类 是指令篇，对象是类的实现，具体来说，补充了类的属性，是指令篇。</p>
+<p>没有继承封装和多态：高级语言回到中级语言。</p>
+<p>封装：过程封装为类的方法，补充。</p>
+<p>继承：指令段的复用，重复的指令段变为父类。</p>
+<p>多态：补充。</p>
+<p>![graph](<a href="https://blog.das-sein.topgraph.svg" rel="nofollow">https://blog.das-sein.topgraph.svg</a></p>
+<pre class="notranslate"><code class="notranslate">digraph LanguageHierarchy {
+    // 设置节点的通用样式，这里设置形状为矩形，字体大小等
+    node [shape=box, fontsize=10];
+
+    // 定义三个子图，分别对应高级语言区、中级语言区和低级语言区，用方框来直观表示区域
+    subgraph cluster_high_level {
+        label="高级语言区";
+        bgcolor="lightblue";
+
+        "Python" [label="Python"];
+        "Java" [label="Java"];
+        "JavaScript" [label="JavaScript"];
+        "Ruby" [label="Ruby"];
+        "PHP" [label="PHP"];
+
+        // 可根据需要添加内部节点之间的连接关系（这里暂未添加，可自行根据实际需求补充）
+        // "Python" -&gt; "Java" [label="某种关联", style=dashed];
+    }
+
+    subgraph cluster_mid_level {
+        label="中级语言区";
+        bgcolor="pink";
+
+        "C" [label="C"];
+        "C++" [label="C++"];
+        "Objective-C" [label="Objective-C"];
+        "Swift" [label="Swift"];
+        "Assembly" [label="Assembly"];
+
+        // 同样可根据需要添加内部节点之间的连接关系（这里暂未添加，可自行根据实际需求补充）
+        // "C" -&gt; "C++" [label="某种关联", style=dashed];
+    }
+
+    subgraph cluster_low_level {
+        label="低级语言区";
+        bgcolor="lightgray";
+
+        "Machine Language" [label="Machine Language"];
+        "Microcode" [label="Microcode"];
+
+        // 可根据需要添加内部节点之间的连接关系（这里暂未添加，可自行根据实际需求补充）
+        // "Machine Language" -&gt; "Microcode" [label="某种关联", style=dashed];
+    }
+
+    // 设置节点的布局方向为从左到右（'LR'）
+    //attr(rankdir='LR');
+
+   
+}
+</code></pre>
+<h4>(一) <strong>语言层次与设计模式</strong>（TODO）</h4>
+<p>在编程语言中，高级语言、中级语言和低级语言分别代表着不同的抽象层次。我们可以通过语言层次的演进来理解设计模式的背景与核心：</p>
+<ol>
+<li><strong>低级语言：机器语言</strong>
+<ul>
+<li>关注点：<strong>指令</strong><br>
+机器语言是直接与硬件交互的二进制代码，所有操作以指令为单位执行。</li>
+</ul>
+</li>
+<li><strong>中级语言：C语言</strong>
+<ul>
+<li>关注点：<strong>过程</strong><br>
+C语言通过分支控制（如 <code class="notranslate">for</code>、<code class="notranslate">if</code>）、函数和指针等抽象特性，为指令的组织提供了灵活性和可复用性。</li>
+</ul>
+</li>
+<li><strong>高级语言：Java语言</strong>
+<ul>
+<li>关注点：<strong>对象与类</strong><br>
+Java进一步引入面向对象特性（如继承、封装、多态），将代码抽象到类与对象的层次，使得程序逻辑更具可读性和扩展性。</li>
+</ul>
+</li>
+</ol>
+<h4>(二) <strong>设计模式的分类与选择</strong></h4>
+<p>在实际开发中，设计模式帮助我们处理对象的创建、组织结构和行为分工的问题。以下对创建型、结构型和行为型模式进行分类说明：</p>
+<h5><strong>1. 创建型模式（Creational Patterns）</strong>：关注<strong>对象创建</strong>的过程，解耦实例化代码。</h5>
+<ul>
+<li>
+<p><strong>工厂模式</strong></p>
+<ul>
+<li>
+<p>背后思想：创建具体对象的逻辑应独立于使用者。</p>
+</li>
+<li>
+<p>场景：需要灵活地根据条件创建不同类型的对象。</p>
+</li>
+<li>
+<p>示例：通过抽象工厂生产不同的 GUI 组件（按钮、文本框）</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>单例模式</strong></p>
+<ul>
+<li>
+<p>背后思想：限制类的实例化，确保全局唯一性。</p>
+</li>
+<li>
+<p>场景：需要全局共享状态，如配置管理器。</p>
+</li>
+<li>
+<p>示例：数据库连接池。</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>建造者模式</strong></p>
+<ul>
+<li>
+<p>背后思想：将复杂对象的构建与表示分离。</p>
+</li>
+<li>
+<p>场景：构造具有多种配置选项的对象。</p>
+</li>
+<li>
+<p>示例：生成一个复杂的报表或对象配置器。</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>原型模式</strong></p>
+<ul>
+<li>
+<p>背后思想：通过<strong>复制</strong>已有实例生成新对象，避免类的直接实例化。</p>
+</li>
+<li>
+<p>场景：对象创建开销大或具有复杂初始化逻辑。</p>
+</li>
+<li>
+<p>示例：克隆一个图形对象或用户配置。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h5><strong>2. 结构型模式（Structural Patterns）</strong>：关注<strong>类与对象的组合</strong>，解决类之间的耦合问题。</h5>
+<ol>
+<li><strong>适配器模式</strong>
+<ul>
+<li>背后思想：将不兼容的接口转为兼容的形式。</li>
+<li>场景：旧系统模块需要与新系统交互。</li>
+<li>示例：为第三方库提供兼容层。</li>
+</ul>
+</li>
+<li><strong>代理模式</strong>
+<ul>
+<li>背后思想：通过代理对象控制对目标对象的访问。</li>
+<li>场景：访问控制或性能优化（如懒加载、缓存）。</li>
+<li>示例：安全检查或日志记录。</li>
+</ul>
+</li>
+<li><strong>装饰器模式</strong>
+<ul>
+<li>背后思想：动态地为对象添加新功能，而无需修改其代码。</li>
+<li>场景：扩展现有功能而不破坏原有类的封装。</li>
+<li>示例：为文本框添加滚动条或背景色。</li>
+</ul>
+</li>
+<li><strong>享元模式</strong>
+<ul>
+<li>背后思想：通过共享技术避免对象创建的高成本。</li>
+<li>场景：需要大量相似对象实例。</li>
+<li>示例：字符渲染中的字形复用。</li>
+</ul>
+</li>
+</ol>
+<h5><strong>3. 行为型模式（Behavioral Patterns）</strong>：核心思想：关注<strong>对象之间的职责分配</strong>与协作方式。</h5>
+<ul>
+<li>
+<p><strong>责任链模式</strong></p>
+<ul>
+<li>
+<p>背后思想：请求沿着链传递，找到合适的处理者。</p>
+</li>
+<li>
+<p>场景：审批流程、事件处理机制。</p>
+</li>
+<li>
+<p>示例：日志系统中按级别记录日志。</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>观察者模式</strong></p>
+<ul>
+<li>
+<p>背后思想：实现一对多的依赖通知。</p>
+</li>
+<li>
+<p>场景：订阅发布系统。</p>
+</li>
+<li>
+<p>示例：消息队列的订阅机制。</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>策略模式</strong></p>
+<ul>
+<li>
+<p>背后思想：将算法封装在类中，使得算法可以自由切换。</p>
+</li>
+<li>
+<p>场景：支付方式切换（如微信支付、支付宝）。</p>
+</li>
+<li>
+<p>示例：不同的排序算法。</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>模板方法模式</strong></p>
+<ul>
+<li>
+<p>背后思想：定义算法骨架，延迟某些步骤到子类实现。</p>
+</li>
+<li>
+<p>场景：共享通用流程但细节实现不同。</p>
+</li>
+<li>
+<p>示例：文件读取器的模板逻辑。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4>(三)  <strong>从问题到模式的选择</strong></h4>
+<h5><strong>问：有类 A、B、C，三者有一方法逻辑相同，也有异处，以何兼共拓异？</strong></h5>
+<p><strong>答曰：</strong> 构建一辅助抽象类 AB，共性逻辑写入其方法；A、B、C继承 AB，重写各自的方法以实现差异化。</p>
+<h5><strong>选择示例</strong></h5>
+<ul>
+<li>使用 <strong>模板方法模式</strong> 提取共性流程，留出可变部分。</li>
+<li>使用 <strong>策略模式</strong> 分离算法逻辑，动态切换实现。</li>
+</ul>
+<p>通过这样的设计，系统具备更高的灵活性与可扩展性。</p>
+<h4>(四) <strong>总结：关键词驱动的模式应用</strong></h4>
+<p>设计模式可以通过三个关键词（<strong>创建</strong>、<strong>结构</strong>、<strong>行为</strong>）帮助开发者快速定位问题与方案：</p>
+<ol>
+<li>创建型模式解决对象实例化的复杂性。</li>
+<li>结构型模式优化对象与对象之间的协作。</li>
+<li>行为型模式理顺职责分配与动态交互。</li>
+</ol>
+<p>关键词：</p>
+<ol>
+<li><strong>对象创建管理：</strong> 选择创建型模式。</li>
+<li><strong>接口适配：</strong> 选择适配器模式。</li>
+<li><strong>动态功能扩展：</strong> 选择装饰器模式。</li>
+<li><strong>控制访问：</strong> 选择代理模式。</li>
+<li><strong>行为变化依赖状态：</strong> 选择模板方法或策略模式。</li>
+<li><strong>链式处理：</strong> 选择责任链模式。</li>
+<li><strong>一对多通知：</strong> 选择观察者模式。</li>
+</ol>
+<blockquote>
+<p><strong>实践建议：</strong> 在具体业务场景中，仔细分析需求的共性与差异性，从而选择合适的设计模式为系统设计赋能。r如：</p>
+<p>需要对对象实例进行创建和存储和管理，涉及到的可能是创建型模式。</p>
+<p>如果需要把一个对象实例变为另一个对象实例，涉及到的可能是适配器模式。</p>
+<p>如果要把一个方法的前面或后面加上一些方法，涉及到的可能是代理模式或装饰器模式。</p>
+<p>如果代码用到子类与父类的继承关系，并且子类之间是非近亲类，并且实现了一些方法，仅有父类调用，那么可能涉及到的到的是模板方法。</p>
+<p>如果如果代码用到子类与父类的继承关系，并且子类之间是近亲类，调用者传入了一些非资源标识符（即功能标识符），那么可能涉及到的到的是策略模式。</p>
+<p>如果一些类代表了不同职责，并且以链表形式组织在一起，外层循环传递责任，那么可能是责任链模式。责任链模式分为三种：分工合作责任链（没个节点都负责一部分），分工单干平级责任链（找到一个符合的，功业务非递进关系），分工单干非平级级责任链（找到一个符合的，功业务递进关系）。</p>
+<p>如果一个类改变，需要对其他多个类也进行改变(list组合)，循环通知，可能是观察者模式。</p>
+<p>还有一些可能是组合，策略模式+单例工厂（map），key取出策略。策略模式+多例工厂（new）。</p>
+</blockquote>
+<h2>第四篇：Spring 中设计模式（TODO）</h2>
+<p>Spring框架中广泛运用了多种设计模式，以实现其强大的功能和灵活性。以下是一些Spring框架中常见的设计模式：</p>
+<ol>
+<li>
+<p>单例模式（Singleton Pattern）</p>
+<ul>
+<li>在Spring的默认作用域中，每个Bean都是单例的，即在整个Spring IoC容器中，每个Bean只会有一个实例。这有助于节省资源并提高性能。</li>
+</ul>
+</li>
+<li>
+<p>工厂模式（Factory Pattern）</p>
+<ul>
+<li>Spring通过BeanFactory和ApplicationContext等接口创建并管理对象实例。这种方式将对象的创建与使用解耦，使得程序更加灵活和可扩展。</li>
+</ul>
+</li>
+<li>
+<p>代理模式（Proxy Pattern）</p>
+<ul>
+<li>Spring的AOP（面向切面编程）功能大量使用了代理模式。AOP通过在目标方法执行前后添加额外的行为（如日志、事务管理等），而这些额外的行为是通过代理对象来实现的。Spring提供了两种代理方式：JDK动态代理和CGLIB代理。</li>
+</ul>
+</li>
+<li>
+<p>模板方法模式（Template Method Pattern）</p>
+<ul>
+<li>在Spring的JdbcTemplate、HibernateTemplate等类中，使用了模板方法模式。这些类定义了一个操作中的算法骨架，而将一些步骤延迟到子类中实现。这种方式使得Spring可以为不同的数据库操作提供统一的接口，同时允许用户根据自己的需求进行定制。</li>
+</ul>
+</li>
+<li>
+<p>观察者模式（Observer Pattern）</p>
+<ul>
+<li>Spring的事件处理机制就是观察者模式的一个应用。当某个事件发生时，所有注册的观察者都会自动收到通知并作出相应的处理。这种方式使得事件的处理更加解耦和灵活。</li>
+</ul>
+</li>
+<li>
+<p>适配器模式（Adapter Pattern）</p>
+<ul>
+<li>Spring MVC中的Controller适配器，以及AOP模块中的适配器，都使用了适配器模式。适配器模式用于将一个接口转换为客户希望的另一个接口，使得不同的类或对象能够协同工作。</li>
+</ul>
+</li>
+<li>
+<p>装饰器模式（Decorator Pattern）</p>
+<ul>
+<li>在Spring AOP中，代理对象（代理类）就是对目标对象的增强（装饰），可以动态地为目标对象添加新的行为（如方法拦截、日志记录、事务管理等）。</li>
+</ul>
+</li>
+<li>
+<p>策略模式（Strategy Pattern）</p>
+<ul>
+<li>在Spring中，策略模式主要用于实现不同的算法或策略。例如，Spring的TaskScheduler接口就定义了不同的任务调度策略，如同步执行、异步执行等。</li>
+</ul>
+</li>
+<li>
+<p>依赖注入（Dependency Injection, DI）和控制反转（Inversion of Control, IoC）</p>
+<ul>
+<li>这两个设计模式是Spring框架的核心。通过依赖注入，Spring负责管理和注入组件之间的依赖关系，降低了组件之间的耦合度。控制反转则是指将对象的创建和依赖关系的管理交给Spring容器，从而实现了对象的解耦。</li>
+</ul>
+</li>
+</ol>
+<p>此外，Spring框架还使用了其他设计模式，如组合模式、建造者模式、委托模式、空对象模式等，以实现各种功能和组件。这些设计模式的运用使得Spring框架更加灵活、可扩展和易于维护。</p>
+<h2>参考文献</h2>
+<p>有时间补上</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://Wang-ABG.github.io/das-sein.github.io">Absoluter Geist</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","Wang-ABG/das-sein.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script>
+
+</html>
