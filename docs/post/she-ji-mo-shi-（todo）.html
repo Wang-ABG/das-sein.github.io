@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
-    
+    <script src='https://blog.meekdai.com/Gmeek/plugins/GmeekVercount.js'></script>
     <link rel="icon" href="https://avatars.githubusercontent.com/u/101440642?s=400&u=06c88f077afc7b58938225692af72f3644e8b1ba&v=4"><script>
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
 <meta name="description" content="
-
 ![页面提取自－13、 设计模式](https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64)
 [13、 设计模式.pdf](https://github.com/user-attachments/files/17894059/13.pdf)
 
@@ -20,7 +19,6 @@
 23种设计模式是面向对象编程中常用的设计思想，它们被分为三大类：创建型模式、结构型模式和行为型模式。">
 <meta property="og:title" content="设计模式（todo）">
 <meta property="og:description" content="
-
 ![页面提取自－13、 设计模式](https://github.com/user-attachments/assets/da58bed9-5a73-4630-aed5-ae56534cca64)
 [13、 设计模式.pdf](https://github.com/user-attachments/files/17894059/13.pdf)
 
@@ -78,12 +76,6 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <a href="https://Wang-ABG.github.io/das-sein.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
             <path id="pathHome" fill-rule="evenodd"></path>
-        </svg>
-    </a>
-    
-    <a href="https://github.com/Wang-ABG/das-sein.github.io/issues/9" target="_blank" class="btn btn-invisible circle" title="Issue">
-        <svg class="octicon" width="16" height="16">
-            <path id="pathIssue" fill-rule="evenodd"></path>
         </svg>
     </a>
     
@@ -1756,18 +1748,19 @@ function utterancesTheme(theme){
     iframe.contentWindow.postMessage(message,'https://utteranc.es');
 }
 if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
-console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
 </script>
 
 <script>
 document.getElementById("pathHome").setAttribute("d",IconList["home"]);
-document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
 
 
 
 function openComments(){
     cm=document.getElementById("comments");
     cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
     cmButton.innerHTML="loading";
     span=document.createElement("span");
     span.setAttribute("class","AnimatedEllipsis");
@@ -1867,6 +1860,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
-
+<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script>
 
 </html>

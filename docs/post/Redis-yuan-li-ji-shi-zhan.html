@@ -11,18 +11,114 @@
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
 <meta name="description" content="
-[王佳文.pdf](https://github.com/user-attachments/files/17741451/default.pdf)
 
-![王佳文](https://github.com/user-attachments/assets/43966aaa-ebeb-4af2-a4bf-225eb9dbfc39)。">
-<meta property="og:title" content="简历">
+### **目录**
+
+#### **原理篇**
+1. **从 I/O 多路复用说起**  
+   - 理解多路复用的概念与重要性  
+   - 典型实现方式与适用场景  
+
+2. **操作系统的角色**  
+   - 资源管理与调度机制  
+   - 操作系统对网络通信的支持  
+
+3. **网络组成原理：Socket、TCP 与“实体”**  
+   - Socket 的基本概念与应用  
+   - TCP 协议详解：从抽象到实践  
+   - 网络通信中的实体关系与抽象模型  
+ 
+4. **相关源码**  
+   - 相关技术与未来趋势 
+
+5. **拓展视角**  
+   - 相关技术与未来趋势  
+
+---
+
+#### **实战篇**
+1. **丰富的数据结构**  
+   - 如何选择合适的数据结构  
+   - 常见应用场景及其对比分析  
+   - 观点：  
+     - **否定论**：不是什么数据结构？  
+     - **形式论**：语言即实体；动作即 API，特点即数据结构  
+
+2. **安全性：数据持久化与高可用方案**  
+   - 主从模式与哨兵机制  
+   - 持久化策略的设计与优化  
+
+3. **扩展性：集群与分片**  
+   - 集群架构设计原则  
+   - 数据分片的实现与注意事项  
+
+4. **配置与优化**  
+   - 常见配置项详解  
+   - 性能优化技巧  
+
+5. **常见问题解决**  
+   - 常见故障排查方法  
+   - 关键问题解决思路与实战案例  
+
+--- 
+。">
+<meta property="og:title" content="Redis原理及实战">
 <meta property="og:description" content="
-[王佳文.pdf](https://github.com/user-attachments/files/17741451/default.pdf)
 
-![王佳文](https://github.com/user-attachments/assets/43966aaa-ebeb-4af2-a4bf-225eb9dbfc39)。">
+### **目录**
+
+#### **原理篇**
+1. **从 I/O 多路复用说起**  
+   - 理解多路复用的概念与重要性  
+   - 典型实现方式与适用场景  
+
+2. **操作系统的角色**  
+   - 资源管理与调度机制  
+   - 操作系统对网络通信的支持  
+
+3. **网络组成原理：Socket、TCP 与“实体”**  
+   - Socket 的基本概念与应用  
+   - TCP 协议详解：从抽象到实践  
+   - 网络通信中的实体关系与抽象模型  
+ 
+4. **相关源码**  
+   - 相关技术与未来趋势 
+
+5. **拓展视角**  
+   - 相关技术与未来趋势  
+
+---
+
+#### **实战篇**
+1. **丰富的数据结构**  
+   - 如何选择合适的数据结构  
+   - 常见应用场景及其对比分析  
+   - 观点：  
+     - **否定论**：不是什么数据结构？  
+     - **形式论**：语言即实体；动作即 API，特点即数据结构  
+
+2. **安全性：数据持久化与高可用方案**  
+   - 主从模式与哨兵机制  
+   - 持久化策略的设计与优化  
+
+3. **扩展性：集群与分片**  
+   - 集群架构设计原则  
+   - 数据分片的实现与注意事项  
+
+4. **配置与优化**  
+   - 常见配置项详解  
+   - 性能优化技巧  
+
+5. **常见问题解决**  
+   - 常见故障排查方法  
+   - 关键问题解决思路与实战案例  
+
+--- 
+。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://Wang-ABG.github.io/das-sein.github.io/post/jian-li.html">
+<meta property="og:url" content="https://Wang-ABG.github.io/das-sein.github.io/post/Redis-yuan-li-ji-shi-zhan.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/101440642?s=400&u=06c88f077afc7b58938225692af72f3644e8b1ba&v=4">
-<title>简历</title>
+<title>Redis原理及实战</title>
 
 
 
@@ -55,7 +151,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">简历</h1>
+<h1 class="postTitle">Redis原理及实战</h1>
 <div class="title-right">
     <a href="https://Wang-ABG.github.io/das-sein.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -73,8 +169,90 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p><a href="https://github.com/user-attachments/files/17741451/default.pdf">王佳文.pdf</a></p>
-<p><a target="_blank" rel="noopener noreferrer" href="https://github.com/user-attachments/assets/43966aaa-ebeb-4af2-a4bf-225eb9dbfc39"><img src="https://github.com/user-attachments/assets/43966aaa-ebeb-4af2-a4bf-225eb9dbfc39" alt="王佳文" style="max-width: 100%;"></a></p></div>
+<div class="markdown-body" id="postBody"><h3><strong>目录</strong></h3>
+<h4><strong>原理篇</strong></h4>
+<ol>
+<li>
+<p><strong>从 I/O 多路复用说起</strong></p>
+<ul>
+<li>理解多路复用的概念与重要性</li>
+<li>典型实现方式与适用场景</li>
+</ul>
+</li>
+<li>
+<p><strong>操作系统的角色</strong></p>
+<ul>
+<li>资源管理与调度机制</li>
+<li>操作系统对网络通信的支持</li>
+</ul>
+</li>
+<li>
+<p><strong>网络组成原理：Socket、TCP 与“实体”</strong></p>
+<ul>
+<li>Socket 的基本概念与应用</li>
+<li>TCP 协议详解：从抽象到实践</li>
+<li>网络通信中的实体关系与抽象模型</li>
+</ul>
+</li>
+<li>
+<p><strong>相关源码</strong></p>
+<ul>
+<li>相关技术与未来趋势</li>
+</ul>
+</li>
+<li>
+<p><strong>拓展视角</strong></p>
+<ul>
+<li>相关技术与未来趋势</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h4><strong>实战篇</strong></h4>
+<ol>
+<li>
+<p><strong>丰富的数据结构</strong></p>
+<ul>
+<li>如何选择合适的数据结构</li>
+<li>常见应用场景及其对比分析</li>
+<li>观点：
+<ul>
+<li><strong>否定论</strong>：不是什么数据结构？</li>
+<li><strong>形式论</strong>：语言即实体；动作即 API，特点即数据结构</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>安全性：数据持久化与高可用方案</strong></p>
+<ul>
+<li>主从模式与哨兵机制</li>
+<li>持久化策略的设计与优化</li>
+</ul>
+</li>
+<li>
+<p><strong>扩展性：集群与分片</strong></p>
+<ul>
+<li>集群架构设计原则</li>
+<li>数据分片的实现与注意事项</li>
+</ul>
+</li>
+<li>
+<p><strong>配置与优化</strong></p>
+<ul>
+<li>常见配置项详解</li>
+<li>性能优化技巧</li>
+</ul>
+</li>
+<li>
+<p><strong>常见问题解决</strong></p>
+<ul>
+<li>常见故障排查方法</li>
+<li>关键问题解决思路与实战案例</li>
+</ul>
+</li>
+</ol>
+<hr></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
