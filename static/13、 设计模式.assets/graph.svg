@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="958pt" height="101pt" viewBox="0.00 0.00 958.00 100.80">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 96.8)">
+<title>LanguageHierarchy</title>
+<polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-96.8 954,-96.8 954,4 -4,4"/>
+<g id="clust3" class="cluster">
+<title>cluster_low_level</title>
+<polygon fill="#d3d3d3" stroke="#000000" points="756,-8 756,-84.8 942,-84.8 942,-8 756,-8"/>
+<text text-anchor="middle" x="849" y="-68.2" font-family="Times,serif" font-size="14.00" fill="#000000">低级语言区</text>
+</g>
+<g id="clust1" class="cluster">
+<title>cluster_high_level</title>
+<polygon fill="#add8e6" stroke="#000000" points="8,-8 8,-84.8 370,-84.8 370,-8 8,-8"/>
+<text text-anchor="middle" x="189" y="-68.2" font-family="Times,serif" font-size="14.00" fill="#000000">高级语言区</text>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_mid_level</title>
+<polygon fill="#ffc0cb" stroke="#000000" points="378,-8 378,-84.8 748,-84.8 748,-8 378,-8"/>
+<text text-anchor="middle" x="563" y="-68.2" font-family="Times,serif" font-size="14.00" fill="#000000">中级语言区</text>
+</g>
+<!-- Python -->
+<g id="node1" class="node">
+<title>Python</title>
+<polygon fill="none" stroke="#000000" points="362,-52 308,-52 308,-16 362,-16 362,-52"/>
+<text text-anchor="middle" x="335" y="-31" font-family="Times,serif" font-size="10.00" fill="#000000">Python</text>
+</g>
+<!-- Java -->
+<g id="node2" class="node">
+<title>Java</title>
+<polygon fill="none" stroke="#000000" points="290,-52 236,-52 236,-16 290,-16 290,-52"/>
+<text text-anchor="middle" x="263" y="-31" font-family="Times,serif" font-size="10.00" fill="#000000">Java</text>
+</g>
+<!-- JavaScript -->
+<g id="node3" class="node">
+<title>JavaScript</title>
+<polygon fill="none" stroke="#000000" points="217.653,-52 160.347,-52 160.347,-16 217.653,-16 217.653,-52"/>
+<text text-anchor="middle" x="189" y="-31" font-family="Times,serif" font-size="10.00" fill="#000000">JavaScript</text>
+</g>
+<!-- Ruby -->
+<g id="node4" class="node">
+<title>Ruby</title>
+<polygon fill="none" stroke="#000000" points="142,-52 88,-52 88,-16 142,-16 142,-52"/>
+<text text-anchor="middle" x="115" y="-31" font-family="Times,serif" font-size="10.00" fill="#000000">Ruby</text>
+</g>
+<!-- PHP -->
+<g id="node5" class="node">
+<title>PHP</title>
+<polygon fill="none" stroke="#000000" points="70,-52 16,-52 16,-16 70,-16 70,-52"/>
+<text text-anchor="middle" x="43" y="-31" font-family="Times,serif" font-size="10.00" fill="#000000">PHP</text>
+</g>
+<!-- C -->
+<g id="node6" class="node">
+<title>C</title>
+<polygon fill="none" stroke="#000000" points="740,-52 686,-52 686,-16 740,-16 740,-52"/>
+<text text-anchor="middle" x="713" y="-31" font-family="Times,serif" font-size="10.00" fill="#000000">C</text>
+</g>
+<!-- C++ -->
+<g id="node7" class="node">
+<title>C++</title>
+<polygon fill="none" stroke="#000000" points="668,-52 614,-52 614,-16 668,-16 668,-52"/>
+<text text-anchor="middle" x="641" y="-31" font-family="Times,serif" font-size="10.00" fill="#000000">C++</text>
+</g>
+<!-- Objective&#45;C -->
+<g id="node8" class="node">
+<title>Objective-C</title>
+<polygon fill="none" stroke="#000000" points="596.3711,-52 531.6289,-52 531.6289,-16 596.3711,-16 596.3711,-52"/>
+<text text-anchor="middle" x="564" y="-31" font-family="Times,serif" font-size="10.00" fill="#000000">Objective-C</text>
+</g>
+<!-- Swift -->
+<g id="node9" class="node">
+<title>Swift</title>
+<polygon fill="none" stroke="#000000" points="514,-52 460,-52 460,-16 514,-16 514,-52"/>
+<text text-anchor="middle" x="487" y="-31" font-family="Times,serif" font-size="10.00" fill="#000000">Swift</text>
+</g>
+<!-- Assembly -->
+<g id="node10" class="node">
+<title>Assembly</title>
+<polygon fill="none" stroke="#000000" points="441.994,-52 386.006,-52 386.006,-16 441.994,-16 441.994,-52"/>
+<text text-anchor="middle" x="414" y="-31" font-family="Times,serif" font-size="10.00" fill="#000000">Assembly</text>
+</g>
+<!-- Machine Language -->
+<g id="node11" class="node">
+<title>Machine Language</title>
+<polygon fill="none" stroke="#000000" points="934.411,-52 841.589,-52 841.589,-16 934.411,-16 934.411,-52"/>
+<text text-anchor="middle" x="888" y="-31" font-family="Times,serif" font-size="10.00" fill="#000000">Machine Language</text>
+</g>
+<!-- Microcode -->
+<g id="node12" class="node">
+<title>Microcode</title>
+<polygon fill="none" stroke="#000000" points="823.8148,-52 764.1852,-52 764.1852,-16 823.8148,-16 823.8148,-52"/>
+<text text-anchor="middle" x="794" y="-31" font-family="Times,serif" font-size="10.00" fill="#000000">Microcode</text>
+</g>
+</g>
+</svg>
