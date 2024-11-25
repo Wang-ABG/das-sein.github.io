@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/101440642?s=400&u=06c88f077afc7b58938225692af72f3644e8b1ba&v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="
+
+> [!NOTE]
+> 假定存在 5 台机器，每台机器都运行着 1 个 Redis 实例主节点，这样一来，主节点的数量便呈现**奇数**状态。">
+<meta property="og:title" content="【草履虫版Redis教程(7)】Redis分片集群部署">
+<meta property="og:description" content="
+
+> [!NOTE]
+> 假定存在 5 台机器，每台机器都运行着 1 个 Redis 实例主节点，这样一来，主节点的数量便呈现**奇数**状态。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://Wang-ABG.github.io/das-sein.github.io/post/%E3%80%90-cao-lv-chong-ban-Redis-jiao-cheng-%287%29%E3%80%91Redis-fen-pian-ji-qun-bu-shu.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/101440642?s=400&u=06c88f077afc7b58938225692af72f3644e8b1ba&v=4">
+<title>【草履虫版Redis教程(7)】Redis分片集群部署</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-note {border-left-color:var(--borderColor-accent-emphasis, var(--color-accent-emphasis));background-color:var(--color-accent-subtle);}.markdown-alert.markdown-alert-note .markdown-alert-title {color: var(--fgColor-accent,var(--color-accent-fg));}</style><style>.markdown-alert.markdown-alert-tip {border-left-color:var(--borderColor-success-emphasis, var(--color-success-emphasis));background-color:var(--color-success-subtle);}.markdown-alert.markdown-alert-tip .markdown-alert-title {color: var(--fgColor-success,var(--color-success-fg));}</style>
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">【草履虫版Redis教程(7)】Redis分片集群部署</h1>
+<div class="title-right">
+    <a href="https://Wang-ABG.github.io/das-sein.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>假定存在 5 台机器，每台机器都运行着 1 个 Redis 实例主节点，这样一来，主节点的数量便呈现<strong>奇数</strong>状态。基于此状况，我们运用<strong>一主二从</strong>的架构来开展部署工作，如此总共就需要<strong>15 个 Redis 实例</strong>。那么，当我们借助 <strong>Docker 与 Docker Compose</strong> 实施部署操作时，究竟需要对哪些<strong>配置文件</strong>予以配置？又需要执行哪些具体的<strong>命令</strong>呢？本篇文章将会围绕这一核心要点逐步展开深入探讨，与此同时，还会对所需的配置文件数量以及命令数量进行精确统计。</p>
+<p>我将这一套行文思路命名为文字版部署可视化，通过这样的方式，能够以文字描述的形式清晰呈现整个部署流程的关键要素与步骤。</p>
+</div>
+<p>下面将详细描述如何在5台机器上部署15个 Redis 实例，并使用 Docker 和 Docker Compose 配置它们。这个过程包括 Redis 配置文件、Docker Compose 配置文件以及每个步骤所需的命令和说明。</p>
+<h3><strong>操作与配置文件列表</strong></h3>
+<p><strong>1. 每台机器所需安装的软件</strong></p>
+<ul>
+<li><strong>Docker</strong>：每台机器需安装一次。</li>
+<li><strong>Docker Compose</strong>：每台机器需安装一次。</li>
+</ul>
+<p><strong>2. 配置文件名称与用途</strong></p>
+<p>每台机器需要配置 3 个 Redis 实例，以下是每个机器上的配置文件名称：</p>
+<p><strong>Redis 配置文件</strong></p>
+<ul>
+<li><strong>Machine 1</strong>: <code class="notranslate">redis-7001.conf</code>、<code class="notranslate">redis-7002.conf</code>、<code class="notranslate">redis-7003.conf</code></li>
+<li><strong>Machine 2</strong>: <code class="notranslate">redis-7004.conf</code>、<code class="notranslate">redis-7005.conf</code>、<code class="notranslate">redis-7006.conf</code></li>
+<li><strong>Machine 3</strong>: <code class="notranslate">redis-7007.conf</code>、<code class="notranslate">redis-7008.conf</code>、<code class="notranslate">redis-7009.conf</code></li>
+<li><strong>Machine 4</strong>: <code class="notranslate">redis-7010.conf</code>、<code class="notranslate">redis-7011.conf</code>、<code class="notranslate">redis-7012.conf</code></li>
+<li><strong>Machine 5</strong>: <code class="notranslate">redis-7013.conf</code>、<code class="notranslate">redis-7014.conf</code>、<code class="notranslate">redis-7015.conf</code></li>
+</ul>
+<p><strong>Docker Compose 文件</strong></p>
+<ul>
+<li><strong>Machine 1</strong>: <code class="notranslate">docker-compose-redis1.yml</code></li>
+<li><strong>Machine 2</strong>: <code class="notranslate">docker-compose-redis2.yml</code></li>
+<li><strong>Machine 3</strong>: <code class="notranslate">docker-compose-redis3.yml</code></li>
+<li><strong>Machine 4</strong>: <code class="notranslate">docker-compose-redis4.yml</code></li>
+<li><strong>Machine 5</strong>: <code class="notranslate">docker-compose-redis5.yml</code></li>
+</ul>
+<h3><strong>Redis 配置文件内容</strong></h3>
+<p>一个典型的 Redis 配置文件模板（以 <code class="notranslate">redis-7001.conf</code> 为例）：</p>
+<pre lang="plaintext" class="notranslate"><code class="notranslate">port 7001
+cluster-enabled yes
+cluster-config-file nodes-7001.conf
+cluster-node-timeout 5000
+appendonly yes
+dir /data/redis-7001/
+bind 0.0.0.0
+daemonize no
+protected-mode no
+</code></pre>
+<ul>
+<li><strong>port</strong>: 指定 Redis 实例的端口号。</li>
+<li><strong>cluster-enabled</strong>: 启用集群模式。</li>
+<li><strong>cluster-config-file</strong>: 集群配置文件，用于记录节点信息。</li>
+<li><strong>appendonly</strong>: 开启持久化设置。</li>
+<li><strong>dir</strong>: 数据存储目录。</li>
+<li><strong>bind</strong>: 绑定 IP 地址。</li>
+<li><strong>daemonize</strong>: 是否以后台进程运行。</li>
+</ul>
+<h3><strong>Docker Compose 配置文件</strong></h3>
+<p>一个 Docker Compose 配置文件模板（以 <code class="notranslate">docker-compose-redis1.yml</code> 为例）：</p>
+<div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">version</span>: <span class="pl-s"><span class="pl-pds">'</span>3.8<span class="pl-pds">'</span></span>
+<span class="pl-ent">services</span>:
+  <span class="pl-ent">redis-7001</span>:
+    <span class="pl-ent">image</span>: <span class="pl-s">redis:7.2.0</span>
+    <span class="pl-ent">container_name</span>: <span class="pl-s">redis-7001</span>
+    <span class="pl-ent">ports</span>:
+      - <span class="pl-s"><span class="pl-pds">"</span>7001:7001<span class="pl-pds">"</span></span>
+    <span class="pl-ent">volumes</span>:
+      - <span class="pl-s">./redis-7001.conf:/usr/local/etc/redis/redis.conf</span>
+      - <span class="pl-s">./data/redis-7001:/data</span>
+    <span class="pl-ent">command</span>: <span class="pl-s">redis-server /usr/local/etc/redis/redis.conf</span>
+    <span class="pl-ent">networks</span>:
+      - <span class="pl-s">redis-cluster</span>
+    <span class="pl-ent">healthcheck</span>:
+      <span class="pl-ent">test</span>: <span class="pl-s">[ "CMD", "redis-cli", "ping" ]</span>
+      <span class="pl-ent">interval</span>: <span class="pl-c1">10s</span>
+      <span class="pl-ent">timeout</span>: <span class="pl-c1">5s</span>
+      <span class="pl-ent">retries</span>: <span class="pl-c1">3</span>
+
+  <span class="pl-ent">redis-7002</span>:
+    <span class="pl-ent">image</span>: <span class="pl-s">redis:7.2.0</span>
+    <span class="pl-ent">container_name</span>: <span class="pl-s">redis-7002</span>
+    <span class="pl-ent">ports</span>:
+      - <span class="pl-s"><span class="pl-pds">"</span>7002:7002<span class="pl-pds">"</span></span>
+    <span class="pl-ent">volumes</span>:
+      - <span class="pl-s">./redis-7002.conf:/usr/local/etc/redis/redis.conf</span>
+      - <span class="pl-s">./data/redis-7002:/data</span>
+    <span class="pl-ent">command</span>: <span class="pl-s">redis-server /usr/local/etc/redis/redis.conf</span>
+    <span class="pl-ent">networks</span>:
+      - <span class="pl-s">redis-cluster</span>
+    <span class="pl-ent">healthcheck</span>:
+      <span class="pl-ent">test</span>: <span class="pl-s">[ "CMD", "redis-cli", "ping" ]</span>
+      <span class="pl-ent">interval</span>: <span class="pl-c1">10s</span>
+      <span class="pl-ent">timeout</span>: <span class="pl-c1">5s</span>
+      <span class="pl-ent">retries</span>: <span class="pl-c1">3</span>
+  <span class="pl-c"><span class="pl-c">#</span> Add more Redis services as needed...</span></pre></div>
+<h3><strong>操作流程</strong></h3>
+<h4><strong>1. 安装 Docker 和 Docker Compose</strong></h4>
+<p>在每台机器上分别执行以下命令：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">sudo apt-get update
+sudo apt-get install -y docker.io
+sudo curl -L <span class="pl-s"><span class="pl-pds">"</span>https://github.com/docker/compose/releases/download/v2.22.0/docker-compose-<span class="pl-s"><span class="pl-pds">$(</span>uname -s<span class="pl-pds">)</span></span>-<span class="pl-s"><span class="pl-pds">$(</span>uname -m<span class="pl-pds">)</span></span><span class="pl-pds">"</span></span> -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose --version</pre></div>
+<h4><strong>2. 部署 Redis 实例</strong></h4>
+<p>在每台机器的项目目录中，创建 Redis 配置文件和 Docker Compose 文件：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">mkdir -p redis-cluster
+<span class="pl-c1">cd</span> redis-cluster
+
+<span class="pl-c"><span class="pl-c">#</span> 放置配置文件 redis-7001.conf, redis-7002.conf, redis-7003.conf</span>
+<span class="pl-c"><span class="pl-c">#</span> 放置 docker-compose-redis1.yml</span></pre></div>
+<p>启动 Redis 容器：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">docker-compose -f docker-compose-redis1.yml up -d</pre></div>
+<h4><strong>3. 初始化 Redis 集群</strong></h4>
+<p>在其中一台机器运行以下命令，初始化 Redis 集群：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">docker <span class="pl-c1">exec</span> -it redis-7001 redis-cli --cluster create \
+  192.168.1.101:7001 192.168.1.101:7002 192.168.1.101:7003 \
+  192.168.1.102:7004 192.168.1.102:7005 192.168.1.102:7006 \
+  192.168.1.103:7007 192.168.1.103:7008 192.168.1.103:7009 \
+  192.168.1.104:7010 192.168.1.104:7011 192.168.1.104:7012 \
+  192.168.1.105:7013 192.168.1.105:7014 192.168.1.105:7015 \
+  192.168.1.106:7016 192.168.1.106:7017 192.168.1.106:7018 \
+  --cluster-replicas 2</pre></div>
+<h4><strong>4. 检查集群状态</strong></h4>
+<p>使用以下命令检查集群的健康状态：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">docker <span class="pl-c1">exec</span> -it redis-7001 redis-cli -p 7001 cluster info</pre></div>
+<h4><strong>5. 访问 Redis 集群</strong></h4>
+<p>可以使用 <code class="notranslate">redis-cli</code> 或其他客户端连接到集群，进行数据操作验证。</p>
+<h3><strong>总结</strong></h3>
+<p><a target="_blank" rel="noopener noreferrer nofollow" href="https://camo.githubusercontent.com/1070cb4c6921833fc6ce8349e9326b6f5e0449dc45ac93499a7b6a9470151094/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f5265646973e99b86e7bea4e5ae9ee6938d2e737667"><img src="https://camo.githubusercontent.com/1070cb4c6921833fc6ce8349e9326b6f5e0449dc45ac93499a7b6a9470151094/68747470733a2f2f626c6f672e6461732d7365696e2e746f702f5265646973e99b86e7bea4e5ae9ee6938d2e737667" data-canonical-src="https://blog.das-sein.top/Redis集群实操.svg" style="max-width: 100%;"></a></p>
+<ul>
+<li><strong>安装次数</strong>：
+<ul>
+<li>Docker：每台机器安装 1 次，共 5 次。</li>
+<li>Docker Compose：每台机器安装 1 次，共 5 次。</li>
+</ul>
+</li>
+<li><strong>配置文件数量</strong>：
+<ul>
+<li>Redis 配置文件：15 个。</li>
+<li>Docker Compose 文件：5 个。</li>
+</ul>
+</li>
+<li><strong>编辑文件次数</strong>：每个配置文件编辑 1 次，共 20 次。</li>
+<li><strong>运行命令次数</strong>：
+<ul>
+<li>Docker Compose 启动命令：5 次。</li>
+<li>Redis 集群初始化命令：1 次。</li>
+</ul>
+</li>
+</ul>
+<h3><strong>问题</strong></h3>
+<div class="markdown-alert markdown-alert-tip"><p class="markdown-alert-title"><svg class="octicon octicon-light-bulb mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"></path></svg>Tip</p>
+<ol>
+<li>
+<p>主节点为何需奇数个？</p>
+<p>这与 “脑裂” 及 “随机时间” 密切相关。在分布式环境里，网络异常易引发脑裂，使集群分裂成多个子集群。奇数个主节点可避免因选举投票出现平局而无法决策的状况。比如在主节点选举时，利用随机时间机制打破可能的僵局，奇数设置能确保在多数决原则下，总有一个主节点能脱颖而出，有效维护集群的一致性和可用性。</p>
+</li>
+<li>
+<p>在无哨兵机制与注册中心时，如何达成故障转移？</p>
+<p>依靠 “去中心化” 理念、“gossip 协议” 以及 “全节点信息”。去中心化架构下，系统不存在单点故障隐患。gossip 协议让各节点随机交换信息，每个节点都能借此知晓其他节点状态。当主节点故障，凭借全节点信息，节点间利用 gossip 协议传播的信息，按照既定规则迅速确定新主节点，完成故障转移，保障集群不间断运行。</p>
+</li>
+<li>
+<p>怎样定位键？</p>
+<p>“哈西一致性算法” 发挥关键作用。通过该算法对键进行计算与映射，能精准确定键在分布式集群中的存储位置，使数据的存储与获取高效且准确，确保整个 Redis 集群数据处理的高效性与可靠性。</p>
+</li>
+</ol>
+</div></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://Wang-ABG.github.io/das-sein.github.io">Absoluter Geist</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","Wang-ABG/das-sein.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script>
+
+</html>
