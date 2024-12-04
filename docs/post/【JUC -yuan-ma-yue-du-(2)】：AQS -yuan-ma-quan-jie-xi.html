@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/101440642?s=400&u=06c88f077afc7b58938225692af72f3644e8b1ba&v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="
+
+## 1. AQS 的概述
+
+AbstractQueuedSynchronizer（AQS）是 Java 并发包中最精妙的设计之一，它提供了一个状态同步的通用框架，解决了并发编程中的线程协作问题。">
+<meta property="og:title" content="【JUC 源码阅读(2)】：AQS 源码全解析">
+<meta property="og:description" content="
+
+## 1. AQS 的概述
+
+AbstractQueuedSynchronizer（AQS）是 Java 并发包中最精妙的设计之一，它提供了一个状态同步的通用框架，解决了并发编程中的线程协作问题。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://Wang-ABG.github.io/das-sein.github.io/post/%E3%80%90JUC%20-yuan-ma-yue-du-%282%29%E3%80%91%EF%BC%9AAQS%20-yuan-ma-quan-jie-xi.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/101440642?s=400&u=06c88f077afc7b58938225692af72f3644e8b1ba&v=4">
+<title>【JUC 源码阅读(2)】：AQS 源码全解析</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">【JUC 源码阅读(2)】：AQS 源码全解析</h1>
+<div class="title-right">
+    <a href="https://Wang-ABG.github.io/das-sein.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h2>1. AQS 的概述</h2>
+<p>AbstractQueuedSynchronizer（AQS）是 Java 并发包中最精妙的设计之一，它提供了一个状态同步的通用框架，解决了并发编程中的线程协作问题。</p>
+<p>AQS 内部维护一个共享<strong>同步状态变量</strong>和<strong>线程等待队列</strong>。如果被请求的<strong>共享状态变量</strong>空闲，那么就将当前请求资源的<strong>线程</strong>设置为有效的<strong>工作线程</strong>，将<strong>共享状态变量</strong>设置为锁定状态；如果<strong>共享状态变量</strong>被占用，就需要一定的阻塞等待唤醒机制来保证锁分配。这个机制主要用的是<strong>CLH 队列</strong>的变体实现的，将暂时获取不到锁的线程加入到<strong>等待队列</strong>中，待条件允许的时候将线程从队列中取出并进行唤醒。</p>
+<h2>2. 核心属性</h2>
+<h3>2.1 同步状态变量管理</h3>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 同步状态，使用 volatile 修饰确保可见性</span>
+<span class="pl-k">private</span> <span class="pl-k">volatile</span> <span class="pl-smi">int</span> <span class="pl-s1">state</span>;
+
+<span class="pl-c">// 原子更新状态的关键方法</span>
+<span class="pl-k">protected</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">compareAndSetState</span>(<span class="pl-smi">int</span> <span class="pl-s1">expect</span>, <span class="pl-smi">int</span> <span class="pl-s1">update</span>) {
+    <span class="pl-k">return</span> <span class="pl-s1">unsafe</span>.<span class="pl-en">compareAndSwapInt</span>(<span class="pl-smi">this</span>, <span class="pl-s1">stateOffset</span>, <span class="pl-s1">expect</span>, <span class="pl-s1">update</span>);
+}</pre></div>
+<p>AQS 使用一个 32 位整型 <code class="notranslate">state</code> 来表示同步状态。</p>
+<ul>
+<li>32 位足够表示复杂的同步场景。</li>
+<li><code class="notranslate">volatile</code> 保证多线程可见性。</li>
+<li>CAS 操作确保线程安全的状态更新。</li>
+</ul>
+<h3>2.2 等待队列节点</h3>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-k">class</span> <span class="pl-smi">Node</span> {
+    <span class="pl-c">// 等待状态常量</span>
+    <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">int</span> <span class="pl-c1">CANCELLED</span> =  <span class="pl-c1">1</span>;   <span class="pl-c">// 节点已取消</span>
+    <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">int</span> <span class="pl-c1">SIGNAL</span>    = -<span class="pl-c1">1</span>;   <span class="pl-c">// 后继节点需要被唤醒</span>
+    <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">int</span> <span class="pl-c1">CONDITION</span> = -<span class="pl-c1">2</span>;   <span class="pl-c">// 条件等待</span>
+    <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">int</span> <span class="pl-c1">PROPAGATE</span> = -<span class="pl-c1">3</span>;   <span class="pl-c">// 共享模式状态传播</span>
+
+    <span class="pl-c">// 节点关键属性</span>
+    <span class="pl-k">volatile</span> <span class="pl-smi">int</span> <span class="pl-s1">waitStatus</span>;        <span class="pl-c">// 节点等待状态</span>
+    <span class="pl-k">volatile</span> <span class="pl-smi">Node</span> <span class="pl-s1">prev</span>;             <span class="pl-c">// 前驱节点</span>
+    <span class="pl-k">volatile</span> <span class="pl-smi">Node</span> <span class="pl-s1">next</span>;             <span class="pl-c">// 后继节点</span>
+    <span class="pl-k">volatile</span> <span class="pl-smi">Thread</span> <span class="pl-s1">thread</span>;         <span class="pl-c">// 绑定线程</span>
+}</pre></div>
+<p>等待队列是一个双向链表，每个节点代表一个等待的线程。</p>
+<ul>
+<li>线程状态通过 <code class="notranslate">waitStatus</code> 精确控制。</li>
+<li>双向链表便于高效的节点操作。</li>
+<li><code class="notranslate">volatile</code> 修饰保证线程间可见性。</li>
+</ul>
+<h3>2.3 两个队列</h3>
+<p>未完待续</p>
+<h2>3. 同步模式</h2>
+<p>AQS 提供两种同步模式：</p>
+<h3>3.1 独占模式（Exclusive）</h3>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 独占式获取同步状态</span>
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">acquire</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+    <span class="pl-k">if</span> (!<span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>) &amp;&amp;
+        <span class="pl-en">acquireQueued</span>(<span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">EXCLUSIVE</span>), <span class="pl-s1">arg</span>))
+        <span class="pl-en">selfInterrupt</span>();
+}
+
+<span class="pl-c">// 独占式释放同步状态</span>
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">release</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+    <span class="pl-k">if</span> (<span class="pl-en">tryRelease</span>(<span class="pl-s1">arg</span>)) {
+        <span class="pl-smi">Node</span> <span class="pl-s1">h</span> = <span class="pl-s1">head</span>;
+        <span class="pl-k">if</span> (<span class="pl-s1">h</span> != <span class="pl-c1">null</span> &amp;&amp; <span class="pl-s1">h</span>.<span class="pl-s1">waitStatus</span> != <span class="pl-c1">0</span>)
+            <span class="pl-en">unparkSuccessor</span>(<span class="pl-s1">h</span>);
+        <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+    }
+    <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+}</pre></div>
+<h3>3.2 共享模式（Shared）</h3>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 共享模式获取同步状态</span>
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">acquireShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+    <span class="pl-k">if</span> (<span class="pl-en">tryAcquireShared</span>(<span class="pl-s1">arg</span>) &lt; <span class="pl-c1">0</span>)
+        <span class="pl-en">doAcquireShared</span>(<span class="pl-s1">arg</span>);
+}
+
+<span class="pl-c">// 共享模式释放同步状态</span>
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">releaseShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+    <span class="pl-k">if</span> (<span class="pl-en">tryReleaseShared</span>(<span class="pl-s1">arg</span>)) {
+        <span class="pl-en">doReleaseShared</span>();
+        <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+    }
+    <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+}</pre></div>
+<h2>4. 核心同步机制</h2>
+<h3>4.1 节点入队</h3>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">private</span> <span class="pl-smi">Node</span> <span class="pl-s1">addWaiter</span>(<span class="pl-smi">Node</span> <span class="pl-s1">mode</span>) {
+    <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-k">new</span> <span class="pl-smi">Node</span>(<span class="pl-smi">Thread</span>.<span class="pl-en">currentThread</span>(), <span class="pl-s1">mode</span>);
+    <span class="pl-smi">Node</span> <span class="pl-s1">pred</span> = <span class="pl-s1">tail</span>;
+    <span class="pl-k">if</span> (<span class="pl-s1">pred</span> != <span class="pl-c1">null</span>) {
+        <span class="pl-s1">node</span>.<span class="pl-s1">prev</span> = <span class="pl-s1">pred</span>;
+        <span class="pl-k">if</span> (<span class="pl-en">compareAndSetTail</span>(<span class="pl-s1">pred</span>, <span class="pl-s1">node</span>)) {
+            <span class="pl-s1">pred</span>.<span class="pl-s1">next</span> = <span class="pl-s1">node</span>;
+            <span class="pl-k">return</span> <span class="pl-s1">node</span>;
+        }
+    }
+    <span class="pl-en">enq</span>(<span class="pl-s1">node</span>);
+    <span class="pl-k">return</span> <span class="pl-s1">node</span>;
+}</pre></div>
+<h3>4.2 线程阻塞与唤醒</h3>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+    <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
+    <span class="pl-k">try</span> {
+        <span class="pl-smi">boolean</span> <span class="pl-s1">interrupted</span> = <span class="pl-c1">false</span>;
+        <span class="pl-k">for</span> (;;) {
+            <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">node</span>.<span class="pl-en">predecessor</span>();
+            <span class="pl-k">if</span> (<span class="pl-s1">p</span> == <span class="pl-s1">head</span> &amp;&amp; <span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>)) {
+                <span class="pl-en">setHead</span>(<span class="pl-s1">node</span>);
+                <span class="pl-s1">p</span>.<span class="pl-s1">next</span> = <span class="pl-c1">null</span>;
+                <span class="pl-s1">failed</span> = <span class="pl-c1">false</span>;
+                <span class="pl-k">return</span> <span class="pl-s1">interrupted</span>;
+            }
+            <span class="pl-k">if</span> (<span class="pl-en">shouldParkAfterFailedAcquire</span>(<span class="pl-s1">p</span>, <span class="pl-s1">node</span>) &amp;&amp;
+                <span class="pl-en">parkAndCheckInterrupt</span>())
+                <span class="pl-s1">interrupted</span> = <span class="pl-c1">true</span>;
+        }
+    } <span class="pl-k">finally</span> {
+        <span class="pl-k">if</span> (<span class="pl-s1">failed</span>)
+            <span class="pl-en">cancelAcquire</span>(<span class="pl-s1">node</span>);
+    }
+}</pre></div>
+<h3>4.3 中断处理</h3>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doAcquireInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+    <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">EXCLUSIVE</span>);
+    <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
+    <span class="pl-k">try</span> {
+        <span class="pl-k">for</span> (;;) {
+            <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">node</span>.<span class="pl-en">predecessor</span>();
+            <span class="pl-k">if</span> (<span class="pl-s1">p</span> == <span class="pl-s1">head</span> &amp;&amp; <span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>)) {
+                <span class="pl-en">setHead</span>(<span class="pl-s1">node</span>);
+                <span class="pl-s1">p</span>.<span class="pl-s1">next</span> = <span class="pl-c1">null</span>;
+                <span class="pl-s1">failed</span> = <span class="pl-c1">false</span>;
+                <span class="pl-k">return</span>;
+            }
+            <span class="pl-k">if</span> (<span class="pl-en">shouldParkAfterFailedAcquire</span>(<span class="pl-s1">p</span>, <span class="pl-s1">node</span>) &amp;&amp;
+                <span class="pl-en">parkAndCheckInterrupt</span>())
+                <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
+        }
+    } <span class="pl-k">finally</span> {
+        <span class="pl-k">if</span> (<span class="pl-s1">failed</span>)
+            <span class="pl-en">cancelAcquire</span>(<span class="pl-s1">node</span>);
+    }
+}</pre></div>
+<h2>5. 高级特性</h2>
+<h3>5.1 条件队列</h3>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">await</span>() <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+    <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">interrupted</span>())
+        <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
+    <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addConditionWaiter</span>();
+    <span class="pl-smi">int</span> <span class="pl-s1">savedState</span> = <span class="pl-en">fullyRelease</span>(<span class="pl-s1">node</span>);
+    <span class="pl-smi">int</span> <span class="pl-s1">interruptMode</span> = <span class="pl-c1">0</span>;
+    <span class="pl-k">while</span> (!<span class="pl-en">isOnSyncQueue</span>(<span class="pl-s1">node</span>)) {
+        <span class="pl-smi">LockSupport</span>.<span class="pl-en">park</span>(<span class="pl-smi">this</span>);
+        <span class="pl-k">if</span> ((<span class="pl-s1">interruptMode</span> = <span class="pl-en">checkInterruptWhileWaiting</span>(<span class="pl-s1">node</span>)) != <span class="pl-c1">0</span>)
+            <span class="pl-k">break</span>;
+    }
+    <span class="pl-k">if</span> (<span class="pl-en">acquireQueued</span>(<span class="pl-s1">node</span>, <span class="pl-s1">savedState</span>) &amp;&amp; <span class="pl-s1">interruptMode</span> != <span class="pl-c1">THROW_IE</span>)
+        <span class="pl-s1">interruptMode</span> = <span class="pl-c1">REINTERRUPT</span>;
+    <span class="pl-k">if</span> (<span class="pl-s1">node</span>.<span class="pl-s1">nextWaiter</span> != <span class="pl-c1">null</span>)
+        <span class="pl-en">unlinkCancelledWaiters</span>();
+    <span class="pl-k">if</span> (<span class="pl-s1">interruptMode</span> != <span class="pl-c1">0</span>)
+        <span class="pl-en">reportInterruptAfterWait</span>(<span class="pl-s1">interruptMode</span>);
+}</pre></div>
+<h2>6. 优点</h2>
+<p>AQS 的性能优化体现在：</p>
+<ul>
+<li>无锁化设计</li>
+<li>CAS 原子操作</li>
+<li>精细的线程状态管理</li>
+<li>最小化上下文切换</li>
+</ul>
+<h2>7. 源码分析</h2>
+<h3>概览</h3>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>层级</strong></th>
+<th><strong>描述</strong></th>
+<th><strong>关键方法/数据</strong></th>
+<th><strong>子类需要实现的方法</strong></th>
+<th><strong>简要说明</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>第一层：对外暴露的 API</strong></td>
+<td>AQS 提供给外部<br>同步器的接口，<br>用于加锁、解锁<br>等基本操作。</td>
+<td>-<code class="notranslate">acquire(int arg)</code> <br>- <code class="notranslate">release(int arg)</code><br>- <code class="notranslate">tryAcquire(int arg)</code> <br>- <code class="notranslate">tryRelease(int arg)</code><br>- <code class="notranslate">acquireShared(int arg)</code> <br>- <code class="notranslate">releaseShared(int arg)</code> <br>- <code class="notranslate">isHeldExclusively()</code></td>
+<td>- <code class="notranslate">tryAcquire(int arg)</code> <br>- <code class="notranslate">tryRelease(int arg)</code> <br>- <code class="notranslate">acquireShared(int arg)</code> <br>- <code class="notranslate">releaseShared(int arg)</code></td>
+<td>这些方法为外部同步器<br>提供了基本功能，子类<br>同步器需要重写相关的<br>加锁和解锁操作。</td>
+</tr>
+<tr>
+<td><strong>第二层：锁获取</strong></td>
+<td>实际的锁获取<br>操作，通常通<br>过 CAS 或自旋<br>来尝试获取锁。</td>
+<td>- <code class="notranslate">tryAcquire(int arg)</code> <br>-<code class="notranslate">acquireQueued(Node node, int arg)</code> <br>- <code class="notranslate">isAcquiredQueued(Node node)</code></td>
+<td>- <code class="notranslate">tryAcquire(int arg)</code></td>
+<td>子类同步器需要实现如<br>何尝试获取锁的逻辑。<br>具体的实现方式依赖于<br>同步器的策略。</td>
+</tr>
+<tr>
+<td><strong>第三层：等待队列处理</strong></td>
+<td>处理获取锁失败<br>时，线程如何进<br>入等待队列并排队。</td>
+<td>- <code class="notranslate">addWaiter(Node.Mode mode)</code> <br>- <code class="notranslate">cancelWaiter(Node node)</code> <br>- <code class="notranslate">getWaitQueueLength(Node node)</code> <br>- <code class="notranslate">hasQueuedThreads()</code></td>
+<td></td>
+<td>子类需要实现将线程添加<br>到等待队列、取消等待等<br>队列管理的逻辑。</td>
+</tr>
+<tr>
+<td><strong>第四层：线程唤醒</strong></td>
+<td>线程获取锁失败<br>后，如何唤醒队<br>列中的线程继续获取锁。</td>
+<td>- <code class="notranslate">unparkSuccessor(Node node)</code> <br>- <code class="notranslate">signal(Node node)</code></td>
+<td></td>
+<td>负责唤醒排队的线程，确保<br>线程按照公平或优先级的策<br>略被唤醒，进入下一轮加锁争夺。</td>
+</tr>
+<tr>
+<td><strong>第五层：基础数据提供层</strong></td>
+<td>提供底层数据结构，<br>管理锁状态、队列、节点等。</td>
+<td>- <code class="notranslate">state</code> - <code class="notranslate">head</code> 和 <code class="notranslate">tail</code> - <code class="notranslate">node</code> - <code class="notranslate">waitStatus</code></td>
+<td></td>
+<td>管理底层数据结构<br>，确保锁的状态、队列的管理和同步数据的正确性。</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<div class="highlight highlight-text-md"><pre class="notranslate">在 AQS 中，子类需要重写的主要方法如下：
+<span class="pl-s">1</span><span class="pl-v">.</span> tryAcquire(int acquires)
+<span class="pl-v">-</span> 修饰符：protected
+描述：用于尝试获取锁。
+<span class="pl-s">2</span><span class="pl-v">.</span> tryRelease(int releases)
+修饰符：protected
+描述：用于释放锁。
+<span class="pl-s">3</span><span class="pl-v">.</span> tryAcquireShared(int acquires)
+修饰符：protected
+描述：这是一个用于共享锁的获取方法。
+<span class="pl-s">4</span><span class="pl-v">.</span> tryReleaseShared(int releases)
+修饰符：protected
+描述：这是共享锁的释放方法。
+
+<span class="pl-ms">-----------</span>
+其他：
+<span class="pl-s">5</span><span class="pl-v">.</span> isHeldExclusively()
+修饰符：protected
+描述：返回锁是否被当前线程独占。
+<span class="pl-s">6</span><span class="pl-v">.</span> hasQueuedThreads()
+修饰符：public
+描述：检查是否有线程在等待队列中。
+<span class="pl-s">7</span><span class="pl-v">.</span> getFirstQueuedThread()
+修饰符：protected
+描述：获取队列中的第一个等待线程。</pre></div>
+<h3><strong>为什么需要同步和同步器</strong></h3>
+<h4>1. <strong>保证数据一致性</strong></h4>
+<p>在多线程环境中，多个线程可能会同时访问和修改共享的数据，容易导致数据的不一致。<strong>同步机制</strong>可以确保同一时刻<strong>只有一个线程</strong>对<strong>共享资源</strong>进行修改，从而避免数据竞争和冲突。（画外之音：<strong>多线程中</strong>只有<strong>一个</strong>线程<strong>有权</strong>对<strong>共享资源</strong>进行修改）</p>
+<p><strong>举例</strong>：假设有两个线程同时修改一个共享变量 <code class="notranslate">counter</code>，如果没有同步机制，可能会发生丢失更新（Lost Update）问题，即两个线程的更新操作会覆盖对方的修改，导致最终的结果不符合预期。</p>
+<h4>2. <strong>确保线程的协调与通信</strong></h4>
+<p>同步器允许<strong>线程之间</strong>协调和通信，以便在<strong>适当的时候</strong>启动某些任务或<strong>进行</strong>   <strong>数据交换</strong>。例如，在并行计算中，需要确保某些线程完成任务后，其他线程才能继续执行。同步器可以帮助线程按顺序执行任务，协调任务之间的依赖关系。（画外之音：<strong>线程之间</strong>有<strong>通信需求</strong>。）</p>
+<p><strong>举例</strong>：使用 <code class="notranslate">CountDownLatch</code> 来等待多个线程完成后，再执行后续操作。比如在一个网络请求的场景中，所有的请求都需要并行执行，但只有所有请求都完成后，才会执行后续的合并数据操作。</p>
+<h3><strong>如何实现这两点？</strong></h3>
+<ul>
+<li><strong>如何确保多线程中只有一个线程有权修改共享资源？</strong></li>
+</ul>
+<p>首先，我们需要设计一个字段，来标识“<strong>只有一个线程</strong>有权对共享资源进行修改”，这个字段可以命名为 <code class="notranslate">exclusiveOwnerThread</code>。每次线程请求资源时，都会先检查这个字段，确认是否自己是该资源的“独占者”。</p>
+<p>于是我们有了如下的同步器设计，它是通过一个标记 <code class="notranslate">exclusiveOwnerThread</code> 来管理资源的所有权。</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">class</span> <span class="pl-smi">AbstractQueuedSynchronizer</span> {
+
+    <span class="pl-c">// 存储当前拥有锁的线程</span>
+    <span class="pl-k">private</span> <span class="pl-k">transient</span> <span class="pl-smi">Thread</span> <span class="pl-s1">exclusiveOwnerThread</span>;
+
+    <span class="pl-c">// 设置当前独占线程</span>
+    <span class="pl-smi">void</span> <span class="pl-en">setExclusiveOwnerThread</span>(<span class="pl-smi">Thread</span> <span class="pl-s1">thread</span>) {
+        <span class="pl-s1">exclusiveOwnerThread</span> = <span class="pl-s1">thread</span>;
+    }
+
+    <span class="pl-c">// 获取当前独占线程</span>
+    <span class="pl-k">protected</span> <span class="pl-k">final</span> <span class="pl-smi">Thread</span> <span class="pl-en">getExclusiveOwnerThread</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">exclusiveOwnerThread</span>;
+    }
+    
+     <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">tryAcquire</span>(<span class="pl-smi">int</span> <span class="pl-s1">acquires</span>) {
+        <span class="pl-k">if</span> (<span class="pl-s1">exclusiveOwnerThread</span>==<span class="pl-c1">null</span>) {
+            <span class="pl-c">// 成功获取锁</span>
+            <span class="pl-en">setExclusiveOwnerThread</span>(<span class="pl-smi">Thread</span>.<span class="pl-en">currentThread</span>());
+            <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+        }
+        <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+    }
+
+    <span class="pl-c">// 释放锁</span>
+    <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">tryRelease</span>(<span class="pl-smi">int</span> <span class="pl-s1">releases</span>) {
+        <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">currentThread</span>()==<span class="pl-s1">exclusiveOwnerThread</span>) {
+            <span class="pl-c">// 释放锁</span>
+            <span class="pl-en">setExclusiveOwnerThread</span>(<span class="pl-c1">null</span>);
+            <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+        }
+        <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+    }
+
+}</pre></div>
+<p>在上面的设计中，<strong>每次线程请求资源时，都会调用 <code class="notranslate">getExclusiveOwnerThread()</code> 来检查自己是否是该资源的拥有者</strong>。如果是，则可以修改资源；如果不是，则会根据 <code class="notranslate">exclusiveOwnerThread</code> 是否为空来判断是否有其他线程持有资源。如果 <code class="notranslate">exclusiveOwnerThread</code> 为空，则当前线程会设置为资源的拥有者。如果已经有线程持有资源，则当前线程会被阻塞，直到资源被释放。</p>
+<div class="highlight highlight-source-mermaid"><pre class="notranslate"><span class="pl-k">sequenceDiagram</span>
+    <span class="pl-k">participant</span> <span class="pl-ent">T1</span> <span class="pl-k">as</span> <span class="pl-ent">Thread 1</span>
+    <span class="pl-k">participant</span> <span class="pl-ent">T2</span> <span class="pl-k">as</span> <span class="pl-ent">Thread 2</span>
+    <span class="pl-k">participant</span> <span class="pl-ent">AQS</span> <span class="pl-k">as</span> <span class="pl-ent">AQS</span>
+
+    <span class="pl-c"><span class="pl-c">%%</span> 线程1请求锁</span>
+    <span class="pl-ent">T1</span><span class="pl-k">-&gt;&gt;</span><span class="pl-ent">AQS</span><span class="pl-k">:</span> <span class="pl-s">请求锁</span>
+    <span class="pl-ent">AQS</span><span class="pl-k">--&gt;&gt;</span><span class="pl-ent">AQS</span><span class="pl-k">:</span> <span class="pl-s">getExclusiveOwnerThread() 返回 null</span>
+    <span class="pl-ent">AQS</span><span class="pl-k">--&gt;&gt;</span><span class="pl-ent">T1</span><span class="pl-k">:</span> <span class="pl-s">资源空闲，成功获取锁</span>
+    <span class="pl-ent">AQS</span><span class="pl-k">--&gt;&gt;</span><span class="pl-ent">AQS</span><span class="pl-k">:</span> <span class="pl-s">setExclusiveOwnerThread(T1)</span>
+    <span class="pl-ent">AQS</span><span class="pl-k">--&gt;&gt;</span><span class="pl-ent">T1</span><span class="pl-k">:</span> <span class="pl-s">设置T1为独占线程</span>
+
+    <span class="pl-c"><span class="pl-c">%%</span> 线程2请求锁</span>
+    <span class="pl-ent">T2</span><span class="pl-k">-&gt;&gt;</span><span class="pl-ent">AQS</span><span class="pl-k">:</span> <span class="pl-s">请求锁</span>
+    <span class="pl-ent">AQS</span><span class="pl-k">--&gt;&gt;</span><span class="pl-ent">AQS</span><span class="pl-k">:</span> <span class="pl-s">getExclusiveOwnerThread() 返回 T1</span>
+    <span class="pl-ent">AQS</span><span class="pl-k">--&gt;&gt;</span><span class="pl-ent">T2</span><span class="pl-k">:</span> <span class="pl-s">资源被T1占用，锁定失败</span>
+    <span class="pl-ent">AQS</span><span class="pl-k">--&gt;&gt;</span><span class="pl-ent">T2</span><span class="pl-k">:</span> <span class="pl-s">阻塞等待</span>
+
+    <span class="pl-c"><span class="pl-c">%%</span> 线程1释放锁</span>
+    <span class="pl-ent">T1</span><span class="pl-k">-&gt;&gt;</span><span class="pl-ent">AQS</span><span class="pl-k">:</span> <span class="pl-s">释放锁</span>
+    <span class="pl-ent">AQS</span><span class="pl-k">--&gt;&gt;</span><span class="pl-ent">AQS</span><span class="pl-k">:</span> <span class="pl-s">获取当前线程（T1）并验证是否是独占线程</span>
+    <span class="pl-ent">AQS</span><span class="pl-k">--&gt;&gt;</span><span class="pl-ent">AQS</span><span class="pl-k">:</span> <span class="pl-s">setExclusiveOwnerThread(null)</span>
+    <span class="pl-ent">AQS</span><span class="pl-k">--&gt;&gt;</span><span class="pl-ent">T2</span><span class="pl-k">:</span> <span class="pl-s">唤醒T2并允许获取锁</span>
+    <span class="pl-ent">AQS</span><span class="pl-k">--&gt;&gt;</span><span class="pl-ent">T2</span><span class="pl-k">:</span> <span class="pl-s">setExclusiveOwnerThread(T2)</span>
+    <span class="pl-ent">AQS</span><span class="pl-k">--&gt;&gt;</span><span class="pl-ent">T2</span><span class="pl-k">:</span> <span class="pl-s">设置T2为独占线程，成功获取锁</span>
+
+</pre></div>
+<p>上面的实现方式存在一个问题：<strong>修改<code class="notranslate">exclusiveOwnerThread</code>字段本身也会涉及到同步操作</strong>，而这个操作本身可能会被其他线程打断，从而引发线程安全问题。为了解决这个问题，我们有以下两种方案：</p>
+<ul>
+<li><strong>悲观锁（synchronized）</strong>：使用 <code class="notranslate">synchronized</code> 来确保只有一个线程能够访问 <code class="notranslate">exclusiveOwnerThread</code> 字段，这种方法会引入性能开销，因为每次操作都需要获得锁。</li>
+<li><strong>乐观锁（CAS）</strong>：使用 <code class="notranslate">exclusiveOwnerThread</code> 进行 CAS（Compare And Swap）操作，这样就能确保只有一个线程能够成功更新该字段，但它依赖于硬件支持和 JVM 的优化。(低情商：硬件和jvm“不支持”。)</li>
+</ul>
+<h3><strong>解决同步问题</strong></h3>
+<p>在多线程编程中，同步问题的核心在于如何合理地控制线程访问共享资源。两种常见的同步机制是<strong>悲观锁</strong>和<strong>乐观锁</strong>。尽管它们都有一定的优势，但各自的缺点也不可忽视：</p>
+<ul>
+<li><strong>悲观锁</strong>：虽然它能够保证线程安全，但它带来了性能的损失。每次请求资源时都会加锁，导致线程之间的竞争增加，降低了程序的并发效率。相比之下，我们可能会想，“既然已经有了 <code class="notranslate">synchronized</code> 这种机制，为什么还要自己实现同步器呢？”</li>
+<li><strong>乐观锁</strong>：依赖于 <code class="notranslate">CAS</code>（比较和交换）机制，性能相对较好，但实现上需要保证操作的原子性，且可能会导致 CAS 失败，导致竞争的线程重试，增加了复杂度。</li>
+</ul>
+<p>那么，有没有一种更加高效且简洁的方案呢？</p>
+<h3><strong>使用 <code class="notranslate">AtomicInteger</code> 表示共享状态</strong></h3>
+<p>我们可以用 <code class="notranslate">AtomicInteger</code> 来表示共享资源的锁定状态，通过 CAS 操作来修改它，从而避免了悲观锁带来的性能开销。<code class="notranslate">AtomicInteger</code> 提供了无锁的原子操作，使得在高并发环境下的性能得到了极大的提升。</p>
+<p>我们使用 <code class="notranslate">state</code> 来标记资源是否被锁住：</p>
+<ul>
+<li><code class="notranslate">state == 0</code>：表示资源空闲，可以被获取；</li>
+<li><code class="notranslate">state == 1</code>：表示资源已经被锁定，不能再被其他线程占用。</li>
+</ul>
+<p>同时，我们需要一个字段来标识当前资源的拥有者——<code class="notranslate">exclusiveOwnerThread</code>。如果资源被占用，只有拥有该资源的线程才能释放它。</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">class</span> <span class="pl-smi">AbstractQueuedSynchronizer</span> {
+    
+    <span class="pl-c">// 使用原子整数来表示锁的状态</span>
+    <span class="pl-k">private</span> <span class="pl-k">final</span> <span class="pl-smi">AtomicInteger</span> <span class="pl-s1">state</span> = <span class="pl-k">new</span> <span class="pl-smi">AtomicInteger</span>(<span class="pl-c1">0</span>);
+    
+    <span class="pl-c">// 存储当前拥有锁的线程</span>
+    <span class="pl-k">private</span> <span class="pl-k">transient</span> <span class="pl-smi">Thread</span> <span class="pl-s1">exclusiveOwnerThread</span>;
+
+    <span class="pl-c">// 设置当前独占线程</span>
+    <span class="pl-smi">void</span> <span class="pl-en">setExclusiveOwnerThread</span>(<span class="pl-smi">Thread</span> <span class="pl-s1">thread</span>) {
+        <span class="pl-s1">exclusiveOwnerThread</span> = <span class="pl-s1">thread</span>;
+    }
+
+    <span class="pl-c">// 获取当前独占线程</span>
+    <span class="pl-k">protected</span> <span class="pl-k">final</span> <span class="pl-smi">Thread</span> <span class="pl-en">getExclusiveOwnerThread</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">exclusiveOwnerThread</span>;
+    }
+
+    <span class="pl-c">// 获取锁</span>
+    <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">tryAcquire</span>(<span class="pl-smi">int</span> <span class="pl-s1">acquires</span>) {
+        <span class="pl-c">// 如果 state == 0，表示锁空闲，尝试获取锁</span>
+        <span class="pl-k">if</span> (<span class="pl-s1">state</span>.<span class="pl-en">compareAndSet</span>(<span class="pl-c1">0</span>, <span class="pl-s1">acquires</span>)) {
+            <span class="pl-c">// 成功获取锁，设置当前线程为独占线程</span>
+            <span class="pl-en">setExclusiveOwnerThread</span>(<span class="pl-smi">Thread</span>.<span class="pl-en">currentThread</span>());
+            <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+        }
+        <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+    }
+
+    <span class="pl-c">// 释放锁</span>
+    <span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">tryRelease</span>(<span class="pl-smi">int</span> <span class="pl-s1">releases</span>) {
+        <span class="pl-c">// 如果当前线程是独占线程，释放锁</span>
+        <span class="pl-k">if</span> (<span class="pl-s1">state</span>.<span class="pl-en">compareAndSet</span>(<span class="pl-s1">releases</span>, <span class="pl-c1">0</span>)) {
+            <span class="pl-c">// 释放锁，清空独占线程字段</span>
+            <span class="pl-en">setExclusiveOwnerThread</span>(<span class="pl-c1">null</span>);
+            <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+        }
+        <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+    }
+}</pre></div>
+<p>通过 <code class="notranslate">AtomicInteger</code> 和 <code class="notranslate">CAS</code> 操作，我们成功实现了高效的同步控制。以下是加锁和释放锁的流程：</p>
+<ol>
+<li><strong>请求锁</strong>：线程请求锁时，首先检查 <code class="notranslate">state</code> 是否为 0，表示锁空闲。如果是，当前线程尝试通过 <code class="notranslate">CAS</code> 操作将 <code class="notranslate">state</code> 设置为 1，并将当前线程设置为锁的拥有者。</li>
+<li><strong>获取锁成功</strong>：如果 <code class="notranslate">CAS</code> 操作成功，当前线程成为锁的独占线程，执行任务。</li>
+<li><strong>释放锁</strong>：当任务完成，线程会释放锁。通过 <code class="notranslate">CAS</code> 操作将 <code class="notranslate">state</code> 设置为 0，表示锁被释放。如果当前线程是持有锁的线程，那么它会将 <code class="notranslate">exclusiveOwnerThread</code> 设置为 <code class="notranslate">null</code>，并唤醒等待线程。</li>
+</ol>
+<div class="highlight highlight-source-mermaid"><pre class="notranslate"><span class="pl-k">graph</span> <span class="pl-c1">TD</span>
+    <span class="pl-ent">A</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>请求锁<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span> <span class="pl-k">--&gt;</span> <span class="pl-ent">B</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>是否有独占线程？<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span>
+    <span class="pl-ent">B</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">没有</span><span class="pl-k">|</span> <span class="pl-ent">C</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>设置当前线程为独占线程<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span>
+    <span class="pl-ent">C</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">D</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>资源已被当前线程占用，执行操作<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span>
+    <span class="pl-ent">B</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">有</span><span class="pl-k">|</span> <span class="pl-ent">E</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>当前线程是否是独占线程？<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span>
+    <span class="pl-ent">E</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">D</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>资源已被当前线程占用，执行操作<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span>
+    <span class="pl-ent">E</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">F</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>阻塞当前线程<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span>
+    
+    <span class="pl-c"><span class="pl-c">%%</span>D --&gt; G["释放锁"]</span>
+    <span class="pl-c"><span class="pl-c">%%</span>G --&gt; H{"当前线程是否是独占线程？"}</span>
+    <span class="pl-c"><span class="pl-c">%%</span>H --&gt;|是| I["清空独占线程字段"]</span>
+    <span class="pl-c"><span class="pl-c">%%</span>I --&gt; J["唤醒等待线程"]</span>
+    <span class="pl-c"><span class="pl-c">%%</span>J --&gt; K["设置等待线程为独占线程"]</span>
+    <span class="pl-c"><span class="pl-c">%%</span>K --&gt; L["资源被新线程占用，执行操作"]</span>
+    
+    <span class="pl-c"><span class="pl-c">%%</span> Define styles for clarity</span>
+    <span class="pl-k">class</span> <span class="pl-ent">A</span>,<span class="pl-ent">B</span>,<span class="pl-ent">C</span>,<span class="pl-ent">D</span>,<span class="pl-ent">E</span>,<span class="pl-ent">F</span>,<span class="pl-ent">G</span>,<span class="pl-ent">H</span>,<span class="pl-ent">I</span>,<span class="pl-ent">J</span>,<span class="pl-ent">K</span>,<span class="pl-ent">L</span> <span class="pl-en">flowchartprocess</span><span class="pl-sg">;</span>
+    <span class="pl-k">class</span> <span class="pl-ent">A</span>,<span class="pl-ent">B</span>,<span class="pl-ent">C</span>,<span class="pl-ent">D</span>,<span class="pl-ent">E</span>,<span class="pl-ent">F</span> <span class="pl-en">flowchartstart</span><span class="pl-sg">;</span>
+    <span class="pl-k">class</span> <span class="pl-ent">G</span>,<span class="pl-ent">H</span>,<span class="pl-ent">I</span>,<span class="pl-ent">J</span>,<span class="pl-ent">K</span>,<span class="pl-ent">L</span> <span class="pl-en">flowchartend</span><span class="pl-sg">;</span>
+    
+    <span class="pl-c"><span class="pl-c">%%</span> Apply styles</span>
+    <span class="pl-k">class</span> <span class="pl-ent">flowchartprocess</span> fill:#<span class="pl-ent">f9f</span>,stroke:#<span class="pl-ent">333</span>,stroke-width:<span class="pl-en">2px</span><span class="pl-sg">;</span>
+    <span class="pl-k">class</span> <span class="pl-ent">flowchartstart</span> fill:#<span class="pl-ent">cfc</span>,stroke:#<span class="pl-ent">333</span>,stroke-width:<span class="pl-en">2px</span><span class="pl-sg">;</span>
+    <span class="pl-k">class</span> <span class="pl-ent">flowchartend</span> fill:#<span class="pl-ent">ffeb3b</span>,stroke:#<span class="pl-ent">333</span>,stroke-width:<span class="pl-en">2px</span><span class="pl-sg">;</span></pre></div>
+<h3><strong>处理线程阻塞</strong></h3>
+<p>在前面的部分，我们通过 <code class="notranslate">AtomicInteger</code> 和 <code class="notranslate">CAS</code> 实现了一个高效的同步机制，用于保证共享资源的访问安全。每次线程请求资源时，通过 <code class="notranslate">state</code> 和 <code class="notranslate">exclusiveOwnerThread</code> 来判断资源是否已经被占用，并确保只有一个线程能够成功获取锁，其他线程将被阻塞。通过这一方式，我们避免了传统悲观锁的性能问题，并确保了线程安全。</p>
+<p>但是，问题并没有完全解决。当多个线程同时请求锁时，<strong>如何合理地处理这些被阻塞的线程</strong>。在前面的设计中，我们提到如果一个线程无法获取锁，它将被阻塞。但问题在于：**如何管理这些被阻塞的线程？**在获取到锁的线程释放锁之后，这些等待的线程如何能够有效地重新获得执行机会？</p>
+<h4><strong>方案一：放弃任务</strong></h4>
+<p>一种简单的处理方式是，<strong>让无法获取锁的线程直接放弃任务</strong>。这在一些场景中是可行的，尤其是当线程的工作并不关键，或者可以通过其他方式重新调度任务时。</p>
+<h4><strong>方案二：空转（自旋）</strong></h4>
+<p>另一种方式是让线程<strong>自旋</strong>，即线程不断地尝试获取锁，而不是进入阻塞状态。自旋虽然在某些情况下可以减少上下文切换带来的性能损失，但它也可能导致 <strong>CPU 资源的浪费</strong>，因为线程在没有获得锁时仍然占用 CPU 时间。</p>
+<h4><strong>方案三：让出 CPU（推荐方案）</strong></h4>
+<p>最优的方式是<strong>让出 CPU</strong>。即当线程获取不到锁时，可以调用 <code class="notranslate">park()</code> 方法将自己挂起，<strong>释放 CPU 资源</strong>，等待其他线程释放锁时再被唤醒。这样，线程不再占用 CPU 时间，其他线程能够继续执行，提高了并发效率。</p>
+<h3><strong>唤醒线程的机制与流程</strong></h3>
+<p>当一个线程完成任务并释放锁后，<strong>如何唤醒被阻塞的线程</strong>，让它们重新竞争锁呢？每当有线程无法获取锁时，我们将该线程放入一个<strong>等待队列</strong>中。这个队列中存储着所有被阻塞的线程，等待锁的释放。在唤醒机制中，我们会根据特定的顺序或策略来唤醒这些线程。最常见的策略是，<strong>先唤醒队列中的第一个线程</strong>，让它重新尝试获取锁。</p>
+<p><strong>具体实现</strong>：</p>
+<ul>
+<li>当线程释放锁时，<strong>唤醒队列中的线程</strong>（这时我们可能需要通过某种机制比如 <code class="notranslate">unpark()</code> 来唤醒队列中的线程）。</li>
+<li>唤醒后的线程将重新竞争锁。如果它能够成功获取锁，它就成为新的独占线程，开始执行任务。</li>
+</ul>
+<p>在此过程中，我们使用 <strong>队列管理</strong>，来实现对阻塞线程的合理调度。</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">class</span> <span class="pl-smi">Node</span> {
+    <span class="pl-c">// 标记共享模式的节点</span>
+    <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-c1">SHARED</span> = <span class="pl-k">new</span> <span class="pl-smi">Node</span>();
+    <span class="pl-c">// 标记独占模式的节点</span>
+    <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-c1">EXCLUSIVE</span> = <span class="pl-c1">null</span>;
+
+    <span class="pl-c">// 表示线程已取消的状态</span>
+    <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">int</span> <span class="pl-c1">CANCELLED</span> = <span class="pl-c1">1</span>;
+    <span class="pl-c">// 表示节点的后继线程需要被唤醒</span>
+    <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">int</span> <span class="pl-c1">SIGNAL</span> = -<span class="pl-c1">1</span>;
+    <span class="pl-c">// 表示节点正在等待条件</span>
+    <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">int</span> <span class="pl-c1">CONDITION</span> = -<span class="pl-c1">2</span>;
+    <span class="pl-c">// 表示下一个获取共享锁的操作需要传播</span>
+    <span class="pl-k">static</span> <span class="pl-k">final</span> <span class="pl-smi">int</span> <span class="pl-c1">PROPAGATE</span> = -<span class="pl-c1">3</span>;
+
+    <span class="pl-c">// 节点的状态，记录当前线程的等待状态,填入上面的常量</span>
+    <span class="pl-k">volatile</span> <span class="pl-smi">int</span> <span class="pl-s1">waitStatus</span>;
+
+    <span class="pl-c">// 上一个节点</span>
+    <span class="pl-k">volatile</span> <span class="pl-smi">Node</span> <span class="pl-s1">prev</span>;
+
+    <span class="pl-c">// 下一个节点</span>
+    <span class="pl-k">volatile</span> <span class="pl-smi">Node</span> <span class="pl-s1">next</span>;
+
+    <span class="pl-c">// 该节点的线程</span>
+    <span class="pl-k">volatile</span> <span class="pl-smi">Thread</span> <span class="pl-s1">thread</span>;
+
+    <span class="pl-c">// 下一个等待条件的节点，或者特殊的共享模式</span>
+    <span class="pl-smi">Node</span> <span class="pl-s1">nextWaiter</span>;
+
+    <span class="pl-c">// 判断当前节点是否是共享模式</span>
+    <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">isShared</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">nextWaiter</span> == <span class="pl-c1">SHARED</span>;
+    }
+
+    <span class="pl-c">// 返回当前节点的前驱节点</span>
+    <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-en">predecessor</span>() <span class="pl-k">throws</span> <span class="pl-smi">NullPointerException</span> {
+        <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">prev</span>;
+        <span class="pl-k">if</span> (<span class="pl-s1">p</span> == <span class="pl-c1">null</span>)
+            <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">NullPointerException</span>();
+        <span class="pl-k">else</span>
+            <span class="pl-k">return</span> <span class="pl-s1">p</span>;
+    }
+
+    <span class="pl-c">// 无参构造方法，用于初始化头节点或者共享标记</span>
+    <span class="pl-smi">Node</span>() {}
+
+    <span class="pl-c">// 带线程和模式的构造方法，用于添加等待节点</span>
+    <span class="pl-smi">Node</span>(<span class="pl-smi">Thread</span> <span class="pl-s1">thread</span>, <span class="pl-smi">Node</span> <span class="pl-s1">mode</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">nextWaiter</span> = <span class="pl-s1">mode</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">thread</span> = <span class="pl-s1">thread</span>;
+    }
+
+    <span class="pl-c">// 带线程和状态的构造方法，用于条件等待</span>
+    <span class="pl-smi">Node</span>(<span class="pl-smi">Thread</span> <span class="pl-s1">thread</span>, <span class="pl-smi">int</span> <span class="pl-s1">waitStatus</span>) {
+        <span class="pl-smi">this</span>.<span class="pl-s1">waitStatus</span> = <span class="pl-s1">waitStatus</span>;
+        <span class="pl-smi">this</span>.<span class="pl-s1">thread</span> = <span class="pl-s1">thread</span>;
+    }
+}
+
+</pre></div>
+<p>这一步，我们将要解决如何把无法获得锁的线程进行挂起。但是挂起前应该先把线程封装为Node节点，然后加入队列，在挂起自己。否则，我们将无法找到该线程，更别提去唤醒了。我们把这个方法封装进入aquire()方法中。</p>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">class</span> <span class="pl-smi">AbstractQueuedSynchronizer</span> {
+    
+    <span class="pl-c">// 使用原子整数来表示锁的状态</span>
+    <span class="pl-k">private</span> <span class="pl-k">final</span> <span class="pl-smi">AtomicInteger</span> <span class="pl-s1">state</span> = <span class="pl-k">new</span> <span class="pl-smi">AtomicInteger</span>(<span class="pl-c1">0</span>);
+    
+    <span class="pl-c">// 存储当前拥有锁的线程</span>
+    <span class="pl-k">private</span> <span class="pl-k">transient</span> <span class="pl-smi">Thread</span> <span class="pl-s1">exclusiveOwnerThread</span>;
+
+    <span class="pl-c">// 设置当前独占线程</span>
+    <span class="pl-smi">void</span> <span class="pl-en">setExclusiveOwnerThread</span>(<span class="pl-smi">Thread</span> <span class="pl-s1">thread</span>) {<span class="pl-s1">exclusiveOwnerThread</span> = <span class="pl-s1">thread</span>;}
+
+    <span class="pl-c">// 获取当前独占线程</span>
+   <span class="pl-smi">Thread</span> <span class="pl-en">getExclusiveOwnerThread</span>() {<span class="pl-k">return</span> <span class="pl-s1">exclusiveOwnerThread</span>; }
+
+    <span class="pl-c">// 获取锁逻辑</span>
+    <span class="pl-smi">boolean</span> <span class="pl-en">tryAcquire</span>(<span class="pl-smi">int</span> <span class="pl-s1">acquires</span>) { ... }
+
+    <span class="pl-c">// 释放锁逻辑</span>
+    <span class="pl-smi">boolean</span> <span class="pl-en">tryRelease</span>(<span class="pl-smi">int</span> <span class="pl-s1">releases</span>) { ... }
+        
+    <span class="pl-k">class</span> <span class="pl-smi">Node</span> {...}
+    
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-en">acquire</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+        <span class="pl-c">// 首先尝试直接获取锁，如果失败则进入同步队列等待</span>
+        <span class="pl-k">if</span> (!<span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>) &amp;&amp; <span class="pl-en">acquireQueued</span>(<span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">EXCLUSIVE</span>), <span class="pl-s1">arg</span>))
+            <span class="pl-en">selfInterrupt</span>(); <span class="pl-c">// 如果线程被中断过，则再次设置中断标志</span>
+    }
+    
+}</pre></div>
+<hr>
+<h3>施工中（未完待续）。。。。</h3>
+<div class="highlight highlight-source-java"><pre class="notranslate">  
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">acquire</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+        <span class="pl-k">if</span> (!<span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>) &amp;&amp;
+            <span class="pl-en">acquireQueued</span>(<span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">EXCLUSIVE</span>), <span class="pl-s1">arg</span>))
+            <span class="pl-en">selfInterrupt</span>();
+    }
+
+    
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">acquireInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
+            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+        <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">interrupted</span>())
+            <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
+        <span class="pl-k">if</span> (!<span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>))
+            <span class="pl-en">doAcquireInterruptibly</span>(<span class="pl-s1">arg</span>);
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">tryAcquireNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
+            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+        <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">interrupted</span>())
+            <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
+        <span class="pl-k">return</span> <span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>) ||
+            <span class="pl-en">doAcquireNanos</span>(<span class="pl-s1">arg</span>, <span class="pl-s1">nanosTimeout</span>);
+    }
+
+   
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">release</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+        <span class="pl-k">if</span> (<span class="pl-en">tryRelease</span>(<span class="pl-s1">arg</span>)) {
+            <span class="pl-smi">Node</span> <span class="pl-s1">h</span> = <span class="pl-s1">head</span>;
+            <span class="pl-k">if</span> (<span class="pl-s1">h</span> != <span class="pl-c1">null</span> &amp;&amp; <span class="pl-s1">h</span>.<span class="pl-s1">waitStatus</span> != <span class="pl-c1">0</span>)
+                <span class="pl-en">unparkSuccessor</span>(<span class="pl-s1">h</span>);
+            <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+        }
+        <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">acquireShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+        <span class="pl-k">if</span> (<span class="pl-en">tryAcquireShared</span>(<span class="pl-s1">arg</span>) &lt; <span class="pl-c1">0</span>)
+            <span class="pl-en">doAcquireShared</span>(<span class="pl-s1">arg</span>);
+    }
+
+   
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">acquireSharedInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
+            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+        <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">interrupted</span>())
+            <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
+        <span class="pl-k">if</span> (<span class="pl-en">tryAcquireShared</span>(<span class="pl-s1">arg</span>) &lt; <span class="pl-c1">0</span>)
+            <span class="pl-en">doAcquireSharedInterruptibly</span>(<span class="pl-s1">arg</span>);
+    }
+
+   
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">tryAcquireSharedNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
+            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+        <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">interrupted</span>())
+            <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
+        <span class="pl-k">return</span> <span class="pl-en">tryAcquireShared</span>(<span class="pl-s1">arg</span>) &gt;= <span class="pl-c1">0</span> ||
+            <span class="pl-en">doAcquireSharedNanos</span>(<span class="pl-s1">arg</span>, <span class="pl-s1">nanosTimeout</span>);
+    }
+
+   
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">releaseShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+        <span class="pl-k">if</span> (<span class="pl-en">tryReleaseShared</span>(<span class="pl-s1">arg</span>)) {
+            <span class="pl-en">doReleaseShared</span>();
+            <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+        }
+        <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+    }
+
+    
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">hasQueuedThreads</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">head</span> != <span class="pl-s1">tail</span>;
+    }
+
+   
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">hasContended</span>() {
+        <span class="pl-k">return</span> <span class="pl-s1">head</span> != <span class="pl-c1">null</span>;
+    }
+
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">Thread</span> <span class="pl-s1">getFirstQueuedThread</span>() {
+        <span class="pl-c">// handle only fast path, else relay</span>
+        <span class="pl-k">return</span> (<span class="pl-s1">head</span> == <span class="pl-s1">tail</span>) ? <span class="pl-c1">null</span> : <span class="pl-en">fullGetFirstQueuedThread</span>();
+    }</pre></div>
+<div class="highlight highlight-source-java"><pre class="notranslate"> <span class="pl-k">private</span> <span class="pl-smi">Node</span> <span class="pl-s1">addWaiter</span>(<span class="pl-smi">Node</span> <span class="pl-s1">mode</span>) {
+        <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-k">new</span> <span class="pl-smi">Node</span>(<span class="pl-smi">Thread</span>.<span class="pl-en">currentThread</span>(), <span class="pl-s1">mode</span>);
+        <span class="pl-c">// Try the fast path of enq; backup to full enq on failure</span>
+        <span class="pl-smi">Node</span> <span class="pl-s1">pred</span> = <span class="pl-s1">tail</span>;
+        <span class="pl-k">if</span> (<span class="pl-s1">pred</span> != <span class="pl-c1">null</span>) {
+            <span class="pl-s1">node</span>.<span class="pl-s1">prev</span> = <span class="pl-s1">pred</span>;
+            <span class="pl-k">if</span> (<span class="pl-en">compareAndSetTail</span>(<span class="pl-s1">pred</span>, <span class="pl-s1">node</span>)) {
+                <span class="pl-s1">pred</span>.<span class="pl-s1">next</span> = <span class="pl-s1">node</span>;
+                <span class="pl-k">return</span> <span class="pl-s1">node</span>;
+            }
+        }
+        <span class="pl-en">enq</span>(<span class="pl-s1">node</span>);
+        <span class="pl-k">return</span> <span class="pl-s1">node</span>;
+    }
+
+<span class="pl-k">private</span> <span class="pl-smi">Node</span> <span class="pl-s1">enq</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>) {
+        <span class="pl-k">for</span> (;;) {
+            <span class="pl-smi">Node</span> <span class="pl-s1">t</span> = <span class="pl-s1">tail</span>;
+            <span class="pl-k">if</span> (<span class="pl-s1">t</span> == <span class="pl-c1">null</span>) { <span class="pl-c">// Must initialize</span>
+                <span class="pl-k">if</span> (<span class="pl-en">compareAndSetHead</span>(<span class="pl-k">new</span> <span class="pl-smi">Node</span>()))
+                    <span class="pl-s1">tail</span> = <span class="pl-s1">head</span>;
+            } <span class="pl-k">else</span> {
+                <span class="pl-s1">node</span>.<span class="pl-s1">prev</span> = <span class="pl-s1">t</span>;
+                <span class="pl-k">if</span> (<span class="pl-en">compareAndSetTail</span>(<span class="pl-s1">t</span>, <span class="pl-s1">node</span>)) {
+                    <span class="pl-s1">t</span>.<span class="pl-s1">next</span> = <span class="pl-s1">node</span>;
+                    <span class="pl-k">return</span> <span class="pl-s1">t</span>;
+                }
+            }
+        }
+    }
+
+<span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+        <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
+        <span class="pl-k">try</span> {
+            <span class="pl-smi">boolean</span> <span class="pl-s1">interrupted</span> = <span class="pl-c1">false</span>;
+            <span class="pl-k">for</span> (;;) {
+                <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">node</span>.<span class="pl-en">predecessor</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">p</span> == <span class="pl-s1">head</span> &amp;&amp; <span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>)) {
+                    <span class="pl-en">setHead</span>(<span class="pl-s1">node</span>);
+                    <span class="pl-s1">p</span>.<span class="pl-s1">next</span> = <span class="pl-c1">null</span>; <span class="pl-c">// help GC</span>
+                    <span class="pl-s1">failed</span> = <span class="pl-c1">false</span>;
+                    <span class="pl-k">return</span> <span class="pl-s1">interrupted</span>;
+                }
+                <span class="pl-k">if</span> (<span class="pl-en">shouldParkAfterFailedAcquire</span>(<span class="pl-s1">p</span>, <span class="pl-s1">node</span>) &amp;&amp;
+                    <span class="pl-en">parkAndCheckInterrupt</span>())
+                    <span class="pl-s1">interrupted</span> = <span class="pl-c1">true</span>;
+            }
+        } <span class="pl-k">finally</span> {
+            <span class="pl-k">if</span> (<span class="pl-s1">failed</span>)
+                <span class="pl-en">cancelAcquire</span>(<span class="pl-s1">node</span>);
+        }
+    }
+
+   
+    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doAcquireInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
+        <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+        <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">EXCLUSIVE</span>);
+        <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
+        <span class="pl-k">try</span> {
+            <span class="pl-k">for</span> (;;) {
+                <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">node</span>.<span class="pl-en">predecessor</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">p</span> == <span class="pl-s1">head</span> &amp;&amp; <span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>)) {
+                    <span class="pl-en">setHead</span>(<span class="pl-s1">node</span>);
+                    <span class="pl-s1">p</span>.<span class="pl-s1">next</span> = <span class="pl-c1">null</span>; <span class="pl-c">// help GC</span>
+                    <span class="pl-s1">failed</span> = <span class="pl-c1">false</span>;
+                    <span class="pl-k">return</span>;
+                }
+                <span class="pl-k">if</span> (<span class="pl-en">shouldParkAfterFailedAcquire</span>(<span class="pl-s1">p</span>, <span class="pl-s1">node</span>) &amp;&amp;
+                    <span class="pl-en">parkAndCheckInterrupt</span>())
+                    <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
+            }
+        } <span class="pl-k">finally</span> {
+            <span class="pl-k">if</span> (<span class="pl-s1">failed</span>)
+                <span class="pl-en">cancelAcquire</span>(<span class="pl-s1">node</span>);
+        }
+    }
+
+   
+    <span class="pl-k">private</span> <span class="pl-smi">boolean</span> <span class="pl-s1">doAcquireNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
+            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+        <span class="pl-k">if</span> (<span class="pl-s1">nanosTimeout</span> &lt;= <span class="pl-c1">0L</span>)
+            <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+        <span class="pl-k">final</span> <span class="pl-smi">long</span> <span class="pl-s1">deadline</span> = <span class="pl-smi">System</span>.<span class="pl-en">nanoTime</span>() + <span class="pl-s1">nanosTimeout</span>;
+        <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">EXCLUSIVE</span>);
+        <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
+        <span class="pl-k">try</span> {
+            <span class="pl-k">for</span> (;;) {
+                <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">node</span>.<span class="pl-en">predecessor</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">p</span> == <span class="pl-s1">head</span> &amp;&amp; <span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>)) {
+                    <span class="pl-en">setHead</span>(<span class="pl-s1">node</span>);
+                    <span class="pl-s1">p</span>.<span class="pl-s1">next</span> = <span class="pl-c1">null</span>; <span class="pl-c">// help GC</span>
+                    <span class="pl-s1">failed</span> = <span class="pl-c1">false</span>;
+                    <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+                }
+                <span class="pl-s1">nanosTimeout</span> = <span class="pl-s1">deadline</span> - <span class="pl-smi">System</span>.<span class="pl-en">nanoTime</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">nanosTimeout</span> &lt;= <span class="pl-c1">0L</span>)
+                    <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+                <span class="pl-k">if</span> (<span class="pl-en">shouldParkAfterFailedAcquire</span>(<span class="pl-s1">p</span>, <span class="pl-s1">node</span>) &amp;&amp;
+                    <span class="pl-s1">nanosTimeout</span> &gt; <span class="pl-s1">spinForTimeoutThreshold</span>)
+                    <span class="pl-smi">LockSupport</span>.<span class="pl-en">parkNanos</span>(<span class="pl-smi">this</span>, <span class="pl-s1">nanosTimeout</span>);
+                <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">interrupted</span>())
+                    <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
+            }
+        } <span class="pl-k">finally</span> {
+            <span class="pl-k">if</span> (<span class="pl-s1">failed</span>)
+                <span class="pl-en">cancelAcquire</span>(<span class="pl-s1">node</span>);
+        }
+    }
+
+   
+    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doAcquireShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+        <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">SHARED</span>);
+        <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
+        <span class="pl-k">try</span> {
+            <span class="pl-smi">boolean</span> <span class="pl-s1">interrupted</span> = <span class="pl-c1">false</span>;
+            <span class="pl-k">for</span> (;;) {
+                <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">node</span>.<span class="pl-en">predecessor</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">p</span> == <span class="pl-s1">head</span>) {
+                    <span class="pl-smi">int</span> <span class="pl-s1">r</span> = <span class="pl-en">tryAcquireShared</span>(<span class="pl-s1">arg</span>);
+                    <span class="pl-k">if</span> (<span class="pl-s1">r</span> &gt;= <span class="pl-c1">0</span>) {
+                        <span class="pl-en">setHeadAndPropagate</span>(<span class="pl-s1">node</span>, <span class="pl-s1">r</span>);
+                        <span class="pl-s1">p</span>.<span class="pl-s1">next</span> = <span class="pl-c1">null</span>; <span class="pl-c">// help GC</span>
+                        <span class="pl-k">if</span> (<span class="pl-s1">interrupted</span>)
+                            <span class="pl-en">selfInterrupt</span>();
+                        <span class="pl-s1">failed</span> = <span class="pl-c1">false</span>;
+                        <span class="pl-k">return</span>;
+                    }
+                }
+                <span class="pl-k">if</span> (<span class="pl-en">shouldParkAfterFailedAcquire</span>(<span class="pl-s1">p</span>, <span class="pl-s1">node</span>) &amp;&amp;
+                    <span class="pl-en">parkAndCheckInterrupt</span>())
+                    <span class="pl-s1">interrupted</span> = <span class="pl-c1">true</span>;
+            }
+        } <span class="pl-k">finally</span> {
+            <span class="pl-k">if</span> (<span class="pl-s1">failed</span>)
+                <span class="pl-en">cancelAcquire</span>(<span class="pl-s1">node</span>);
+        }
+    }
+
+   
+    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doAcquireSharedInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
+        <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+        <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">SHARED</span>);
+        <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
+        <span class="pl-k">try</span> {
+            <span class="pl-k">for</span> (;;) {
+                <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">node</span>.<span class="pl-en">predecessor</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">p</span> == <span class="pl-s1">head</span>) {
+                    <span class="pl-smi">int</span> <span class="pl-s1">r</span> = <span class="pl-en">tryAcquireShared</span>(<span class="pl-s1">arg</span>);
+                    <span class="pl-k">if</span> (<span class="pl-s1">r</span> &gt;= <span class="pl-c1">0</span>) {
+                        <span class="pl-en">setHeadAndPropagate</span>(<span class="pl-s1">node</span>, <span class="pl-s1">r</span>);
+                        <span class="pl-s1">p</span>.<span class="pl-s1">next</span> = <span class="pl-c1">null</span>; <span class="pl-c">// help GC</span>
+                        <span class="pl-s1">failed</span> = <span class="pl-c1">false</span>;
+                        <span class="pl-k">return</span>;
+                    }
+                }
+                <span class="pl-k">if</span> (<span class="pl-en">shouldParkAfterFailedAcquire</span>(<span class="pl-s1">p</span>, <span class="pl-s1">node</span>) &amp;&amp;
+                    <span class="pl-en">parkAndCheckInterrupt</span>())
+                    <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
+            }
+        } <span class="pl-k">finally</span> {
+            <span class="pl-k">if</span> (<span class="pl-s1">failed</span>)
+                <span class="pl-en">cancelAcquire</span>(<span class="pl-s1">node</span>);
+        }
+    }
+
+    <span class="pl-k">private</span> <span class="pl-smi">boolean</span> <span class="pl-s1">doAcquireSharedNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
+            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+        <span class="pl-k">if</span> (<span class="pl-s1">nanosTimeout</span> &lt;= <span class="pl-c1">0L</span>)
+            <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+        <span class="pl-k">final</span> <span class="pl-smi">long</span> <span class="pl-s1">deadline</span> = <span class="pl-smi">System</span>.<span class="pl-en">nanoTime</span>() + <span class="pl-s1">nanosTimeout</span>;
+        <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">SHARED</span>);
+        <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
+        <span class="pl-k">try</span> {
+            <span class="pl-k">for</span> (;;) {
+                <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">node</span>.<span class="pl-en">predecessor</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">p</span> == <span class="pl-s1">head</span>) {
+                    <span class="pl-smi">int</span> <span class="pl-s1">r</span> = <span class="pl-en">tryAcquireShared</span>(<span class="pl-s1">arg</span>);
+                    <span class="pl-k">if</span> (<span class="pl-s1">r</span> &gt;= <span class="pl-c1">0</span>) {
+                        <span class="pl-en">setHeadAndPropagate</span>(<span class="pl-s1">node</span>, <span class="pl-s1">r</span>);
+                        <span class="pl-s1">p</span>.<span class="pl-s1">next</span> = <span class="pl-c1">null</span>; <span class="pl-c">// help GC</span>
+                        <span class="pl-s1">failed</span> = <span class="pl-c1">false</span>;
+                        <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+                    }
+                }
+                <span class="pl-s1">nanosTimeout</span> = <span class="pl-s1">deadline</span> - <span class="pl-smi">System</span>.<span class="pl-en">nanoTime</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">nanosTimeout</span> &lt;= <span class="pl-c1">0L</span>)
+                    <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+                <span class="pl-k">if</span> (<span class="pl-en">shouldParkAfterFailedAcquire</span>(<span class="pl-s1">p</span>, <span class="pl-s1">node</span>) &amp;&amp;
+                    <span class="pl-s1">nanosTimeout</span> &gt; <span class="pl-s1">spinForTimeoutThreshold</span>)
+                    <span class="pl-smi">LockSupport</span>.<span class="pl-en">parkNanos</span>(<span class="pl-smi">this</span>, <span class="pl-s1">nanosTimeout</span>);
+                <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">interrupted</span>())
+                    <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
+            }
+        } <span class="pl-k">finally</span> {
+            <span class="pl-k">if</span> (<span class="pl-s1">failed</span>)
+                <span class="pl-en">cancelAcquire</span>(<span class="pl-s1">node</span>);
+        }
+    }</pre></div>
+<div class="highlight highlight-source-java"><pre class="notranslate"> <span class="pl-k">private</span> <span class="pl-smi">Node</span> <span class="pl-s1">addWaiter</span>(<span class="pl-smi">Node</span> <span class="pl-s1">mode</span>) {
+        <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-k">new</span> <span class="pl-smi">Node</span>(<span class="pl-smi">Thread</span>.<span class="pl-en">currentThread</span>(), <span class="pl-s1">mode</span>);
+        <span class="pl-c">// Try the fast path of enq; backup to full enq on failure</span>
+        <span class="pl-smi">Node</span> <span class="pl-s1">pred</span> = <span class="pl-s1">tail</span>;
+        <span class="pl-k">if</span> (<span class="pl-s1">pred</span> != <span class="pl-c1">null</span>) {
+            <span class="pl-s1">node</span>.<span class="pl-s1">prev</span> = <span class="pl-s1">pred</span>;
+            <span class="pl-k">if</span> (<span class="pl-en">compareAndSetTail</span>(<span class="pl-s1">pred</span>, <span class="pl-s1">node</span>)) {
+                <span class="pl-s1">pred</span>.<span class="pl-s1">next</span> = <span class="pl-s1">node</span>;
+                <span class="pl-k">return</span> <span class="pl-s1">node</span>;
+            }
+        }
+        <span class="pl-en">enq</span>(<span class="pl-s1">node</span>);
+        <span class="pl-k">return</span> <span class="pl-s1">node</span>;
+    }
+
+<span class="pl-k">private</span> <span class="pl-smi">Node</span> <span class="pl-s1">enq</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>) {
+        <span class="pl-k">for</span> (;;) {
+            <span class="pl-smi">Node</span> <span class="pl-s1">t</span> = <span class="pl-s1">tail</span>;
+            <span class="pl-k">if</span> (<span class="pl-s1">t</span> == <span class="pl-c1">null</span>) { <span class="pl-c">// Must initialize</span>
+                <span class="pl-k">if</span> (<span class="pl-en">compareAndSetHead</span>(<span class="pl-k">new</span> <span class="pl-smi">Node</span>()))
+                    <span class="pl-s1">tail</span> = <span class="pl-s1">head</span>;
+            } <span class="pl-k">else</span> {
+                <span class="pl-s1">node</span>.<span class="pl-s1">prev</span> = <span class="pl-s1">t</span>;
+                <span class="pl-k">if</span> (<span class="pl-en">compareAndSetTail</span>(<span class="pl-s1">t</span>, <span class="pl-s1">node</span>)) {
+                    <span class="pl-s1">t</span>.<span class="pl-s1">next</span> = <span class="pl-s1">node</span>;
+                    <span class="pl-k">return</span> <span class="pl-s1">t</span>;
+                }
+            }
+        }
+    }
+
+<span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+        <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
+        <span class="pl-k">try</span> {
+            <span class="pl-smi">boolean</span> <span class="pl-s1">interrupted</span> = <span class="pl-c1">false</span>;
+            <span class="pl-k">for</span> (;;) {
+                <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">node</span>.<span class="pl-en">predecessor</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">p</span> == <span class="pl-s1">head</span> &amp;&amp; <span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>)) {
+                    <span class="pl-en">setHead</span>(<span class="pl-s1">node</span>);<span class="pl-c">// 改</span>
+                    <span class="pl-s1">p</span>.<span class="pl-s1">next</span> = <span class="pl-c1">null</span>; 
+                    <span class="pl-s1">failed</span> = <span class="pl-c1">false</span>;
+                    <span class="pl-k">return</span> <span class="pl-s1">interrupted</span>;<span class="pl-c">// 改</span>
+                }
+                <span class="pl-k">if</span> (<span class="pl-en">shouldParkAfterFailedAcquire</span>(<span class="pl-s1">p</span>, <span class="pl-s1">node</span>) &amp;&amp;
+                    <span class="pl-en">parkAndCheckInterrupt</span>())
+                    <span class="pl-s1">interrupted</span> = <span class="pl-c1">true</span>;
+            }
+        } <span class="pl-k">finally</span> {
+            <span class="pl-k">if</span> (<span class="pl-s1">failed</span>)
+                <span class="pl-en">cancelAcquire</span>(<span class="pl-s1">node</span>);
+        }
+    }
+
+   
+    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doAcquireInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
+        <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+        <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">EXCLUSIVE</span>);
+        <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
+        <span class="pl-k">try</span> {
+            <span class="pl-k">for</span> (;;) {
+                <span class="pl-k">final</span> 
+                <span class="pl-s1">if</span> () {
+                    <span class="pl-c">//...</span>
+                    <span class="pl-k">return</span>;
+                }
+                <span class="pl-k">if</span> (<span class="pl-c">//... )</span>
+                    <span class="pl-smi">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
+            }
+        } <span class="pl-k">finally</span> {
+            <span class="pl-c">//...</span>
+        }
+    }
+
+   
+    <span class="pl-k">private</span> <span class="pl-smi">boolean</span> <span class="pl-s1">doAcquireNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
+            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+        <span class="pl-k">if</span> (<span class="pl-s1">nanosTimeout</span> &lt;= <span class="pl-c1">0L</span>)
+            <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+        <span class="pl-k">final</span> <span class="pl-smi">long</span> <span class="pl-s1">deadline</span> = <span class="pl-smi">System</span>.<span class="pl-en">nanoTime</span>() + <span class="pl-s1">nanosTimeout</span>;
+        <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">EXCLUSIVE</span>);
+        <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
+        <span class="pl-k">try</span> {
+            <span class="pl-k">for</span> (;;) {
+                <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">node</span>.<span class="pl-en">predecessor</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">p</span> == <span class="pl-s1">head</span> &amp;&amp; <span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>)) {
+                   <span class="pl-c">//...</span>
+                    <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+                }
+                <span class="pl-s1">nanosTimeout</span> = <span class="pl-s1">deadline</span> - <span class="pl-smi">System</span>.<span class="pl-en">nanoTime</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">nanosTimeout</span> &lt;= <span class="pl-c1">0L</span>)
+                    <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+                <span class="pl-k">if</span> (<span class="pl-en">shouldParkAfterFailedAcquire</span>(<span class="pl-s1">p</span>, <span class="pl-s1">node</span>) &amp;&amp;
+                    <span class="pl-s1">nanosTimeout</span> &gt; <span class="pl-s1">spinForTimeoutThreshold</span>)
+                    <span class="pl-smi">LockSupport</span>.<span class="pl-en">parkNanos</span>(<span class="pl-smi">this</span>, <span class="pl-s1">nanosTimeout</span>);
+                <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">interrupted</span>())
+                    <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
+            }
+        } <span class="pl-k">finally</span> {
+            <span class="pl-k">if</span> (<span class="pl-s1">failed</span>)
+                <span class="pl-en">cancelAcquire</span>(<span class="pl-s1">node</span>);
+        }
+    }
+
+   
+    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doAcquireShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+        <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">SHARED</span>);
+        <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
+        <span class="pl-k">try</span> {
+            <span class="pl-smi">boolean</span> <span class="pl-s1">interrupted</span> = <span class="pl-c1">false</span>;
+            <span class="pl-k">for</span> (;;) {
+                <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">node</span>.<span class="pl-en">predecessor</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">p</span> == <span class="pl-s1">head</span>) {
+                    <span class="pl-smi">int</span> <span class="pl-s1">r</span> = <span class="pl-en">tryAcquireShared</span>(<span class="pl-s1">arg</span>);
+                    <span class="pl-k">if</span> (<span class="pl-s1">r</span> &gt;= <span class="pl-c1">0</span>) {
+                        <span class="pl-en">setHeadAndPropagate</span>(<span class="pl-s1">node</span>, <span class="pl-s1">r</span>);
+                        <span class="pl-s1">p</span>.<span class="pl-s1">next</span> = <span class="pl-c1">null</span>; <span class="pl-c">// help GC</span>
+                        <span class="pl-k">if</span> (<span class="pl-s1">interrupted</span>)
+                            <span class="pl-en">selfInterrupt</span>();
+                        <span class="pl-s1">failed</span> = <span class="pl-c1">false</span>;
+                        <span class="pl-k">return</span>;
+                    }
+                }
+                <span class="pl-k">if</span> (<span class="pl-en">shouldParkAfterFailedAcquire</span>(<span class="pl-s1">p</span>, <span class="pl-s1">node</span>) &amp;&amp;
+                    <span class="pl-en">parkAndCheckInterrupt</span>())
+                    <span class="pl-s1">interrupted</span> = <span class="pl-c1">true</span>;
+            }
+        } <span class="pl-k">finally</span> {
+            <span class="pl-k">if</span> (<span class="pl-s1">failed</span>)
+                <span class="pl-en">cancelAcquire</span>(<span class="pl-s1">node</span>);
+        }
+    }
+
+   
+    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doAcquireSharedInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
+        <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+        <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">SHARED</span>);
+        <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
+        <span class="pl-k">try</span> {
+            <span class="pl-k">for</span> (;;) {
+                <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">node</span>.<span class="pl-en">predecessor</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">p</span> == <span class="pl-s1">head</span>) {
+                    <span class="pl-smi">int</span> <span class="pl-s1">r</span> = <span class="pl-en">tryAcquireShared</span>(<span class="pl-s1">arg</span>);
+                    <span class="pl-k">if</span> (<span class="pl-s1">r</span> &gt;= <span class="pl-c1">0</span>) {
+                        <span class="pl-en">setHeadAndPropagate</span>(<span class="pl-s1">node</span>, <span class="pl-s1">r</span>);
+                        <span class="pl-s1">p</span>.<span class="pl-s1">next</span> = <span class="pl-c1">null</span>; <span class="pl-c">// help GC</span>
+                        <span class="pl-s1">failed</span> = <span class="pl-c1">false</span>;
+                        <span class="pl-k">return</span>;
+                    }
+                }
+                <span class="pl-k">if</span> (<span class="pl-c">//... )</span>
+                    <span class="pl-smi">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
+            }
+        } <span class="pl-k">finally</span> {
+            <span class="pl-k">if</span> (<span class="pl-s1">failed</span>)
+                <span class="pl-en">cancelAcquire</span>(<span class="pl-s1">node</span>);
+        }
+    }
+
+    <span class="pl-k">private</span> <span class="pl-smi">boolean</span> <span class="pl-s1">doAcquireSharedNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
+            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+        <span class="pl-k">if</span> (<span class="pl-s1">nanosTimeout</span> &lt;= <span class="pl-c1">0L</span>)
+            <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+        <span class="pl-k">final</span> <span class="pl-smi">long</span> <span class="pl-s1">deadline</span> = <span class="pl-smi">System</span>.<span class="pl-en">nanoTime</span>() + <span class="pl-s1">nanosTimeout</span>;
+        <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">SHARED</span>);
+        <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
+        <span class="pl-k">try</span> {
+            <span class="pl-k">for</span> (;;) {
+                <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">node</span>.<span class="pl-en">predecessor</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">p</span> == <span class="pl-s1">head</span>) {
+                    <span class="pl-smi">int</span> <span class="pl-s1">r</span> = <span class="pl-en">tryAcquireShared</span>(<span class="pl-s1">arg</span>);
+                    <span class="pl-k">if</span> (<span class="pl-s1">r</span> &gt;= <span class="pl-c1">0</span>) {
+                        <span class="pl-en">setHeadAndPropagate</span>(<span class="pl-s1">node</span>, <span class="pl-s1">r</span>);
+                        <span class="pl-s1">p</span>.<span class="pl-s1">next</span> = <span class="pl-c1">null</span>; <span class="pl-c">// help GC</span>
+                        <span class="pl-s1">failed</span> = <span class="pl-c1">false</span>;
+                        <span class="pl-k">return</span> <span class="pl-c1">true</span>;
+                    }
+                }
+                <span class="pl-s1">nanosTimeout</span> = <span class="pl-s1">deadline</span> - <span class="pl-smi">System</span>.<span class="pl-en">nanoTime</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">nanosTimeout</span> &lt;= <span class="pl-c1">0L</span>)
+                    <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+                <span class="pl-k">if</span> (<span class="pl-en">shouldParkAfterFailedAcquire</span>(<span class="pl-s1">p</span>, <span class="pl-s1">node</span>) &amp;&amp;
+                    <span class="pl-s1">nanosTimeout</span> &gt; <span class="pl-s1">spinForTimeoutThreshold</span>)
+                    <span class="pl-smi">LockSupport</span>.<span class="pl-en">parkNanos</span>(<span class="pl-smi">this</span>, <span class="pl-s1">nanosTimeout</span>);
+                <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">interrupted</span>())
+                    <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
+            }
+        } <span class="pl-k">finally</span> {
+            <span class="pl-c">//....</span>
+        }
+    }
+                    </pre></div>
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+            <span class="pl-k">for</span> (;;) {
+                <span class="pl-k">if</span> (是头结点&amp;&amp; 获得共享资源) {
+                    这个节点不需要了，移除他
+                    <span class="pl-k">return</span> <span class="pl-s1">interrupted</span>;<span class="pl-c">// 改</span>
+                }
+                <span class="pl-c">//上面失败了，来到下面</span>
+                <span class="pl-k">if</span> (应该挂起&amp;&amp; 挂起并检查中断 )
+                    <span class="pl-s1">interrupted</span> = <span class="pl-c1">true</span>;
+            }
+}
+
+
+<span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+    <span class="pl-k">try</span>{
+            <span class="pl-k">for</span> (;;) {
+                <span class="pl-k">if</span> (是头结点&amp;&amp; 获得共享资源) {
+                    这个节点不需要了，移除他
+                    <span class="pl-k">return</span> <span class="pl-s1">interrupted</span>;<span class="pl-c">// 改</span>
+                }
+                <span class="pl-c">//上面失败了，来到下面</span>
+                <span class="pl-k">if</span> (应该挂起&amp;&amp; 挂起并检查中断 )
+                    <span class="pl-s1">interrupted</span> = <span class="pl-c1">true</span>;
+            }
+    }<span class="pl-k">finally</span> {
+            <span class="pl-c">//....</span>
+    }
+}
+
+<span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+    <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
+    <span class="pl-k">try</span>{
+        	<span class="pl-smi">boolean</span> <span class="pl-s1">interrupted</span> = <span class="pl-c1">false</span>;
+            <span class="pl-k">for</span> (;;) {
+                <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">node</span>.<span class="pl-en">predecessor</span>();
+                <span class="pl-k">if</span> (<span class="pl-s1">p</span>是头结点&amp;&amp; 获得共享资源) {
+                    这个节点不需要了，移除这个节点
+                    <span class="pl-k">return</span> <span class="pl-s1">interrupted</span>;<span class="pl-c">// 改</span>
+                }
+                <span class="pl-c">//上面失败了，来到下面</span>
+                <span class="pl-k">if</span> (应该挂起&amp;&amp; 挂起并检查中断 )
+                    <span class="pl-s1">interrupted</span> = <span class="pl-c1">true</span>;
+            }
+    }<span class="pl-k">finally</span> {
+           <span class="pl-k">if</span> (<span class="pl-s1">failed</span>)
+                <span class="pl-en">cancelAcquire</span>(<span class="pl-s1">node</span>);.
+    }
+    
+}</pre></div>
+<h4>整体调用关系流程图</h4>
+<div class="highlight highlight-source-mermaid"><pre class="notranslate"><span class="pl-k">graph</span> <span class="pl-ent">TD</span><span class="pl-sg">;</span>
+    <span class="pl-ent">A</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>外部调用（独占锁相关场景）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span> <span class="pl-k">--&gt;</span> <span class="pl-ent">B</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>doAcquireInterruptibly<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">A</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">C</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>doAcquireNanos<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">A</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">D</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>acquireQueued（底层锁实现间接调用）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">E</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>外部调用（共享锁相关场景）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span> <span class="pl-k">--&gt;</span> <span class="pl-ent">F</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>doAcquireShared<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">E</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">G</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>doAcquireSharedInterruptibly<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">E</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">H</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>doAcquireSharedNanos<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">B</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">I</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>addWaiter(Node.EXCLUSIVE)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">C</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">I</span><span class="pl-sg">;</span>
+    <span class="pl-ent">D</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">I</span><span class="pl-sg">;</span>
+    <span class="pl-ent">F</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">J</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>addWaiter(Node.SHARED)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">G</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">J</span><span class="pl-sg">;</span>
+    <span class="pl-ent">H</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">J</span><span class="pl-sg">;</span>
+    <span class="pl-ent">I</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">K</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>compareAndSetTail（尝试入队）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">K</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">L</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>入队成功？<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">L</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">M</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>继续后续获取锁逻辑<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">L</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">N</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>enq<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">J</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">K</span><span class="pl-sg">;</span>
+    <span class="pl-ent">N</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">O</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>compareAndSetHead（队列初始化）/compareAndSetTail（入队操作）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">O</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">P</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>操作成功？<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">P</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">Q</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>完成入队，继续后续获取锁逻辑<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">P</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">N</span><span class="pl-sg">;</span></pre></div>
+<h4><code class="notranslate">acquireQueued</code> 方法内部调用流程图</h4>
+<div class="highlight highlight-source-mermaid"><pre class="notranslate"><span class="pl-k">graph</span> <span class="pl-ent">TD</span><span class="pl-sg">;</span>
+    <span class="pl-ent">R</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>acquireQueued<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span> <span class="pl-k">--&gt;</span> <span class="pl-ent">S</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>node.predecessor()<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">R</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">T</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>tryAcquire(arg)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">S</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">U</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>前驱节点是否为头节点<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">U</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">V</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>tryAcquire(arg)是否成功<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">V</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">W</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>setHead(node)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">V</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">X</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>shouldParkAfterFailedAcquire(p, node)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">X</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">Y</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>是否应阻塞线程<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">Y</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">Z</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>parkAndCheckInterrupt()<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">Z</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AA</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>线程是否中断<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AA</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">AB</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>记录中断状态<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AA</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">AC</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>继续循环<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">U</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">AC</span><span class="pl-sg">;</span>
+    <span class="pl-ent">W</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AD</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>后续处理（如清理前驱节点指针等）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AB</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AC</span><span class="pl-sg">;</span>
+    <span class="pl-ent">AD</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AC</span><span class="pl-sg">;</span>
+    <span class="pl-ent">R</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AD</span><span class="pl-sg">;</span>
+    <span class="pl-ent">R</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AF</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>最终是否获取锁失败（failed变量判断）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AF</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">AG</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>cancelAcquire(node)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span></pre></div>
+<h4><code class="notranslate">doAcquireInterruptibly</code> 方法内部调用流程图</h4>
+<div class="highlight highlight-source-mermaid"><pre class="notranslate"><span class="pl-k">graph</span> <span class="pl-ent">TD</span><span class="pl-sg">;</span>
+    <span class="pl-ent">AH</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>doAcquireInterruptibly<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AI</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>addWaiter(Node.EXCLUSIVE)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AH</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AJ</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>node.predecessor()<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AH</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AK</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>tryAcquire(arg)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AI</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AL</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>compareAndSetTail（尝试入队）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AL</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AM</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>入队成功？<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AM</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">AN</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>继续后续获取锁逻辑<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AM</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">AO</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>enq<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AO</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AP</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>compareAndSetHead（队列初始化）/compareAndSetTail（入队操作）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AP</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AQ</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>操作成功？<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AQ</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">AR</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>完成入队，继续后续获取锁逻辑<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AQ</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">AO</span><span class="pl-sg">;</span>
+    <span class="pl-ent">AJ</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AS</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>前驱节点是否为头节点<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AS</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">AT</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>tryAcquire(arg)是否成功<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AT</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">AU</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>setHead(node)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AT</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">AV</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>shouldParkAfterFailedAcquire(p, node)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AV</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AW</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>是否应阻塞线程<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AW</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">AX</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>parkAndCheckInterrupt()<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AX</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">AY</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>线程是否中断<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AY</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">AZ</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>抛出InterruptedException<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AY</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">BA</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>继续循环<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AS</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">BA</span><span class="pl-sg">;</span>
+    <span class="pl-ent">AU</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BB</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>后续处理（如清理前驱节点指针等）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">AZ</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BB</span><span class="pl-sg">;</span>
+    <span class="pl-ent">BA</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BB</span><span class="pl-sg">;</span>
+    <span class="pl-ent">AH</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BB</span><span class="pl-sg">;</span>
+    <span class="pl-ent">AH</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BC</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>最终是否获取锁失败（failed变量判断）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BC</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">BD</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>cancelAcquire(node)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span></pre></div>
+<h4><code class="notranslate">doAcquireNanos</code> 方法内部调用流程图</h4>
+<div class="highlight highlight-source-mermaid"><pre class="notranslate"><span class="pl-k">graph</span> <span class="pl-ent">TD</span><span class="pl-sg">;</span>
+    <span class="pl-ent">BE</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>doAcquireNanos<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BF</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>addWaiter(Node.EXCLUSIVE)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BE</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BG</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>node.predecessor()<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BE</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BH</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>tryAcquire(arg)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BF</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BI</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>compareAndSetTail（尝试入队）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BI</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BJ</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>入队成功？<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BJ</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">BK</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>继续后续获取锁逻辑<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BJ</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">BL</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>enq<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BL</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BM</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>compareAndSetHead（队列初始化）/compareAndSetTail（入队操作）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BM</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BN</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>操作成功？<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BN</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">BO</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>完成入队，继续后续获取锁逻辑<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BN</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">BL</span><span class="pl-sg">;</span>
+    <span class="pl-ent">BG</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BP</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>前驱节点是否为头节点<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BP</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">BQ</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>tryAcquire(arg)是否成功<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BQ</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">BR</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>setHead(node)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BQ</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">BS</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>shouldParkAfterFailedAcquire(p, node)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BS</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BT</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>是否应阻塞线程（结合超时时间判断）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BT</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">BU</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>LockSupport.parkNanos(this, nanosTimeout)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BU</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BV</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>线程是否中断<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BV</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">BW</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>抛出InterruptedException<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BV</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">BX</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>继续循环（更新超时时间判断）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BP</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">BX</span><span class="pl-sg">;</span>
+    <span class="pl-ent">BR</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BY</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>后续处理（如清理前驱节点指针等）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BW</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BY</span><span class="pl-sg">;</span>
+    <span class="pl-ent">BX</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BY</span><span class="pl-sg">;</span>
+    <span class="pl-ent">BE</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BY</span><span class="pl-sg">;</span>
+    <span class="pl-ent">BE</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">BZ</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>最终是否获取锁失败（failed变量判断）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">BZ</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CA</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>cancelAcquire(node)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span></pre></div>
+<h4><code class="notranslate">doAcquireShared</code> 方法内部调用流程图</h4>
+<div class="highlight highlight-source-mermaid"><pre class="notranslate"><span class="pl-k">graph</span> <span class="pl-ent">TD</span><span class="pl-sg">;</span>
+    <span class="pl-ent">CB</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>doAcquireShared<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CC</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>addWaiter(Node.SHARED)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CB</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CD</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>node.predecessor()<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CB</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CE</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>tryAcquireShared(arg)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CC</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CF</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>compareAndSetTail（尝试入队）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CF</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CG</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>入队成功？<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CG</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">CH</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>继续后续获取锁逻辑<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CG</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">CI</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>enq<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CI</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CJ</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>compareAndSetHead（队列初始化）/compareAndSetTail（入队操作）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CJ</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CK</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>操作成功？<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CK</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">CL</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>完成入队，继续后续获取锁逻辑<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CK</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">CI</span><span class="pl-sg">;</span>
+    <span class="pl-ent">CD</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CM</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>前驱节点是否为头节点<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CM</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">CN</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>tryAcquireShared(arg)是否成功<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CN</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">CO</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>setHeadAndPropagate(node, r)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CN</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">CP</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>shouldParkAfterFailedAcquire(p, node)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CP</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CQ</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>是否应阻塞线程<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CQ</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">CR</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>parkAndCheckInterrupt()<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CR</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CS</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>线程是否中断<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CS</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">CT</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>标记中断状态<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CS</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">CU</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>继续循环<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CM</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">CU</span><span class="pl-sg">;</span>
+    <span class="pl-ent">CO</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CV</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>后续处理（如清理前驱节点指针等）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CT</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CW</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>若最终中断状态为真，执行selfInterrupt()<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CW</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CV</span><span class="pl-sg">;</span>
+    <span class="pl-ent">CU</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CV</span><span class="pl-sg">;</span>
+    <span class="pl-ent">CB</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CV</span><span class="pl-sg">;</span>
+    <span class="pl-ent">CB</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CX</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>最终是否获取锁失败（failed变量判断）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CX</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">CY</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>cancelAcquire(node)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span></pre></div>
+<h4><code class="notranslate">doAcquireSharedInterruptibly</code> 方法内部调用流程图</h4>
+<div class="highlight highlight-source-mermaid"><pre class="notranslate"><span class="pl-k">graph</span> <span class="pl-ent">TD</span><span class="pl-sg">;</span>
+    <span class="pl-ent">CZ</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>doAcquireSharedInterruptibly<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DA</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>addWaiter(Node.SHARED)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CZ</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DB</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>node.predecessor()<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">CZ</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DC</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>tryAcquireShared(arg)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DA</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DD</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>compareAndSetTail（尝试入队）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DD</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DE</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>入队成功？<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DE</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">DF</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>继续后续获取锁逻辑<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DE</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">DG</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>enq<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DG</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DH</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>compareAndSetHead（队列初始化）/compareAndSetTai（入队操作）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DH</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DI</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>操作成功？<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DI</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">DJ</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>完成入队，继续后续获取锁逻辑<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DI</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">DG</span><span class="pl-sg">;</span>
+    <span class="pl-ent">DB</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DK</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>前驱节点是否为头节点<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DK</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">DL</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>tryAcquireShared(arg)是否成功<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DL</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">DM</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>setHeadAndPropagate(node, r)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DL</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">DN</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>shouldParkAfterFailedAcquire(p, node)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DN</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DO</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>是否应阻塞线程<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DO</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">DP</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>parkAndCheckInterrupt()<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DP</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DQ</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>线程是否中断<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DQ</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">DR</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>抛出InterruptedException<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DQ</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">DS</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>继续循环<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DK</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">DS</span><span class="pl-sg">;</span>
+    <span class="pl-ent">DM</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DT</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>后续处理（如清理前驱节点指针等）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DR</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DT</span><span class="pl-sg">;</span>
+    <span class="pl-ent">DS</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DT</span><span class="pl-sg">;</span>
+    <span class="pl-ent">CZ</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DT</span><span class="pl-sg">;</span>
+    <span class="pl-ent">CZ</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DU</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>最终是否获取锁失败（failed变量判断）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DU</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DV</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>cancelAcquire(node)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span></pre></div>
+<h4><code class="notranslate">doAcquireSharedNanos</code> 方法内部调用流程图</h4>
+<div class="highlight highlight-source-mermaid"><pre class="notranslate"><span class="pl-k">graph</span> <span class="pl-ent">TD</span><span class="pl-sg">;</span>
+    <span class="pl-ent">DW</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>doAcquireSharedNanos<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DX</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>addWaiter(Node.SHARED)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DW</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DY</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>node.predecessor()<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DW</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">DZ</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>tryAcquireShared(arg)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">DX</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">EA</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>compareAndSetTail（尝试入队）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EA</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">EB</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>入队成功？<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EB</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">EC</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>继续后续获取锁逻辑<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EB</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">ED</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>enq<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">ED</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">EE</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>compareAndSetHead（队列初始化）/compareAndSetTail（入队操作）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EE</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">EF</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>操作成功？<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EF</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">EG</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>完成入队，继续后续获取锁逻辑<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EF</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">ED</span><span class="pl-sg">;</span>
+    <span class="pl-ent">DY</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">EH</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>前驱节点是否为头节点<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EH</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">EI</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>tryAcquireShared(arg)是否成功<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EI</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">EJ</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>setHeadAndPropagate(node, r)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EI</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">EK</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>shouldParkAfterFailedAcquire(p, node)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EK</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">EL</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>是否应阻塞线程（结合超时时间判断）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EL</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">EM</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>LockSupport.parkNanos(this, nanosTimeout)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EM</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">EN</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>线程是否中断<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EN</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">是</span><span class="pl-k">|</span> <span class="pl-ent">EO</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>抛出InterruptedException<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EN</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">EP</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>继续循环（更新超时时间判断）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EH</span> <span class="pl-k">--&gt;</span><span class="pl-k">|</span><span class="pl-s">否</span><span class="pl-k">|</span> <span class="pl-ent">EP</span><span class="pl-sg">;</span>
+    <span class="pl-ent">EJ</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">EQ</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>后续处理（如清理前驱节点指针等）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">EO</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">EQ</span><span class="pl-sg">;</span>
+    <span class="pl-ent">EP</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">EQ</span><span class="pl-sg">;</span>
+    <span class="pl-ent">DW</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">EQ</span><span class="pl-sg">;</span>
+    <span class="pl-ent">DW</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">ER</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">{</span></span><span class="pl-s"><span class="pl-pds">"</span>最终是否获取锁失败（failed变量判断）<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">}</span></span></span><span class="pl-sg">;</span>
+    <span class="pl-ent">ER</span> <span class="pl-k">--&gt;</span> <span class="pl-ent">ES</span><span class="pl-s"><span class="pl-pds"><span class="pl-sg">[</span></span><span class="pl-s"><span class="pl-pds">"</span>cancelAcquire(node)<span class="pl-pds">"</span></span><span class="pl-pds"><span class="pl-sg">]</span></span></span><span class="pl-sg">;</span></pre></div>
+<p>在接下来的文章中，我们将深入探讨 AQS 在 <code class="notranslate">ReentrantLock</code>、<code class="notranslate">CountDownLatch</code> 等具体同步工具中的应用，揭示其强大的可扩展性。</p>
+<p>##参考<br>
+从ReentrantLock的实现看AQS的原理及应用 <a href="https://mp.weixin.qq.com/s/sA01gxC4EbgypCsQt5pVog" rel="nofollow">https://mp.weixin.qq.com/s/sA01gxC4EbgypCsQt5pVog</a><br>
+深度剖析 AQS 设计原理，内容相当硬核！<a href="https://mp.weixin.qq.com/s/pDFZ7MEl108Q4OnrCayLhQ" rel="nofollow">https://mp.weixin.qq.com/s/pDFZ7MEl108Q4OnrCayLhQ</a><br>
+《Java并发编程实战》</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://Wang-ABG.github.io/das-sein.github.io">Absoluter Geist</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","Wang-ABG/das-sein.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script>
+
+</html>
