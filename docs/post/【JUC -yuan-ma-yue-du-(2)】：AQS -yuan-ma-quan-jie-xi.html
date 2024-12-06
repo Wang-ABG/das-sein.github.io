@@ -94,7 +94,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <span class="pl-k">private</span> <span class="pl-k">volatile</span> <span class="pl-smi">int</span> <span class="pl-s1">state</span>;
 
 <span class="pl-c">// 原子更新状态的关键方法</span>
-<span class="pl-k">protected</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">compareAndSetState</span>(<span class="pl-smi">int</span> <span class="pl-s1">expect</span>, <span class="pl-smi">int</span> <span class="pl-s1">update</span>) {
+<span class="pl-k">protected</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">compareAndSetState</span>(<span class="pl-smi">int</span> <span class="pl-s1">expect</span>, <span class="pl-smi">int</span> <span class="pl-s1">update</span>) {
     <span class="pl-k">return</span> <span class="pl-s1">unsafe</span>.<span class="pl-en">compareAndSwapInt</span>(<span class="pl-smi">this</span>, <span class="pl-s1">stateOffset</span>, <span class="pl-s1">expect</span>, <span class="pl-s1">update</span>);
 }</pre></div>
 <p>AQS 使用一个 32 位整型 <code class="notranslate">state</code> 来表示同步状态。</p>
@@ -129,14 +129,14 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>AQS 提供两种同步模式：</p>
 <h3>3.1 独占模式（Exclusive）</h3>
 <div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 独占式获取同步状态</span>
-<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">acquire</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-en">acquire</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
     <span class="pl-k">if</span> (!<span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>) &amp;&amp;
         <span class="pl-en">acquireQueued</span>(<span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">EXCLUSIVE</span>), <span class="pl-s1">arg</span>))
         <span class="pl-en">selfInterrupt</span>();
 }
 
 <span class="pl-c">// 独占式释放同步状态</span>
-<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">release</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">release</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
     <span class="pl-k">if</span> (<span class="pl-en">tryRelease</span>(<span class="pl-s1">arg</span>)) {
         <span class="pl-smi">Node</span> <span class="pl-s1">h</span> = <span class="pl-s1">head</span>;
         <span class="pl-k">if</span> (<span class="pl-s1">h</span> != <span class="pl-c1">null</span> &amp;&amp; <span class="pl-s1">h</span>.<span class="pl-s1">waitStatus</span> != <span class="pl-c1">0</span>)
@@ -147,13 +147,13 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 }</pre></div>
 <h3>3.2 共享模式（Shared）</h3>
 <div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-c">// 共享模式获取同步状态</span>
-<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">acquireShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-en">acquireShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
     <span class="pl-k">if</span> (<span class="pl-en">tryAcquireShared</span>(<span class="pl-s1">arg</span>) &lt; <span class="pl-c1">0</span>)
         <span class="pl-en">doAcquireShared</span>(<span class="pl-s1">arg</span>);
 }
 
 <span class="pl-c">// 共享模式释放同步状态</span>
-<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">releaseShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">releaseShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
     <span class="pl-k">if</span> (<span class="pl-en">tryReleaseShared</span>(<span class="pl-s1">arg</span>)) {
         <span class="pl-en">doReleaseShared</span>();
         <span class="pl-k">return</span> <span class="pl-c1">true</span>;
@@ -162,7 +162,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 }</pre></div>
 <h2>4. 核心同步机制</h2>
 <h3>4.1 节点入队</h3>
-<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">private</span> <span class="pl-smi">Node</span> <span class="pl-s1">addWaiter</span>(<span class="pl-smi">Node</span> <span class="pl-s1">mode</span>) {
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">private</span> <span class="pl-smi">Node</span> <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span> <span class="pl-s1">mode</span>) {
     <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-k">new</span> <span class="pl-smi">Node</span>(<span class="pl-smi">Thread</span>.<span class="pl-en">currentThread</span>(), <span class="pl-s1">mode</span>);
     <span class="pl-smi">Node</span> <span class="pl-s1">pred</span> = <span class="pl-s1">tail</span>;
     <span class="pl-k">if</span> (<span class="pl-s1">pred</span> != <span class="pl-c1">null</span>) {
@@ -176,7 +176,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <span class="pl-k">return</span> <span class="pl-s1">node</span>;
 }</pre></div>
 <h3>4.2 线程阻塞与唤醒</h3>
-<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
     <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
     <span class="pl-k">try</span> {
         <span class="pl-smi">boolean</span> <span class="pl-s1">interrupted</span> = <span class="pl-c1">false</span>;
@@ -198,7 +198,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 }</pre></div>
 <h3>4.3 中断处理</h3>
-<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doAcquireInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-en">doAcquireInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
     <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">EXCLUSIVE</span>);
     <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
     <span class="pl-k">try</span> {
@@ -221,7 +221,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 }</pre></div>
 <h2>5. 高级特性</h2>
 <h3>5.1 条件队列</h3>
-<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">await</span>() <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-en">await</span>() <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
     <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">interrupted</span>())
         <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
     <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addConditionWaiter</span>();
@@ -599,23 +599,23 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <hr>
 <h3>施工中（未完待续）。。。。</h3>
 <div class="highlight highlight-source-java"><pre class="notranslate">  
-    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">acquire</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-en">acquire</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
         <span class="pl-k">if</span> (!<span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>) &amp;&amp;
             <span class="pl-en">acquireQueued</span>(<span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">EXCLUSIVE</span>), <span class="pl-s1">arg</span>))
             <span class="pl-en">selfInterrupt</span>();
     }
 
     
-    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">acquireInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
-            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-en">acquireInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
+            <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
         <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">interrupted</span>())
             <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
         <span class="pl-k">if</span> (!<span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>))
             <span class="pl-en">doAcquireInterruptibly</span>(<span class="pl-s1">arg</span>);
     }
 
-    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">tryAcquireNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
-            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">tryAcquireNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
+            <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
         <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">interrupted</span>())
             <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
         <span class="pl-k">return</span> <span class="pl-en">tryAcquire</span>(<span class="pl-s1">arg</span>) ||
@@ -623,7 +623,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 
    
-    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">release</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">release</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
         <span class="pl-k">if</span> (<span class="pl-en">tryRelease</span>(<span class="pl-s1">arg</span>)) {
             <span class="pl-smi">Node</span> <span class="pl-s1">h</span> = <span class="pl-s1">head</span>;
             <span class="pl-k">if</span> (<span class="pl-s1">h</span> != <span class="pl-c1">null</span> &amp;&amp; <span class="pl-s1">h</span>.<span class="pl-s1">waitStatus</span> != <span class="pl-c1">0</span>)
@@ -633,14 +633,14 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
         <span class="pl-k">return</span> <span class="pl-c1">false</span>;
     }
 
-    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">acquireShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-en">acquireShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
         <span class="pl-k">if</span> (<span class="pl-en">tryAcquireShared</span>(<span class="pl-s1">arg</span>) &lt; <span class="pl-c1">0</span>)
             <span class="pl-en">doAcquireShared</span>(<span class="pl-s1">arg</span>);
     }
 
    
-    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">acquireSharedInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
-            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-en">acquireSharedInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
+            <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
         <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">interrupted</span>())
             <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
         <span class="pl-k">if</span> (<span class="pl-en">tryAcquireShared</span>(<span class="pl-s1">arg</span>) &lt; <span class="pl-c1">0</span>)
@@ -648,8 +648,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 
    
-    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">tryAcquireSharedNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
-            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">tryAcquireSharedNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
+            <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
         <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">interrupted</span>())
             <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
         <span class="pl-k">return</span> <span class="pl-en">tryAcquireShared</span>(<span class="pl-s1">arg</span>) &gt;= <span class="pl-c1">0</span> ||
@@ -657,7 +657,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 
    
-    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">releaseShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">releaseShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
         <span class="pl-k">if</span> (<span class="pl-en">tryReleaseShared</span>(<span class="pl-s1">arg</span>)) {
             <span class="pl-en">doReleaseShared</span>();
             <span class="pl-k">return</span> <span class="pl-c1">true</span>;
@@ -666,20 +666,20 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 
     
-    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">hasQueuedThreads</span>() {
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">hasQueuedThreads</span>() {
         <span class="pl-k">return</span> <span class="pl-s1">head</span> != <span class="pl-s1">tail</span>;
     }
 
    
-    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">hasContended</span>() {
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">hasContended</span>() {
         <span class="pl-k">return</span> <span class="pl-s1">head</span> != <span class="pl-c1">null</span>;
     }
 
-    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">Thread</span> <span class="pl-s1">getFirstQueuedThread</span>() {
+    <span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">Thread</span> <span class="pl-en">getFirstQueuedThread</span>() {
         <span class="pl-c">// handle only fast path, else relay</span>
         <span class="pl-k">return</span> (<span class="pl-s1">head</span> == <span class="pl-s1">tail</span>) ? <span class="pl-c1">null</span> : <span class="pl-en">fullGetFirstQueuedThread</span>();
     }</pre></div>
-<div class="highlight highlight-source-java"><pre class="notranslate"> <span class="pl-k">private</span> <span class="pl-smi">Node</span> <span class="pl-s1">addWaiter</span>(<span class="pl-smi">Node</span> <span class="pl-s1">mode</span>) {
+<div class="highlight highlight-source-java"><pre class="notranslate"> <span class="pl-k">private</span> <span class="pl-smi">Node</span> <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span> <span class="pl-s1">mode</span>) {
         <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-k">new</span> <span class="pl-smi">Node</span>(<span class="pl-smi">Thread</span>.<span class="pl-en">currentThread</span>(), <span class="pl-s1">mode</span>);
         <span class="pl-c">// Try the fast path of enq; backup to full enq on failure</span>
         <span class="pl-smi">Node</span> <span class="pl-s1">pred</span> = <span class="pl-s1">tail</span>;
@@ -694,7 +694,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
         <span class="pl-k">return</span> <span class="pl-s1">node</span>;
     }
 
-<span class="pl-k">private</span> <span class="pl-smi">Node</span> <span class="pl-s1">enq</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>) {
+<span class="pl-k">private</span> <span class="pl-smi">Node</span> <span class="pl-en">enq</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>) {
         <span class="pl-k">for</span> (;;) {
             <span class="pl-smi">Node</span> <span class="pl-s1">t</span> = <span class="pl-s1">tail</span>;
             <span class="pl-k">if</span> (<span class="pl-s1">t</span> == <span class="pl-c1">null</span>) { <span class="pl-c">// Must initialize</span>
@@ -710,7 +710,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
         }
     }
 
-<span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+<span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
         <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
         <span class="pl-k">try</span> {
             <span class="pl-smi">boolean</span> <span class="pl-s1">interrupted</span> = <span class="pl-c1">false</span>;
@@ -733,8 +733,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 
    
-    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doAcquireInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
-        <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-en">doAcquireInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
+        <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
         <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">EXCLUSIVE</span>);
         <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
         <span class="pl-k">try</span> {
@@ -757,8 +757,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 
    
-    <span class="pl-k">private</span> <span class="pl-smi">boolean</span> <span class="pl-s1">doAcquireNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
-            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">boolean</span> <span class="pl-en">doAcquireNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
+            <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
         <span class="pl-k">if</span> (<span class="pl-s1">nanosTimeout</span> &lt;= <span class="pl-c1">0L</span>)
             <span class="pl-k">return</span> <span class="pl-c1">false</span>;
         <span class="pl-k">final</span> <span class="pl-smi">long</span> <span class="pl-s1">deadline</span> = <span class="pl-smi">System</span>.<span class="pl-en">nanoTime</span>() + <span class="pl-s1">nanosTimeout</span>;
@@ -789,7 +789,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 
    
-    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doAcquireShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-en">doAcquireShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
         <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">SHARED</span>);
         <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
         <span class="pl-k">try</span> {
@@ -818,8 +818,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 
    
-    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doAcquireSharedInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
-        <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-en">doAcquireSharedInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
+        <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
         <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">SHARED</span>);
         <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
         <span class="pl-k">try</span> {
@@ -844,8 +844,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
         }
     }
 
-    <span class="pl-k">private</span> <span class="pl-smi">boolean</span> <span class="pl-s1">doAcquireSharedNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
-            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">boolean</span> <span class="pl-en">doAcquireSharedNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
+            <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
         <span class="pl-k">if</span> (<span class="pl-s1">nanosTimeout</span> &lt;= <span class="pl-c1">0L</span>)
             <span class="pl-k">return</span> <span class="pl-c1">false</span>;
         <span class="pl-k">final</span> <span class="pl-smi">long</span> <span class="pl-s1">deadline</span> = <span class="pl-smi">System</span>.<span class="pl-en">nanoTime</span>() + <span class="pl-s1">nanosTimeout</span>;
@@ -877,7 +877,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
                 <span class="pl-en">cancelAcquire</span>(<span class="pl-s1">node</span>);
         }
     }</pre></div>
-<div class="highlight highlight-source-java"><pre class="notranslate"> <span class="pl-k">private</span> <span class="pl-smi">Node</span> <span class="pl-s1">addWaiter</span>(<span class="pl-smi">Node</span> <span class="pl-s1">mode</span>) {
+<div class="highlight highlight-source-java"><pre class="notranslate"> <span class="pl-k">private</span> <span class="pl-smi">Node</span> <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span> <span class="pl-s1">mode</span>) {
         <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-k">new</span> <span class="pl-smi">Node</span>(<span class="pl-smi">Thread</span>.<span class="pl-en">currentThread</span>(), <span class="pl-s1">mode</span>);
         <span class="pl-c">// Try the fast path of enq; backup to full enq on failure</span>
         <span class="pl-smi">Node</span> <span class="pl-s1">pred</span> = <span class="pl-s1">tail</span>;
@@ -892,7 +892,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
         <span class="pl-k">return</span> <span class="pl-s1">node</span>;
     }
 
-<span class="pl-k">private</span> <span class="pl-smi">Node</span> <span class="pl-s1">enq</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>) {
+<span class="pl-k">private</span> <span class="pl-smi">Node</span> <span class="pl-en">enq</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>) {
         <span class="pl-k">for</span> (;;) {
             <span class="pl-smi">Node</span> <span class="pl-s1">t</span> = <span class="pl-s1">tail</span>;
             <span class="pl-k">if</span> (<span class="pl-s1">t</span> == <span class="pl-c1">null</span>) { <span class="pl-c">// Must initialize</span>
@@ -908,7 +908,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
         }
     }
 
-<span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+<span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
         <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
         <span class="pl-k">try</span> {
             <span class="pl-smi">boolean</span> <span class="pl-s1">interrupted</span> = <span class="pl-c1">false</span>;
@@ -931,8 +931,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 
    
-    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doAcquireInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
-        <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-en">doAcquireInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
+        <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
         <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">EXCLUSIVE</span>);
         <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
         <span class="pl-k">try</span> {
@@ -951,8 +951,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 
    
-    <span class="pl-k">private</span> <span class="pl-smi">boolean</span> <span class="pl-s1">doAcquireNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
-            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">boolean</span> <span class="pl-en">doAcquireNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
+            <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
         <span class="pl-k">if</span> (<span class="pl-s1">nanosTimeout</span> &lt;= <span class="pl-c1">0L</span>)
             <span class="pl-k">return</span> <span class="pl-c1">false</span>;
         <span class="pl-k">final</span> <span class="pl-smi">long</span> <span class="pl-s1">deadline</span> = <span class="pl-smi">System</span>.<span class="pl-en">nanoTime</span>() + <span class="pl-s1">nanosTimeout</span>;
@@ -981,7 +981,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 
    
-    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doAcquireShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-en">doAcquireShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
         <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">SHARED</span>);
         <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
         <span class="pl-k">try</span> {
@@ -1010,8 +1010,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 
    
-    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doAcquireSharedInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
-        <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-en">doAcquireSharedInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
+        <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
         <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">SHARED</span>);
         <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
         <span class="pl-k">try</span> {
@@ -1035,8 +1035,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
         }
     }
 
-    <span class="pl-k">private</span> <span class="pl-smi">boolean</span> <span class="pl-s1">doAcquireSharedNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
-            <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+    <span class="pl-k">private</span> <span class="pl-smi">boolean</span> <span class="pl-en">doAcquireSharedNanos</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>, <span class="pl-smi">long</span> <span class="pl-s1">nanosTimeout</span>)
+            <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
         <span class="pl-k">if</span> (<span class="pl-s1">nanosTimeout</span> &lt;= <span class="pl-c1">0L</span>)
             <span class="pl-k">return</span> <span class="pl-c1">false</span>;
         <span class="pl-k">final</span> <span class="pl-smi">long</span> <span class="pl-s1">deadline</span> = <span class="pl-smi">System</span>.<span class="pl-en">nanoTime</span>() + <span class="pl-s1">nanosTimeout</span>;
@@ -1068,28 +1068,28 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
         }
     }
                     </pre></div>
-<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
             <span class="pl-k">for</span> (;;) {
-                <span class="pl-k">if</span> (是头结点&amp;&amp; 获得共享资源) {
-                    这个节点不需要了，移除他
-                    <span class="pl-k">return</span> <span class="pl-s1">interrupted</span>;<span class="pl-c">// 改</span>
+                <span class="pl-k">if</span> (<span class="pl-s1">是头结点</span>&amp;&amp; <span class="pl-s1">获得共享资源</span>) {
+                    <span class="pl-smi">这个节点不需要了</span>，<span class="pl-s1">移除他</span>
+                    <span class="pl-s1">return</span> <span class="pl-s1">interrupted</span>;<span class="pl-c">// 改</span>
                 }
                 <span class="pl-c">//上面失败了，来到下面</span>
-                <span class="pl-k">if</span> (应该挂起&amp;&amp; 挂起并检查中断 )
+                <span class="pl-k">if</span> (<span class="pl-s1">应该挂起</span>&amp;&amp; <span class="pl-s1">挂起并检查中断</span> )
                     <span class="pl-s1">interrupted</span> = <span class="pl-c1">true</span>;
             }
 }
 
 
-<span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+<span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
     <span class="pl-k">try</span>{
             <span class="pl-k">for</span> (;;) {
-                <span class="pl-k">if</span> (是头结点&amp;&amp; 获得共享资源) {
-                    这个节点不需要了，移除他
-                    <span class="pl-k">return</span> <span class="pl-s1">interrupted</span>;<span class="pl-c">// 改</span>
+                <span class="pl-k">if</span> (<span class="pl-s1">是头结点</span>&amp;&amp; <span class="pl-s1">获得共享资源</span>) {
+                    <span class="pl-smi">这个节点不需要了</span>，<span class="pl-s1">移除他</span>
+                    <span class="pl-s1">return</span> <span class="pl-s1">interrupted</span>;<span class="pl-c">// 改</span>
                 }
                 <span class="pl-c">//上面失败了，来到下面</span>
-                <span class="pl-k">if</span> (应该挂起&amp;&amp; 挂起并检查中断 )
+                <span class="pl-k">if</span> (<span class="pl-s1">应该挂起</span>&amp;&amp; <span class="pl-s1">挂起并检查中断</span> )
                     <span class="pl-s1">interrupted</span> = <span class="pl-c1">true</span>;
             }
     }<span class="pl-k">finally</span> {
@@ -1097,18 +1097,18 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 }
 
-<span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+<span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">acquireQueued</span>(<span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
     <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
     <span class="pl-k">try</span>{
         	<span class="pl-smi">boolean</span> <span class="pl-s1">interrupted</span> = <span class="pl-c1">false</span>;
             <span class="pl-k">for</span> (;;) {
                 <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">p</span> = <span class="pl-s1">node</span>.<span class="pl-en">predecessor</span>();
-                <span class="pl-k">if</span> (<span class="pl-s1">p</span>是头结点&amp;&amp; 获得共享资源) {
-                    这个节点不需要了，移除这个节点
-                    <span class="pl-k">return</span> <span class="pl-s1">interrupted</span>;<span class="pl-c">// 改</span>
+                <span class="pl-k">if</span> (<span class="pl-s1">p是头结点</span>&amp;&amp; <span class="pl-s1">获得共享资源</span>) {
+                    <span class="pl-smi">这个节点不需要了</span>，<span class="pl-s1">移除这个节点</span>
+                    <span class="pl-s1">return</span> <span class="pl-s1">interrupted</span>;<span class="pl-c">// 改</span>
                 }
                 <span class="pl-c">//上面失败了，来到下面</span>
-                <span class="pl-k">if</span> (应该挂起&amp;&amp; 挂起并检查中断 )
+                <span class="pl-k">if</span> (<span class="pl-s1">应该挂起</span>&amp;&amp; <span class="pl-s1">挂起并检查中断</span> )
                     <span class="pl-s1">interrupted</span> = <span class="pl-c1">true</span>;
             }
     }<span class="pl-k">finally</span> {

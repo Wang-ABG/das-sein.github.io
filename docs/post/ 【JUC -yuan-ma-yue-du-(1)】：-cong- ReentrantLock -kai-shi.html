@@ -210,11 +210,11 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p><code class="notranslate">ReentrantLock</code> 的核心依赖于 <strong>AQS (AbstractQueuedSynchronizer)</strong>，这是 JUC（<code class="notranslate">java.util.concurrent</code>）中用于实现锁和其他同步器的基础框架。理解 AQS 是深入学习 <code class="notranslate">ReentrantLock</code> 的关键。</p>
 <h4>构造函数</h4>
 <p>以下是 <code class="notranslate">ReentrantLock</code> 的核心构造代码：</p>
-<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">ReentrantLock</span>() {
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">ReentrantLock</span><span class="pl-en"></span>() {
     <span class="pl-s1">sync</span> = <span class="pl-k">new</span> <span class="pl-smi">NonfairSync</span>();  <span class="pl-c">// 默认使用非公平锁</span>
 }
 
-<span class="pl-k">public</span> <span class="pl-s1">ReentrantLock</span>(<span class="pl-smi">boolean</span> <span class="pl-s1">fair</span>) {
+<span class="pl-k">public</span> <span class="pl-smi">ReentrantLock</span><span class="pl-en"></span>(<span class="pl-smi">boolean</span> <span class="pl-s1">fair</span>) {
     <span class="pl-s1">sync</span> = <span class="pl-s1">fair</span> ? <span class="pl-k">new</span> <span class="pl-smi">FairSync</span>() : <span class="pl-k">new</span> <span class="pl-smi">NonfairSync</span>();
 }</pre></div>
 <ul>
@@ -223,11 +223,11 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </ul>
 <h4>加锁的核心流程</h4>
 <p>调用 <code class="notranslate">lock()</code> 方法时：</p>
-<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-s1">lock</span>() {
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">lock</span>() {
     <span class="pl-s1">sync</span>.<span class="pl-en">lock</span>();
 }</pre></div>
 <p>以非公平锁为例，其实现为：</p>
-<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">lock</span>() {
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-en">lock</span>() {
     <span class="pl-k">if</span> (<span class="pl-en">compareAndSetState</span>(<span class="pl-c1">0</span>, <span class="pl-c1">1</span>)) {  <span class="pl-c">// 尝试直接获取锁</span>
         <span class="pl-en">setExclusiveOwnerThread</span>(<span class="pl-smi">Thread</span>.<span class="pl-en">currentThread</span>());
     } <span class="pl-k">else</span> {
@@ -243,7 +243,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <ul>
 <li>
 <p><strong>非公平锁</strong>：</p>
-<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">protected</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">tryAcquire</span>(<span class="pl-smi">int</span> <span class="pl-s1">acquires</span>) {
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">protected</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">tryAcquire</span>(<span class="pl-smi">int</span> <span class="pl-s1">acquires</span>) {
     <span class="pl-k">if</span> (<span class="pl-en">getState</span>() == <span class="pl-c1">0</span> &amp;&amp; <span class="pl-en">compareAndSetState</span>(<span class="pl-c1">0</span>, <span class="pl-s1">acquires</span>)) {
         <span class="pl-en">setExclusiveOwnerThread</span>(<span class="pl-smi">Thread</span>.<span class="pl-en">currentThread</span>());
         <span class="pl-k">return</span> <span class="pl-c1">true</span>;
@@ -253,7 +253,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </li>
 <li>
 <p><strong>公平锁</strong>：</p>
-<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">protected</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">tryAcquire</span>(<span class="pl-smi">int</span> <span class="pl-s1">acquires</span>) {
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">protected</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">tryAcquire</span>(<span class="pl-smi">int</span> <span class="pl-s1">acquires</span>) {
     <span class="pl-k">if</span> (<span class="pl-en">getState</span>() == <span class="pl-c1">0</span> &amp;&amp;
         !<span class="pl-en">hasQueuedPredecessors</span>() &amp;&amp;  <span class="pl-c">// 关键检查：是否有排队线程</span>
         <span class="pl-en">compareAndSetState</span>(<span class="pl-c1">0</span>, <span class="pl-s1">acquires</span>)) {

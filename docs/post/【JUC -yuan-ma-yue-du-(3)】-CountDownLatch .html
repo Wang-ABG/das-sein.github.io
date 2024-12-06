@@ -108,7 +108,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <h2>3. 核心源码解析</h2>
 <h3>3.1 <code class="notranslate">CountDownLatch</code> 的构造方法</h3>
 <p><code class="notranslate">CountDownLatch</code> 的构造方法接受一个整数参数，表示初始计数器的值。内部的计数器使用 AQS（AbstractQueuedSynchronizer）来实现：</p>
-<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-s1">CountDownLatch</span>(<span class="pl-smi">int</span> <span class="pl-s1">count</span>) {
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">CountDownLatch</span><span class="pl-en"></span>(<span class="pl-smi">int</span> <span class="pl-s1">count</span>) {
     <span class="pl-k">if</span> (<span class="pl-s1">count</span> &lt; <span class="pl-c1">0</span>) <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">IllegalArgumentException</span>(<span class="pl-s">"count &lt; 0"</span>);
     <span class="pl-c">// 直接使用 AQS 的 state 来存储计数</span>
     <span class="pl-smi">this</span>.<span class="pl-s1">sync</span> = <span class="pl-k">new</span> <span class="pl-smi">Sync</span>(<span class="pl-s1">count</span>);
@@ -123,17 +123,17 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>这里，<code class="notranslate">Sync</code> 是一个继承自 <code class="notranslate">AbstractQueuedSynchronizer</code> 的内部类，它直接使用 AQS 的状态 <code class="notranslate">state</code> 来保存计数器的值。当计数器为零时，AQS 会允许线程继续执行。</p>
 <h3>3.2 <code class="notranslate">await()</code> 方法的实现</h3>
 <p><code class="notranslate">await()</code> 方法是主线程等待计数器归零的关键方法。它通过调用 <code class="notranslate">acquireSharedInterruptibly(1)</code> 来获取共享锁。当计数器不为零时，当前线程会被阻塞，直到计数器归零时，线程才会被唤醒。</p>
-<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-s1">await</span>() <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">await</span>() <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
     <span class="pl-s1">sync</span>.<span class="pl-en">acquireSharedInterruptibly</span>(<span class="pl-c1">1</span>);
 }
 
-<span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-s1">await</span>(<span class="pl-smi">long</span> <span class="pl-s1">timeout</span>, <span class="pl-smi">TimeUnit</span> <span class="pl-s1">unit</span>) 
-        <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+<span class="pl-k">public</span> <span class="pl-smi">boolean</span> <span class="pl-en">await</span>(<span class="pl-smi">long</span> <span class="pl-s1">timeout</span>, <span class="pl-smi">TimeUnit</span> <span class="pl-s1">unit</span>) 
+        <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
     <span class="pl-k">return</span> <span class="pl-s1">sync</span>.<span class="pl-en">tryAcquireSharedNanos</span>(<span class="pl-c1">1</span>, <span class="pl-s1">unit</span>.<span class="pl-en">toNanos</span>(<span class="pl-s1">timeout</span>));
 }
 
-<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-s1">acquireSharedInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
-        <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">void</span> <span class="pl-en">acquireSharedInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>)
+        <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
     <span class="pl-k">if</span> (<span class="pl-smi">Thread</span>.<span class="pl-en">interrupted</span>())
         <span class="pl-k">throw</span> <span class="pl-k">new</span> <span class="pl-smi">InterruptedException</span>();
     <span class="pl-k">if</span> (<span class="pl-en">tryAcquireShared</span>(<span class="pl-s1">arg</span>) &lt; <span class="pl-c1">0</span>)
@@ -141,14 +141,14 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 }
 
 <span class="pl-c">/*  AQS子类实现   */</span>
-<span class="pl-k">protected</span> <span class="pl-smi">int</span> <span class="pl-s1">tryAcquireShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">acquires</span>) {
+<span class="pl-k">protected</span> <span class="pl-smi">int</span> <span class="pl-en">tryAcquireShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">acquires</span>) {
     <span class="pl-c">// 当 state 为 0 时，允许通过</span>
     <span class="pl-k">return</span> <span class="pl-en">getState</span>() == <span class="pl-c1">0</span> ? <span class="pl-c1">1</span> : -<span class="pl-c1">1</span>;
 }
 
 
 
-<span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doAcquireSharedInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) <span class="pl-k">throws</span> <span class="pl-s1">InterruptedException</span> {
+<span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-en">doAcquireSharedInterruptibly</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) <span class="pl-k">throws</span> <span class="pl-smi">InterruptedException</span> {
     <span class="pl-c">// 添加节点至等待队列</span>
     <span class="pl-k">final</span> <span class="pl-smi">Node</span> <span class="pl-s1">node</span> = <span class="pl-en">addWaiter</span>(<span class="pl-smi">Node</span>.<span class="pl-c1">SHARED</span>);
     <span class="pl-smi">boolean</span> <span class="pl-s1">failed</span> = <span class="pl-c1">true</span>;
@@ -179,7 +179,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     }
 }
 
-<span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">setHeadAndPropagate</span>(<span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">propagate</span>) {
+<span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-en">setHeadAndPropagate</span>(<span class="pl-smi">Node</span> <span class="pl-s1">node</span>, <span class="pl-smi">int</span> <span class="pl-s1">propagate</span>) {
     <span class="pl-c">// 获取头节点</span>
     <span class="pl-smi">Node</span> <span class="pl-s1">h</span> = <span class="pl-s1">head</span>; <span class="pl-c">// Record old head for check below</span>
     <span class="pl-c">// 设置头节点</span>
@@ -198,11 +198,11 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 <h3>3.3 <code class="notranslate">countDown()</code> 方法的实现</h3>
 <p><code class="notranslate">countDown()</code> 方法用于递减计数器，直到计数器为零时，所有在 <code class="notranslate">await()</code> 方法中等待的线程才会被唤醒。该方法通过 <code class="notranslate">releaseShared()</code> 调用内部的 <code class="notranslate">tryReleaseShared()</code> 来更新计数器的值。</p>
-<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-s1">countDown</span>() {
+<div class="highlight highlight-source-java"><pre class="notranslate"><span class="pl-k">public</span> <span class="pl-smi">void</span> <span class="pl-en">countDown</span>() {
     <span class="pl-s1">sync</span>.<span class="pl-en">releaseShared</span>(<span class="pl-c1">1</span>);
 }
 
-<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-s1">releaseShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
+<span class="pl-k">public</span> <span class="pl-k">final</span> <span class="pl-smi">boolean</span> <span class="pl-en">releaseShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">arg</span>) {
     <span class="pl-k">if</span> (<span class="pl-en">tryReleaseShared</span>(<span class="pl-s1">arg</span>)) {
         <span class="pl-en">doReleaseShared</span>();
         <span class="pl-k">return</span> <span class="pl-c1">true</span>;
@@ -211,7 +211,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 }
 
 <span class="pl-c">/* 由 AQS 的子类实现*/</span>
-<span class="pl-k">protected</span> <span class="pl-smi">boolean</span> <span class="pl-s1">tryReleaseShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">releases</span>) {
+<span class="pl-k">protected</span> <span class="pl-smi">boolean</span> <span class="pl-en">tryReleaseShared</span>(<span class="pl-smi">int</span> <span class="pl-s1">releases</span>) {
     <span class="pl-c">// 无限循环</span>
     <span class="pl-k">for</span> (;;) {
         <span class="pl-c">// 获取状态</span>
@@ -226,7 +226,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 }
 
 
-<span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-s1">doReleaseShared</span>() {
+<span class="pl-k">private</span> <span class="pl-smi">void</span> <span class="pl-en">doReleaseShared</span>() {
     <span class="pl-c">// 无限循环</span>
     <span class="pl-k">for</span> (;;) {
         <span class="pl-c">// 保存头节点</span>
@@ -282,7 +282,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <span class="pl-c">//创建计数器，这里需要统计4个指标</span>
 <span class="pl-k">private</span> <span class="pl-k">static</span> <span class="pl-smi">CountDownLatch</span> <span class="pl-s1">countDownLatch</span>=<span class="pl-k">new</span> <span class="pl-smi">CountDownLatch</span>(<span class="pl-c1">4</span>);
 
-<span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-s1">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
+<span class="pl-k">public</span> <span class="pl-k">static</span> <span class="pl-smi">void</span> <span class="pl-en">main</span>(<span class="pl-smi">String</span>[] <span class="pl-s1">args</span>) {
 
     <span class="pl-c">//记录开始时间</span>
     <span class="pl-smi">long</span> <span class="pl-s1">startTime</span>=<span class="pl-smi">System</span>.<span class="pl-en">currentTimeMillis</span>();
