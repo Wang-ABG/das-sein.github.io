@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Absoluter Geist</title><link>https://Wang-ABG.github.io/das-sein.github.io</link><description>纵使时光百年遥，将感我心在咫尺。</description><copyright>Absoluter Geist</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/101440642?s=400&amp;u=64734a1b6d25eddc0ac7e0729729e228193de187&amp;v=4</url><title>avatar</title><link>https://Wang-ABG.github.io/das-sein.github.io</link></image><lastBuildDate>Wed, 08 Jan 2025 02:32:45 +0000</lastBuildDate><managingEditor>Absoluter Geist</managingEditor><ttl>60</ttl><webMaster>Absoluter Geist</webMaster><item><title>无题</title><link>https://Wang-ABG.github.io/das-sein.github.io/post/wu-ti.html</link><description>-----------------------------------&#13;
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Absoluter Geist</title><link>https://Wang-ABG.github.io/das-sein.github.io</link><description>纵使时光百年遥，将感我心在咫尺。</description><copyright>Absoluter Geist</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/101440642?s=400&amp;u=64734a1b6d25eddc0ac7e0729729e228193de187&amp;v=4</url><title>avatar</title><link>https://Wang-ABG.github.io/das-sein.github.io</link></image><lastBuildDate>Tue, 25 Feb 2025 05:31:36 +0000</lastBuildDate><managingEditor>Absoluter Geist</managingEditor><ttl>60</ttl><webMaster>Absoluter Geist</webMaster><item><title>无题</title><link>https://Wang-ABG.github.io/das-sein.github.io/post/wu-ti.html</link><description>-----------------------------------&#13;
 &#13;
 ### 七律&#13;
 &#13;
@@ -92,172 +92,106 @@ AbstractQueuedSynchronizer（AQS）是 Java 并发包中最精妙的设计之一
 &#13;
 ### 1.什么是ReentrantLock？&#13;
 &#13;
-`ReentrantLock` 是 Java 并发包（`java.util.concurrent.locks`）中的锁实现，提供了比 `synchronized` 更灵活的锁机制。</description><guid isPermaLink="true">https://Wang-ABG.github.io/das-sein.github.io/post/%20%E3%80%90JUC%20-yuan-ma-yue-du-%281%29%E3%80%91%EF%BC%9A-cong-%20ReentrantLock%20-kai-shi.html</guid><pubDate>Tue, 19 Nov 2024 15:28:59 +0000</pubDate></item><item><title>论文：奶牛数之和为好奇数</title><link>https://Wang-ABG.github.io/das-sein.github.io/post/lun-wen-%EF%BC%9A-nai-niu-shu-zhi-he-wei-hao-qi-shu.html</link><description>[ 下载 ](###下载)&#13;
-[预览](###预览)&#13;
-[推广](###推广)&#13;
-&#13;
-### 下载&#13;
-[奶牛数中的好奇数 v0.6(精简版).pdf](https://github.com/user-attachments/files/17823523/7.pdf)&#13;
-&#13;
-&#13;
-### 预览&#13;
-![奶牛数中的好奇数 (5)_00](https://github.com/user-attachments/assets/4e105d59-ec11-4c47-a0fb-f80f03fb9db5)&#13;
-![奶牛数中的好奇数 (5)_01](https://github.com/user-attachments/assets/43328412-49f5-4a9e-ba10-3d6f93d54f03)&#13;
-![奶牛数中的好奇数 (5)_02](https://github.com/user-attachments/assets/0c855b31-2ddb-41cd-be8f-80653edf2db6)&#13;
-![奶牛数中的好奇数 (5)_03](https://github.com/user-attachments/assets/a71066a5-993b-4648-822a-13de402e146c)&#13;
-![奶牛数中的好奇数 (5)_04](https://github.com/user-attachments/assets/02e7ff00-173a-4044-aea5-f9bb1b150faf)&#13;
-![奶牛数中的好奇数 (5)_05](https://github.com/user-attachments/assets/34571bcb-c09d-4f6e-aadd-524489ac38b1)&#13;
-![奶牛数中的好奇数 (5)_06](https://github.com/user-attachments/assets/86be60e4-78b3-4b2e-aa6d-44b34f582662)&#13;
-![奶牛数中的好奇数 (5)_07](https://github.com/user-attachments/assets/edef1ad1-14c3-4da9-b6e7-5f6bfc7a8535)&#13;
-![奶牛数中的好奇数 (5)_08](https://github.com/user-attachments/assets/5aeadd54-c670-41d4-8510-b05db2babf5d)&#13;
-![奶牛数中的好奇数 (5)_09](https://github.com/user-attachments/assets/37a99a8b-36b3-4ebf-b239-3329d564bf75)&#13;
-![奶牛数中的好奇数 (5)_10](https://github.com/user-attachments/assets/6d4904d5-4808-4639-8982-5561d6c9257f)&#13;
-![奶牛数中的好奇数 (5)_11](https://github.com/user-attachments/assets/f7614d2c-7949-4f54-bd05-e4c71b89614c)&#13;
-![奶牛数中的好奇数 (5)_12](https://github.com/user-attachments/assets/3e6486be-0895-4b52-9560-a03040d0326e)&#13;
-![奶牛数中的好奇数 (5)_13](https://github.com/user-attachments/assets/08c986ae-b79a-46e2-8aa0-c34d662cb304)&#13;
-![奶牛数中的好奇数 (5)_14](https://github.com/user-attachments/assets/76f77b39-d984-45ac-9153-902a4bf80465)&#13;
-![奶牛数中的好奇数 (5)_15](https://github.com/user-attachments/assets/a1bd9a27-5e0f-4a51-9fa6-fec7964ab53b)&#13;
-![奶牛数中的好奇数 (5)_16](https://github.com/user-attachments/assets/0ba8debc-0235-4043-b11f-7ccb8d9c3ccb)&#13;
-![奶牛数中的好奇数 (5)_17](https://github.com/user-attachments/assets/2a1091d0-c3f9-4595-8e8d-c3951021cf68)&#13;
-![奶牛数中的好奇数 (5)_18](https://github.com/user-attachments/assets/9a11c678-5e99-45a5-9a0a-9613bf463f69)&#13;
-![奶牛数中的好奇数 (5)_19](https://github.com/user-attachments/assets/142e7bd0-ebf2-421d-9536-50a8b9d227a7)&#13;
-![奶牛数中的好奇数 (5)_20](https://github.com/user-attachments/assets/33954b0d-2bfa-46a7-ba64-36bf12f0d938)&#13;
-![奶牛数中的好奇数 (5)_21](https://github.com/user-attachments/assets/65fd1f54-c23a-4356-8bd2-538b63dc348c)&#13;
-![奶牛数中的好奇数 (5)_22](https://github.com/user-attachments/assets/b6d14d60-6de7-4ded-b232-1682280920d4)&#13;
-![奶牛数中的好奇数 (5)_23](https://github.com/user-attachments/assets/397ac7c4-c682-4d73-bdd8-bc802c8906ce)&#13;
-![奶牛数中的好奇数 (5)_24](https://github.com/user-attachments/assets/6c82d555-860f-4d81-9a4f-d22abeae19a3)&#13;
-![奶牛数中的好奇数 (5)_25](https://github.com/user-attachments/assets/f3518a34-44c3-48db-a064-34979c798cea)&#13;
-![奶牛数中的好奇数 (5)_26](https://github.com/user-attachments/assets/139d9eaf-0b90-46a1-a884-d656eeaf1b8a)&#13;
-![奶牛数中的好奇数 (5)_27](https://github.com/user-attachments/assets/1f6fe3ab-6009-40e0-bd59-2dc9fafe6a45)&#13;
-![奶牛数中的好奇数 (5)_28](https://github.com/user-attachments/assets/41e223e2-ad13-4f77-a951-e4df9cf907a0)&#13;
-![奶牛数中的好奇数 (5)_29](https://github.com/user-attachments/assets/f315abdf-6621-4e77-854b-02deb5a69f51)&#13;
-![奶牛数中的好奇数 (5)_30](https://github.com/user-attachments/assets/b4b93e51-3ec4-49b6-aba6-1052ee23ab10)&#13;
-![奶牛数中的好奇数 (5)_31](https://github.com/user-attachments/assets/6c319c8a-ba83-4274-b03e-27051d55dbb7)&#13;
-![奶牛数中的好奇数 (5)_32](https://github.com/user-attachments/assets/513cf64b-9999-4773-9364-5879814f7332)&#13;
-![奶牛数中的好奇数 (5)_33](https://github.com/user-attachments/assets/75cdf33a-9498-4c8e-b6bc-ca35b7fa3f29)&#13;
-![奶牛数中的好奇数 (5)_34](https://github.com/user-attachments/assets/5dd1392b-1472-4d9b-94fc-9c9cecb6d620)&#13;
-![奶牛数中的好奇数 (5)_35](https://github.com/user-attachments/assets/0cc21d91-8836-42e3-92c4-d5f63e985866)&#13;
-![奶牛数中的好奇数 (5)_36](https://github.com/user-attachments/assets/85836b5d-635b-4105-9c3a-ce6ce0889cca)&#13;
-![奶牛数中的好奇数 (5)_37](https://github.com/user-attachments/assets/6b92aad9-d484-46d0-95e2-10904098700b)&#13;
-![奶牛数中的好奇数 (5)_38](https://github.com/user-attachments/assets/e7e16e37-eefd-4bf4-b745-5bb3ce975524)&#13;
-![奶牛数中的好奇数 (5)_39](https://github.com/user-attachments/assets/82d58c76-2e2d-4590-b944-d4f53293aa6e)&#13;
-![奶牛数中的好奇数 (5)_40](https://github.com/user-attachments/assets/9c73ca78-b18d-4883-910b-1abeeac841b2)&#13;
-![奶牛数中的好奇数 (5)_41](https://github.com/user-attachments/assets/47fc8775-2b0a-43c7-bf61-5078a571bdd7)&#13;
-![奶牛数中的好奇数 (5)_42](https://github.com/user-attachments/assets/a5c583f2-e647-42e9-8e8a-653e00c79ad1)&#13;
-![奶牛数中的好奇数 (5)_43](https://github.com/user-attachments/assets/bdda2242-f57b-48b4-899a-a79d915e7b1a)&#13;
-![奶牛数中的好奇数 (5)_44](https://github.com/user-attachments/assets/d62982e9-d6b1-44d3-a265-5d436b47311e)&#13;
-![奶牛数中的好奇数 (5)_45](https://github.com/user-attachments/assets/eb80677e-5bec-4e7a-ae41-f4bf9a20e404)&#13;
-![奶牛数中的好奇数 (5)_46](https://github.com/user-attachments/assets/812f41bd-ec17-4220-b2d7-ca7c04a7c493)&#13;
-![奶牛数中的好奇数 (5)_47](https://github.com/user-attachments/assets/c22b28fa-a99e-4912-8099-d9c98a092182)&#13;
-![奶牛数中的好奇数 (5)_48](https://github.com/user-attachments/assets/e5068e02-76c4-4956-9a81-18591fd01b56)&#13;
-![奶牛数中的好奇数 (5)_49](https://github.com/user-attachments/assets/5ea69635-501c-4145-b014-8cec5d5a25c6)&#13;
-![奶牛数中的好奇数 (5)_50](https://github.com/user-attachments/assets/35d66d2b-4c20-442b-928d-8314b256551a)&#13;
-![奶牛数中的好奇数 (5)_51](https://github.com/user-attachments/assets/08b35776-cf51-46c0-9045-227f7fc1f2ee)&#13;
-![奶牛数中的好奇数 (5)_52](https://github.com/user-attachments/assets/805f82a2-5aaa-46ad-85d4-35dcdaf63a24)&#13;
-![奶牛数中的好奇数 (5)_53](https://github.com/user-attachments/assets/7df07fba-2a2e-4ec9-b6e7-eacc4763b761)&#13;
-![奶牛数中的好奇数 (5)_54](https://github.com/user-attachments/assets/762bb898-cb64-47af-9120-4f96d932de1b)&#13;
-&#13;
-&#13;
-### 记录1 关于推广原问题（2,3）为（n,m）的方程组织顺序&#13;
-####方程组织顺序&#13;
-```javapublic class Test6 {&#13;
-    public static int random = 0;  // 随机变量预留&#13;
-    public static int count = 0;   // 边数计数&#13;
-    public static int count0 = 0;  // 方程数（节点数）计数&#13;
-    public static int count1 = 0;  // 路径数（叶子数）计数&#13;
-&#13;
-    // 动态设置终止目标&#13;
-    public static int targetA = 2;  // 目标 a 值&#13;
-    public static int targetB = 4;  // 目标 b 值&#13;
-&#13;
-    public static void main(String[] args) {&#13;
-        int a = 1;  // 初始值 (1,1)&#13;
-        int b = 1;&#13;
-        count0 = targetA * targetB; // 方程数&#13;
-&#13;
-        String startLabel = NumberToLetterMapping.mapToLetters(a, b, random);&#13;
-        System.out.println('graph TD\n' + startLabel + '[' + b + ',' + a + ']');&#13;
-&#13;
-        // 调用递归树&#13;
-        leftTree(a, b);&#13;
-        rightTree(a, b);&#13;
-&#13;
-        System.out.println('count: ' + count);&#13;
-        System.out.println('count0: ' + count0);&#13;
-        System.out.println('count1: ' + count1);&#13;
-    }&#13;
-&#13;
-    public static void leftTree(int a, int b) {&#13;
-        // 若 a 达到 targetA，则输出 (a, True) 并停止递归&#13;
-        if (a == targetA) {&#13;
-            printLeaf(a, b, true);&#13;
-            return;&#13;
-        }&#13;
-        printEdge(a, b, a + 1, b); // 递增 a&#13;
-        leftTree(a + 1, b);&#13;
-        rightTree(a + 1, b);&#13;
-    }&#13;
-&#13;
-    public static void rightTree(int a, int b) {&#13;
-        // 若 b 达到 targetB，则停止递归&#13;
-        if (b == targetB) return;&#13;
-        printEdge(a, b, a, b + 1); // 递增 b&#13;
-        rightTree(a, b + 1);&#13;
-        leftTree(a, b + 1);&#13;
-    }&#13;
-&#13;
-    private static void printEdge(int a1, int b1, int a2, int b2) {&#13;
-        String start = NumberToLetterMapping.mapToLetters(a1, b1, random);&#13;
-        String end = NumberToLetterMapping.mapToLetters(a2, b2, random);&#13;
-&#13;
-        count++;&#13;
-        System.out.println(start + '--&gt;' + end + '[' + a2 + ',' + b2 + ']');&#13;
-    }&#13;
-&#13;
-    private static void printLeaf(int a, int b, boolean isATerminal) {&#13;
-        String start = NumberToLetterMapping.mapToLetters(a, b, random);&#13;
-        count++;&#13;
-        count1++;&#13;
-&#13;
-        // 终止条件输出不同格式&#13;
-        if (isATerminal) {&#13;
-            System.out.println(start + '--&gt; end0[' + a + ', True]');&#13;
-        } else {&#13;
-            System.out.println(start + '--&gt; end0[' + b + ', False]');&#13;
-        }&#13;
-    }&#13;
-&#13;
-    public static class NumberToLetterMapping {&#13;
-&#13;
-        public static String mapToLetters(int M, int N, int random) {&#13;
-            long combinedValue = cantorPairing(M, N);&#13;
-            return numberToLetters(combinedValue);&#13;
-        }&#13;
-&#13;
-        private static long cantorPairing(int M, int N) {&#13;
-            return (M + N) * (M + N + 1) / 2 + N;&#13;
-        }&#13;
-&#13;
-        private static String numberToLetters(long number) {&#13;
-            StringBuilder result = new StringBuilder();&#13;
-            while (number &gt;= 0) {&#13;
-                int remainder = (int) (number % 26);&#13;
-                result.insert(0, (char) ('A' + remainder));&#13;
-                number = number / 26 - 1;&#13;
-                if (number &lt; 0) break;&#13;
-            }&#13;
-            return result.toString();&#13;
-        }&#13;
-    }&#13;
-}&#13;
-&#13;
-&#13;
-```&#13;
-&#13;
-#### 示例：（3,5）问题方程组织顺序&#13;
-&#13;
-![export (6)](https://github.com/user-attachments/assets/5d6c86bb-4b41-428c-8357-7d06b4edcc53)&#13;
-。</description><guid isPermaLink="true">https://Wang-ABG.github.io/das-sein.github.io/post/lun-wen-%EF%BC%9A-nai-niu-shu-zhi-he-wei-hao-qi-shu.html</guid><pubDate>Sun, 17 Nov 2024 15:52:58 +0000</pubDate></item><item><title>翻译：宇宙际Teichmüller理论：霍奇剧院的构建</title><link>https://Wang-ABG.github.io/das-sein.github.io/post/fan-yi-%EF%BC%9A-yu-zhou-ji-Teichm%C3%BCller-li-lun-%EF%BC%9A-huo-qi-ju-yuan-de-gou-jian.html</link><description>&#13;
+`ReentrantLock` 是 Java 并发包（`java.util.concurrent.locks`）中的锁实现，提供了比 `synchronized` 更灵活的锁机制。</description><guid isPermaLink="true">https://Wang-ABG.github.io/das-sein.github.io/post/%20%E3%80%90JUC%20-yuan-ma-yue-du-%281%29%E3%80%91%EF%BC%9A-cong-%20ReentrantLock%20-kai-shi.html</guid><pubDate>Tue, 19 Nov 2024 15:28:59 +0000</pubDate></item><item><title>奶牛数之和为好奇数</title><link>https://Wang-ABG.github.io/das-sein.github.io/post/nai-niu-shu-zhi-he-wei-hao-qi-shu.html</link><description> 关于推广原问题（2,3）为（n,m）的方程组织顺序
+####方程组织顺序
+```javapublic class Test6 {
+    public static int random = 0;  // 随机变量预留
+    public static int count = 0;   // 边数计数
+    public static int count0 = 0;  // 方程数（节点数）计数
+    public static int count1 = 0;  // 路径数（叶子数）计数
+
+    // 动态设置终止目标
+    public static int targetA = 2;  // 目标 a 值
+    public static int targetB = 4;  // 目标 b 值
+
+    public static void main(String[] args) {
+        int a = 1;  // 初始值 (1,1)
+        int b = 1;
+        count0 = targetA * targetB; // 方程数
+
+        String startLabel = NumberToLetterMapping.mapToLetters(a, b, random);
+        System.out.println('graph TD\n' + startLabel + '[' + b + ',' + a + ']');
+
+        // 调用递归树
+        leftTree(a, b);
+        rightTree(a, b);
+
+        System.out.println('count: ' + count);
+        System.out.println('count0: ' + count0);
+        System.out.println('count1: ' + count1);
+    }
+
+    public static void leftTree(int a, int b) {
+        // 若 a 达到 targetA，则输出 (a, True) 并停止递归
+        if (a == targetA) {
+            printLeaf(a, b, true);
+            return;
+        }
+        printEdge(a, b, a + 1, b); // 递增 a
+        leftTree(a + 1, b);
+        rightTree(a + 1, b);
+    }
+
+    public static void rightTree(int a, int b) {
+        // 若 b 达到 targetB，则停止递归
+        if (b == targetB) return;
+        printEdge(a, b, a, b + 1); // 递增 b
+        rightTree(a, b + 1);
+        leftTree(a, b + 1);
+    }
+
+    private static void printEdge(int a1, int b1, int a2, int b2) {
+        String start = NumberToLetterMapping.mapToLetters(a1, b1, random);
+        String end = NumberToLetterMapping.mapToLetters(a2, b2, random);
+
+        count++;
+        System.out.println(start + '--&gt;' + end + '[' + a2 + ',' + b2 + ']');
+    }
+
+    private static void printLeaf(int a, int b, boolean isATerminal) {
+        String start = NumberToLetterMapping.mapToLetters(a, b, random);
+        count++;
+        count1++;
+
+        // 终止条件输出不同格式
+        if (isATerminal) {
+            System.out.println(start + '--&gt; end0[' + a + ', True]');
+        } else {
+            System.out.println(start + '--&gt; end0[' + b + ', False]');
+        }
+    }
+
+    public static class NumberToLetterMapping {
+
+        public static String mapToLetters(int M, int N, int random) {
+            long combinedValue = cantorPairing(M, N);
+            return numberToLetters(combinedValue);
+        }
+
+        private static long cantorPairing(int M, int N) {
+            return (M + N) * (M + N + 1) / 2 + N;
+        }
+
+        private static String numberToLetters(long number) {
+            StringBuilder result = new StringBuilder();
+            while (number &gt;= 0) {
+                int remainder = (int) (number % 26);
+                result.insert(0, (char) ('A' + remainder));
+                number = number / 26 - 1;
+                if (number &lt; 0) break;
+            }
+            return result.toString();
+        }
+    }
+}
+
+
+```
+
+#### 示例：（3,5）问题方程组织顺序
+
+![export (6)](https://github.com/user-attachments/assets/5d6c86bb-4b41-428c-8357-7d06b4edcc53)
+。</description><guid isPermaLink="true">https://Wang-ABG.github.io/das-sein.github.io/post/nai-niu-shu-zhi-he-wei-hao-qi-shu.html</guid><pubDate>Sun, 17 Nov 2024 15:52:58 +0000</pubDate></item><item><title>翻译：宇宙际Teichmüller理论：霍奇剧院的构建</title><link>https://Wang-ABG.github.io/das-sein.github.io/post/fan-yi-%EF%BC%9A-yu-zhou-ji-Teichm%C3%BCller-li-lun-%EF%BC%9A-huo-qi-ju-yuan-de-gou-jian.html</link><description>&#13;
 2012年8月，京都大学数学教授望月新一（Shinichi Mochizuki）在个人主页上发布了四篇关于宇宙际Teichmüller理论（Inter-universal Teichmüller Theory，IUT）的论文，总长度超过500页。</description><guid isPermaLink="true">https://Wang-ABG.github.io/das-sein.github.io/post/fan-yi-%EF%BC%9A-yu-zhou-ji-Teichm%C3%BCller-li-lun-%EF%BC%9A-huo-qi-ju-yuan-de-gou-jian.html</guid><pubDate>Thu, 14 Nov 2024 02:22:05 +0000</pubDate></item><item><title>简历</title><link>https://Wang-ABG.github.io/das-sein.github.io/post/jian-li.html</link><description>[简历下载-后端开发-王佳文.pdf](https://github.com/user-attachments/files/18039305/-.2.pdf)&#13;
 &#13;
 [简历下载-王佳文.pdf](https://827767.lanzoue.com/i3tM82he6taj)&#13;
