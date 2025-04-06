@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/101440642?s=400&u=64734a1b6d25eddc0ac7e0729729e228193de187&v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="
+
+以下是 **Transformer 模型在推理过程中的全流程矩阵计算流转**，以矩阵运算和维度变化为核心，逐步拆解从输入到输出的数学过程。">
+<meta property="og:title" content="【Transformer 】 模型推理全流程矩阵计算流转解析">
+<meta property="og:description" content="
+
+以下是 **Transformer 模型在推理过程中的全流程矩阵计算流转**，以矩阵运算和维度变化为核心，逐步拆解从输入到输出的数学过程。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://Wang-ABG.github.io/das-sein.github.io/post/%E3%80%90Transformer%20%E3%80%91%20-mo-xing-tui-li-quan-liu-cheng-ju-zhen-ji-suan-liu-zhuan-jie-xi.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/101440642?s=400&u=64734a1b6d25eddc0ac7e0729729e228193de187&v=4">
+<title>【Transformer 】 模型推理全流程矩阵计算流转解析</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+.copy-feedback {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    color: var(--color-fg-on-emphasis);
+    background-color: var(--color-fg-muted);
+    border-radius: 3px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">【Transformer 】 模型推理全流程矩阵计算流转解析</h1>
+<div class="title-right">
+    <a href="https://Wang-ABG.github.io/das-sein.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><p>以下是 <strong>Transformer 模型在推理过程中的全流程矩阵计算流转</strong>，以矩阵运算和维度变化为核心，逐步拆解从输入到输出的数学过程。假设输入为一个长度为$n$的序列，模型参数如下：</p>
+<p><strong>词表大小</strong>：$v_{\text{vocab}}$</p>
+<p><strong>模型维度</strong>：$d_{\text{model}}$</p>
+<p><strong>前馈网络隐藏层维度</strong>：$d_{\text{ff}}$</p>
+<p><strong>注意力头数</strong>：$h$，每个头的维度$d_k = d_{\text{model}} / h$</p>
+<p><strong>Transformer 层数</strong>：$L$</p>
+<hr>
+<h3><strong>1. 输入编码</strong></h3>
+<h4><strong>1.1 Token 转 One-hot 向量</strong></h4>
+<p>输入序列的每个 token 转换为 one-hot 向量：</p>
+<p>输入序列：$\text{IDs} \in \mathbb{R}^{1 \times n}$（假设 batch_size=1）</p>
+<p>One-hot 矩阵：$\mathbf{X}<em>{\text{one-hot}} \in \mathbb{R}^{n \times v</em>{\text{vocab}}}$每行对应一个 token 的 one-hot 向量。</p>
+<h4><strong>1.2 词嵌入（Embedding）</strong></h4>
+<p>通过词嵌入矩阵$\mathbf{E} \in \mathbb{R}^{v_{\text{vocab}} \times d_{\text{model}}}$转换为连续向量：$\mathbf{X}<em>{\text{embed}} = \mathbf{X}</em>{\text{one-hot}} \cdot \mathbf{E} \quad \in \mathbb{R}^{n \times d_{\text{model}}}$</p>
+<h4><strong>1.3 位置编码（Positional Encoding）</strong></h4>
+<p>加入位置信息，直接相加：$\mathbf{H}^{(0)} = \mathbf{X}<em>{\text{embed}} + \mathbf{P} \quad \in \mathbb{R}^{n \times d</em>{\text{model}}}$其中$\mathbf{P} \in \mathbb{R}^{n \times d_{\text{model}}}$是位置编码矩阵。</p>
+<hr>
+<h3><strong>2. Transformer 层处理（共 **** **** 层）</strong></h3>
+<p>对每一层$l = 1, 2, \dots, L$，输入为$\mathbf{H}^{(l-1)} \in \mathbb{R}^{n \times d_{\text{model}}}$，输出为$\mathbf{H}^{(l)}$。</p>
+<h4><strong>2.1 多头自注意力（Multi-Head Self-Attention）</strong></h4>
+<p><strong>Step 1：线性投影生成 Q, K, V</strong></p>
+<p>参数矩阵：$\mathbf{W}_Q^{(l)}, \mathbf{W}<em>K^{(l)}, \mathbf{W}<em>V^{(l)} \in \mathbb{R}^{d</em>{\text{model}} \times d</em>{\text{model}}}$</p>
+<p>计算：$\mathbf{Q} = \mathbf{H}^{(l-1)} \cdot \mathbf{W}_Q^{(l)}, \quad \mathbf{K} = \mathbf{H}^{(l-1)} \cdot \mathbf{W}_K^{(l)}, \quad \mathbf{V} = \mathbf{H}^{(l-1)} \cdot \mathbf{W}<em>V^{(l)} \quad \in \mathbb{R}^{n \times d</em>{\text{model}}}$</p>
+<p>**Step 2：分头（Split Heads）**将$\mathbf{Q}, \mathbf{K}, \mathbf{V}$拆分为$h$个头：$\mathbf{Q} \rightarrow \mathbf{Q}<em>{\text{split}} \in \mathbb{R}^{h \times n \times d_k}, \quad \mathbf{K} \rightarrow \mathbf{K}</em>{\text{split}} \in \mathbb{R}^{h \times n \times d_k}, \quad \mathbf{V} \rightarrow \mathbf{V}_{\text{split}} \in \mathbb{R}^{h \times n \times d_k}$</p>
+<p><strong>Step 3：计算注意力分数</strong>对每个头$i \in {1, 2, \dots, h}$，计算：$\mathbf{A}_i = \text{softmax}\left( \frac{\mathbf{Q}_i \mathbf{K}_i^\top}{\sqrt{d_k}} \right) \cdot \mathbf{V}_i \quad \in \mathbb{R}^{n \times d_k}$</p>
+<p>**Step 4：合并多头（Concat Heads）**将$h$个头的输出拼接：$\mathbf{A}_{\text{concat}} = \text{Concat}(\mathbf{A}_1, \mathbf{A}_2, \dots, \mathbf{A}<em>h) \quad \in \mathbb{R}^{n \times d</em>{\text{model}}}$</p>
+<p><strong>Step 5：线性投影</strong>通过矩阵$\mathbf{W}<em>O^{(l)} \in \mathbb{R}^{d</em>{\text{model}} \times d_{\text{model}}}$合并结果：$\mathbf{A}<em>{\text{out}} = \mathbf{A}</em>{\text{concat}} \cdot \mathbf{W}<em>O^{(l)} \quad \in \mathbb{R}^{n \times d</em>{\text{model}}}$</p>
+<p><strong>Step 6：残差连接 + 层归一化</strong>$\mathbf{H}<em>{\text{attn}} = \text{LayerNorm}\left( \mathbf{H}^{(l-1)} + \mathbf{A}</em>{\text{out}} \right) \quad \in \mathbb{R}^{n \times d_{\text{model}}}$</p>
+<h4><strong>2.2 前馈网络（Feed-Forward Network, FFN）</strong></h4>
+<p><strong>Step 1：第一层线性变换</strong>参数矩阵$\mathbf{W}<em>1^{(l)} \in \mathbb{R}^{d</em>{\text{model}} \times d_{\text{ff}}}$，激活函数（如 ReLU）：$\mathbf{F}<em>{\text{mid}} = \text{ReLU}\left( \mathbf{H}</em>{\text{attn}} \cdot \mathbf{W}<em>1^{(l)} \right) \quad \in \mathbb{R}^{n \times d</em>{\text{ff}}}$</p>
+<p><strong>Step 2：第二层线性变换</strong>参数矩阵$\mathbf{W}<em>2^{(l)} \in \mathbb{R}^{d</em>{\text{ff}} \times d_{\text{model}}}$：$\mathbf{F}<em>{\text{out}} = \mathbf{F}</em>{\text{mid}} \cdot \mathbf{W}<em>2^{(l)} \quad \in \mathbb{R}^{n \times d</em>{\text{model}}}$</p>
+<p><strong>Step 3：残差连接 + 层归一化</strong>$\mathbf{H}^{(l)} = \text{LayerNorm}\left( \mathbf{H}<em>{\text{attn}} + \mathbf{F}</em>{\text{out}} \right) \quad \in \mathbb{R}^{n \times d_{\text{model}}}$</p>
+<hr>
+<h3><strong>3. 输出生成</strong></h3>
+<h4><strong>3.1 提取最后一个位置的隐藏状态</strong></h4>
+<p>在自回归生成中，仅保留序列最后一个位置的向量：$\mathbf{h}<em>{\text{last}} = \mathbf{H}^{(L)}[-1, :] \quad \in \mathbb{R}^{1 \times d</em>{\text{model}}}$</p>
+<h4><strong>3.2 Unembedding（线性变换）</strong></h4>
+<p>与词嵌入矩阵$\mathbf{E} \in \mathbb{R}^{v_{\text{vocab}} \times d_{\text{model}}}$的转置相乘：$\mathbf{l} = \mathbf{h}<em>{\text{last}} \cdot \mathbf{E}^\top \quad \in \mathbb{R}^{1 \times v</em>{\text{vocab}}}$</p>
+<h4><strong>3.3 Softmax 归一化</strong></h4>
+<p>将 logits 转换为概率分布：$\mathbf{p} = \text{softmax}(\mathbf{l}) \quad \in \mathbb{R}^{1 \times v_{\text{vocab}}}$</p>
+<hr>
+<h3><strong>矩阵流转维度总结</strong></h3>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>步骤</th>
+<th>输入维度</th>
+<th>操作</th>
+<th>参数维度</th>
+<th>输出维度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>词嵌入</td>
+<td>$n \times v_{\text{vocab}}$</td>
+<td>$\mathbf{X}_{\text{one-hot}} \cdot \mathbf{E}$</td>
+<td>$v_{\text{vocab}} \times d_{\text{model}}$</td>
+<td>$n \times d_{\text{model}}$</td>
+</tr>
+<tr>
+<td>位置编码</td>
+<td>$n \times d_{\text{model}}$</td>
+<td>$\mathbf{X}_{\text{embed}} + \mathbf{P}$</td>
+<td>-</td>
+<td>$n \times d_{\text{model}}$</td>
+</tr>
+<tr>
+<td>多头注意力 Q/K/V</td>
+<td>$n \times d_{\text{model}}$</td>
+<td>$\mathbf{H} \cdot \mathbf{W}_Q/\mathbf{W}_K/\mathbf{W}_V$</td>
+<td>$d_{\text{model}} \times d_{\text{model}}$</td>
+<td>$n \times d_{\text{model}}$</td>
+</tr>
+<tr>
+<td>注意力输出投影</td>
+<td>$n \times d_{\text{model}}$</td>
+<td>$\mathbf{A}_{\text{concat}} \cdot \mathbf{W}_O$</td>
+<td>$d_{\text{model}} \times d_{\text{model}}$</td>
+<td>$n \times d_{\text{model}}$</td>
+</tr>
+<tr>
+<td>FFN 第一层</td>
+<td>$n \times d_{\text{model}}$</td>
+<td>$\mathbf{H}_{\text{attn}} \cdot \mathbf{W}_1$</td>
+<td>$d_{\text{model}} \times d_{\text{ff}}$</td>
+<td>$n \times d_{\text{ff}}$</td>
+</tr>
+<tr>
+<td>FFN 第二层</td>
+<td>$n \times d_{\text{ff}}$</td>
+<td>$\mathbf{F}_{\text{mid}} \cdot \mathbf{W}_2$</td>
+<td>$d_{\text{ff}} \times d_{\text{model}}$</td>
+<td>$n \times d_{\text{model}}$</td>
+</tr>
+<tr>
+<td>Unembedding</td>
+<td>$1 \times d_{\text{model}}$</td>
+<td>$\mathbf{h}_{\text{last}} \cdot \mathbf{E}^\top$</td>
+<td>$d_{\text{model}} \times v_{\text{vocab}}$</td>
+<td>$1 \times v_{\text{vocab}}$</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<hr>
+<h3><strong>关键点</strong></h3>
+<p><strong>维度一致性</strong>：所有线性变换需严格对齐输入输出维度（例如$d_{\text{model}}$是核心维度）。</p>
+<p><strong>参数共享</strong>：Unembedding 矩阵通常与 Embedding 矩阵共享（即$\mathbf{E}^\top$）。</p>
+<p><strong>计算效率</strong>：矩阵乘法通过 GPU 并行加速，尤其是多头注意力的分头计算。</p>
+<p>通过这一流程，输入序列的离散 token 被逐步转换为概率分布，最终生成下一个词。</p>
+<hr>
+<h4>代码示例</h4>
+<div class="highlight highlight-source-python"><pre class="notranslate"><span class="pl-k">import</span> <span class="pl-s1">torch</span>
+<span class="pl-k">import</span> <span class="pl-s1">torch</span>.<span class="pl-s1">nn</span> <span class="pl-k">as</span> <span class="pl-s1">nn</span>
+<span class="pl-k">import</span> <span class="pl-s1">torch</span>.<span class="pl-s1">nn</span>.<span class="pl-s1">functional</span> <span class="pl-k">as</span> <span class="pl-c1">F</span>
+
+
+<span class="pl-c"># 定义Transformer推理类</span>
+<span class="pl-k">class</span> <span class="pl-v">TransformerInference</span>:
+    <span class="pl-k">def</span> <span class="pl-en">__init__</span>(<span class="pl-s1">self</span>, <span class="pl-s1">vocab_size</span>, <span class="pl-s1">model_dim</span>, <span class="pl-s1">ff_dim</span>, <span class="pl-s1">num_heads</span>, <span class="pl-s1">num_layers</span>):
+        <span class="pl-s1">self</span>.<span class="pl-c1">vocab_size</span> <span class="pl-c1">=</span> <span class="pl-s1">vocab_size</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">model_dim</span> <span class="pl-c1">=</span> <span class="pl-s1">model_dim</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">ff_dim</span> <span class="pl-c1">=</span> <span class="pl-s1">ff_dim</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">num_heads</span> <span class="pl-c1">=</span> <span class="pl-s1">num_heads</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">num_layers</span> <span class="pl-c1">=</span> <span class="pl-s1">num_layers</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">d_k</span> <span class="pl-c1">=</span> <span class="pl-s1">model_dim</span> <span class="pl-c1">//</span> <span class="pl-s1">num_heads</span>
+
+        <span class="pl-c"># 词嵌入矩阵</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">E</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">randn</span>(<span class="pl-s1">vocab_size</span>, <span class="pl-s1">model_dim</span>)
+        <span class="pl-c"># 位置编码矩阵</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">P</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">randn</span>(<span class="pl-c1">100</span>, <span class="pl-s1">model_dim</span>)  <span class="pl-c"># 假设最大序列长度为100</span>
+
+        <span class="pl-c"># 初始化每层的参数</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">W_Q</span> <span class="pl-c1">=</span> [<span class="pl-s1">torch</span>.<span class="pl-c1">randn</span>(<span class="pl-s1">model_dim</span>, <span class="pl-s1">model_dim</span>) <span class="pl-k">for</span> <span class="pl-s1">_</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">num_layers</span>)]
+        <span class="pl-s1">self</span>.<span class="pl-c1">W_K</span> <span class="pl-c1">=</span> [<span class="pl-s1">torch</span>.<span class="pl-c1">randn</span>(<span class="pl-s1">model_dim</span>, <span class="pl-s1">model_dim</span>) <span class="pl-k">for</span> <span class="pl-s1">_</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">num_layers</span>)]
+        <span class="pl-s1">self</span>.<span class="pl-c1">W_V</span> <span class="pl-c1">=</span> [<span class="pl-s1">torch</span>.<span class="pl-c1">randn</span>(<span class="pl-s1">model_dim</span>, <span class="pl-s1">model_dim</span>) <span class="pl-k">for</span> <span class="pl-s1">_</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">num_layers</span>)]
+        <span class="pl-s1">self</span>.<span class="pl-c1">W_O</span> <span class="pl-c1">=</span> [<span class="pl-s1">torch</span>.<span class="pl-c1">randn</span>(<span class="pl-s1">model_dim</span>, <span class="pl-s1">model_dim</span>) <span class="pl-k">for</span> <span class="pl-s1">_</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">num_layers</span>)]
+        <span class="pl-s1">self</span>.<span class="pl-c1">W_1</span> <span class="pl-c1">=</span> [<span class="pl-s1">torch</span>.<span class="pl-c1">randn</span>(<span class="pl-s1">model_dim</span>, <span class="pl-s1">ff_dim</span>) <span class="pl-k">for</span> <span class="pl-s1">_</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">num_layers</span>)]
+        <span class="pl-s1">self</span>.<span class="pl-c1">W_2</span> <span class="pl-c1">=</span> [<span class="pl-s1">torch</span>.<span class="pl-c1">randn</span>(<span class="pl-s1">ff_dim</span>, <span class="pl-s1">model_dim</span>) <span class="pl-k">for</span> <span class="pl-s1">_</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">num_layers</span>)]
+
+    <span class="pl-k">def</span> <span class="pl-en">token_to_onehot</span>(<span class="pl-s1">self</span>, <span class="pl-s1">input_ids</span>):
+        <span class="pl-s">"""将输入的token转换为one-hot向量"""</span>
+        <span class="pl-s1">batch_size</span>, <span class="pl-s1">seq_len</span> <span class="pl-c1">=</span> <span class="pl-s1">input_ids</span>.<span class="pl-c1">shape</span>
+        <span class="pl-s1">one_hot</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">zeros</span>(<span class="pl-s1">batch_size</span>, <span class="pl-s1">seq_len</span>, <span class="pl-s1">self</span>.<span class="pl-c1">vocab_size</span>)
+        <span class="pl-k">for</span> <span class="pl-s1">i</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">batch_size</span>):
+            <span class="pl-k">for</span> <span class="pl-s1">j</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">seq_len</span>):
+                <span class="pl-s1">one_hot</span>[<span class="pl-s1">i</span>, <span class="pl-s1">j</span>, <span class="pl-s1">input_ids</span>[<span class="pl-s1">i</span>, <span class="pl-s1">j</span>]] <span class="pl-c1">=</span> <span class="pl-c1">1</span>
+        <span class="pl-k">return</span> <span class="pl-s1">one_hot</span>.<span class="pl-c1">squeeze</span>(<span class="pl-c1">0</span>)  <span class="pl-c"># 假设batch_size=1</span>
+
+    <span class="pl-k">def</span> <span class="pl-en">embedding</span>(<span class="pl-s1">self</span>, <span class="pl-s1">one_hot</span>):
+        <span class="pl-s">"""词嵌入"""</span>
+        <span class="pl-k">return</span> <span class="pl-s1">torch</span>.<span class="pl-c1">matmul</span>(<span class="pl-s1">one_hot</span>, <span class="pl-s1">self</span>.<span class="pl-c1">E</span>)
+
+    <span class="pl-k">def</span> <span class="pl-en">positional_encoding</span>(<span class="pl-s1">self</span>, <span class="pl-s1">embeddings</span>):
+        <span class="pl-s">"""位置编码"""</span>
+        <span class="pl-s1">seq_len</span> <span class="pl-c1">=</span> <span class="pl-s1">embeddings</span>.<span class="pl-c1">shape</span>[<span class="pl-c1">0</span>]
+        <span class="pl-k">return</span> <span class="pl-s1">embeddings</span> <span class="pl-c1">+</span> <span class="pl-s1">self</span>.<span class="pl-c1">P</span>[:<span class="pl-s1">seq_len</span>, :]
+
+    <span class="pl-k">def</span> <span class="pl-en">multi_head_attention</span>(<span class="pl-s1">self</span>, <span class="pl-c1">H</span>, <span class="pl-s1">l</span>):
+        <span class="pl-s">"""多头自注意力机制"""</span>
+        <span class="pl-c"># Step 1: 线性投影生成Q, K, V</span>
+        <span class="pl-c1">Q</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">matmul</span>(<span class="pl-c1">H</span>, <span class="pl-s1">self</span>.<span class="pl-c1">W_Q</span>[<span class="pl-s1">l</span>])
+        <span class="pl-c1">K</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">matmul</span>(<span class="pl-c1">H</span>, <span class="pl-s1">self</span>.<span class="pl-c1">W_K</span>[<span class="pl-s1">l</span>])
+        <span class="pl-c1">V</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">matmul</span>(<span class="pl-c1">H</span>, <span class="pl-s1">self</span>.<span class="pl-c1">W_V</span>[<span class="pl-s1">l</span>])
+
+        <span class="pl-c"># Step 2: 分头</span>
+        <span class="pl-v">Q_split</span> <span class="pl-c1">=</span> <span class="pl-c1">Q</span>.<span class="pl-c1">view</span>(<span class="pl-c1">-</span><span class="pl-c1">1</span>, <span class="pl-s1">self</span>.<span class="pl-c1">num_heads</span>, <span class="pl-s1">self</span>.<span class="pl-c1">d_k</span>).<span class="pl-c1">transpose</span>(<span class="pl-c1">0</span>, <span class="pl-c1">1</span>)
+        <span class="pl-v">K_split</span> <span class="pl-c1">=</span> <span class="pl-c1">K</span>.<span class="pl-c1">view</span>(<span class="pl-c1">-</span><span class="pl-c1">1</span>, <span class="pl-s1">self</span>.<span class="pl-c1">num_heads</span>, <span class="pl-s1">self</span>.<span class="pl-c1">d_k</span>).<span class="pl-c1">transpose</span>(<span class="pl-c1">0</span>, <span class="pl-c1">1</span>)
+        <span class="pl-v">V_split</span> <span class="pl-c1">=</span> <span class="pl-c1">V</span>.<span class="pl-c1">view</span>(<span class="pl-c1">-</span><span class="pl-c1">1</span>, <span class="pl-s1">self</span>.<span class="pl-c1">num_heads</span>, <span class="pl-s1">self</span>.<span class="pl-c1">d_k</span>).<span class="pl-c1">transpose</span>(<span class="pl-c1">0</span>, <span class="pl-c1">1</span>)
+
+        <span class="pl-c"># Step 3: 计算注意力分数</span>
+        <span class="pl-v">A_heads</span> <span class="pl-c1">=</span> []
+        <span class="pl-k">for</span> <span class="pl-s1">i</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">self</span>.<span class="pl-c1">num_heads</span>):
+            <span class="pl-s1">attn_scores</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">matmul</span>(<span class="pl-v">Q_split</span>[<span class="pl-s1">i</span>], <span class="pl-v">K_split</span>[<span class="pl-s1">i</span>].<span class="pl-c1">transpose</span>(<span class="pl-c1">-</span><span class="pl-c1">2</span>, <span class="pl-c1">-</span><span class="pl-c1">1</span>)) <span class="pl-c1">/</span> <span class="pl-s1">torch</span>.<span class="pl-c1">sqrt</span>(<span class="pl-s1">torch</span>.<span class="pl-c1">tensor</span>(<span class="pl-s1">self</span>.<span class="pl-c1">d_k</span>, <span class="pl-s1">dtype</span><span class="pl-c1">=</span><span class="pl-s1">torch</span>.<span class="pl-c1">float32</span>))
+            <span class="pl-s1">attn_probs</span> <span class="pl-c1">=</span> <span class="pl-c1">F</span>.<span class="pl-c1">softmax</span>(<span class="pl-s1">attn_scores</span>, <span class="pl-s1">dim</span><span class="pl-c1">=</span><span class="pl-c1">-</span><span class="pl-c1">1</span>)
+            <span class="pl-v">A_i</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">matmul</span>(<span class="pl-s1">attn_probs</span>, <span class="pl-v">V_split</span>[<span class="pl-s1">i</span>])
+            <span class="pl-v">A_heads</span>.<span class="pl-c1">append</span>(<span class="pl-v">A_i</span>)
+
+        <span class="pl-c"># Step 4: 合并多头</span>
+        <span class="pl-v">A_concat</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">cat</span>(<span class="pl-v">A_heads</span>, <span class="pl-s1">dim</span><span class="pl-c1">=</span><span class="pl-c1">-</span><span class="pl-c1">1</span>)
+
+        <span class="pl-c"># Step 5: 线性投影</span>
+        <span class="pl-v">A_out</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">matmul</span>(<span class="pl-v">A_concat</span>, <span class="pl-s1">self</span>.<span class="pl-c1">W_O</span>[<span class="pl-s1">l</span>])
+
+        <span class="pl-c"># Step 6: 残差连接 + 层归一化</span>
+        <span class="pl-s1">layer_norm</span> <span class="pl-c1">=</span> <span class="pl-s1">nn</span>.<span class="pl-c1">LayerNorm</span>(<span class="pl-s1">self</span>.<span class="pl-c1">model_dim</span>)
+        <span class="pl-v">H_attn</span> <span class="pl-c1">=</span> <span class="pl-en">layer_norm</span>(<span class="pl-c1">H</span> <span class="pl-c1">+</span> <span class="pl-v">A_out</span>)
+        <span class="pl-k">return</span> <span class="pl-v">H_attn</span>
+
+    <span class="pl-k">def</span> <span class="pl-en">feed_forward</span>(<span class="pl-s1">self</span>, <span class="pl-v">H_attn</span>, <span class="pl-s1">l</span>):
+        <span class="pl-s">"""前馈网络"""</span>
+        <span class="pl-c"># Step 1: 第一层线性变换</span>
+        <span class="pl-v">F_mid</span> <span class="pl-c1">=</span> <span class="pl-c1">F</span>.<span class="pl-c1">relu</span>(<span class="pl-s1">torch</span>.<span class="pl-c1">matmul</span>(<span class="pl-v">H_attn</span>, <span class="pl-s1">self</span>.<span class="pl-c1">W_1</span>[<span class="pl-s1">l</span>]))
+
+        <span class="pl-c"># Step 2: 第二层线性变换</span>
+        <span class="pl-v">F_out</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">matmul</span>(<span class="pl-v">F_mid</span>, <span class="pl-s1">self</span>.<span class="pl-c1">W_2</span>[<span class="pl-s1">l</span>])
+
+        <span class="pl-c"># Step 3: 残差连接 + 层归一化</span>
+        <span class="pl-s1">layer_norm</span> <span class="pl-c1">=</span> <span class="pl-s1">nn</span>.<span class="pl-c1">LayerNorm</span>(<span class="pl-s1">self</span>.<span class="pl-c1">model_dim</span>)
+        <span class="pl-c1">H</span> <span class="pl-c1">=</span> <span class="pl-en">layer_norm</span>(<span class="pl-v">H_attn</span> <span class="pl-c1">+</span> <span class="pl-v">F_out</span>)
+        <span class="pl-k">return</span> <span class="pl-c1">H</span>
+
+    <span class="pl-k">def</span> <span class="pl-en">inference</span>(<span class="pl-s1">self</span>, <span class="pl-s1">input_ids</span>):
+        <span class="pl-s">"""推理过程"""</span>
+        <span class="pl-c"># 1. 输入编码</span>
+        <span class="pl-v">X_one_hot</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">token_to_onehot</span>(<span class="pl-s1">input_ids</span>)
+        <span class="pl-v">X_embed</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">embedding</span>(<span class="pl-v">X_one_hot</span>)
+        <span class="pl-c1">H</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">positional_encoding</span>(<span class="pl-v">X_embed</span>)
+
+        <span class="pl-c"># 2. Transformer层处理</span>
+        <span class="pl-k">for</span> <span class="pl-s1">l</span> <span class="pl-c1">in</span> <span class="pl-en">range</span>(<span class="pl-s1">self</span>.<span class="pl-c1">num_layers</span>):
+            <span class="pl-v">H_attn</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">multi_head_attention</span>(<span class="pl-c1">H</span>, <span class="pl-s1">l</span>)
+            <span class="pl-c1">H</span> <span class="pl-c1">=</span> <span class="pl-s1">self</span>.<span class="pl-c1">feed_forward</span>(<span class="pl-v">H_attn</span>, <span class="pl-s1">l</span>)
+
+        <span class="pl-c"># 3. 输出生成</span>
+        <span class="pl-s1">h_last</span> <span class="pl-c1">=</span> <span class="pl-c1">H</span>[<span class="pl-c1">-</span><span class="pl-c1">1</span>, :].<span class="pl-c1">unsqueeze</span>(<span class="pl-c1">0</span>)
+        <span class="pl-s1">l</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">matmul</span>(<span class="pl-s1">h_last</span>, <span class="pl-s1">self</span>.<span class="pl-c1">E</span>.<span class="pl-c1">T</span>)
+        <span class="pl-s1">p</span> <span class="pl-c1">=</span> <span class="pl-c1">F</span>.<span class="pl-c1">softmax</span>(<span class="pl-s1">l</span>, <span class="pl-s1">dim</span><span class="pl-c1">=</span><span class="pl-c1">-</span><span class="pl-c1">1</span>)
+        <span class="pl-k">return</span> <span class="pl-s1">p</span>
+
+
+<span class="pl-c"># 示例使用</span>
+<span class="pl-s1">vocab_size</span> <span class="pl-c1">=</span> <span class="pl-c1">1000</span>
+<span class="pl-s1">model_dim</span> <span class="pl-c1">=</span> <span class="pl-c1">512</span>
+<span class="pl-s1">ff_dim</span> <span class="pl-c1">=</span> <span class="pl-c1">2048</span>
+<span class="pl-s1">num_heads</span> <span class="pl-c1">=</span> <span class="pl-c1">8</span>
+<span class="pl-s1">num_layers</span> <span class="pl-c1">=</span> <span class="pl-c1">6</span>
+<span class="pl-s1">input_ids</span> <span class="pl-c1">=</span> <span class="pl-s1">torch</span>.<span class="pl-c1">randint</span>(<span class="pl-c1">0</span>, <span class="pl-s1">vocab_size</span>, (<span class="pl-c1">1</span>, <span class="pl-c1">10</span>))  <span class="pl-c"># 假设输入序列长度为10</span>
+
+<span class="pl-s1">transformer</span> <span class="pl-c1">=</span> <span class="pl-en">TransformerInference</span>(<span class="pl-s1">vocab_size</span>, <span class="pl-s1">model_dim</span>, <span class="pl-s1">ff_dim</span>, <span class="pl-s1">num_heads</span>, <span class="pl-s1">num_layers</span>)
+<span class="pl-s1">output_probs</span> <span class="pl-c1">=</span> <span class="pl-s1">transformer</span>.<span class="pl-c1">inference</span>(<span class="pl-s1">input_ids</span>)
+<span class="pl-en">print</span>(<span class="pl-s">"Output probabilities shape:"</span>, <span class="pl-s1">output_probs</span>.<span class="pl-c1">shape</span>)</pre></div></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://Wang-ABG.github.io/das-sein.github.io">Absoluter Geist</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z', 'copy': 'M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z', 'check': 'M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","Wang-ABG/das-sein.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const createClipboardHTML = (codeContent, additionalClasses = '') => `
+        <pre class="notranslate"><code class="notranslate">${codeContent}</code></pre>
+        <div class="clipboard-container position-absolute right-0 top-0 ${additionalClasses}">
+            <clipboard-copy class="ClipboardButton btn m-2 p-0" role="button" style="display: inherit;">
+                <svg height="16" width="16" class="octicon octicon-copy m-2"><path d="${IconList["copy"]}"></path></svg>
+                <svg height="16" width="16" class="octicon octicon-check color-fg-success m-2 d-none"><path d="${IconList["check"]}"></path></svg>
+            </clipboard-copy>
+            <div class="copy-feedback">Copied!</div>
+        </div>
+    `;
+
+    const handleCodeElements = (selector = '') => {
+        document.querySelectorAll(selector).forEach(codeElement => {
+            const codeContent = codeElement.innerHTML;
+            const newStructure = document.createElement('div');
+            newStructure.className = 'snippet-clipboard-content position-relative overflow-auto';
+            newStructure.innerHTML = createClipboardHTML(codeContent);
+
+            const parentElement = codeElement.parentElement;
+            if (selector.includes('highlight')) {
+                parentElement.insertBefore(newStructure, codeElement.nextSibling);
+                parentElement.removeChild(codeElement);
+            } else {
+                parentElement.parentElement.replaceChild(newStructure, parentElement);
+            }
+        });
+    };
+
+    handleCodeElements('pre.notranslate > code.notranslate');
+    handleCodeElements('div.highlight > pre.notranslate');
+
+    let currentFeedback = null;
+    document.querySelectorAll('clipboard-copy').forEach(copyButton => {
+        copyButton.addEventListener('click', () => {
+            const codeContent = copyButton.closest('.snippet-clipboard-content').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeContent;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const copyIcon = copyButton.querySelector('.octicon-copy');
+            const checkIcon = copyButton.querySelector('.octicon-check');
+            const copyFeedback = copyButton.nextElementSibling;
+
+            if (currentFeedback && currentFeedback !== copyFeedback) {currentFeedback.style.display = 'none';}
+            currentFeedback = copyFeedback;
+
+            copyIcon.classList.add('d-none');
+            checkIcon.classList.remove('d-none');
+            copyFeedback.style.display = 'block';
+            copyButton.style.borderColor = 'var(--color-success-fg)';
+
+            setTimeout(() => {
+                copyIcon.classList.remove('d-none');
+                checkIcon.classList.add('d-none');
+                copyFeedback.style.display = 'none';
+                copyButton.style.borderColor = '';
+            }, 2000);
+        });
+    });
+});
+
+</script>
+<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script><script>MathJax = {tex: {inlineMath: [["$", "$"]]}};</script><script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</html>
