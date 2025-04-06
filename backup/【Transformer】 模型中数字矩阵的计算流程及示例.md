@@ -1,360 +1,189 @@
-# 《Transformer 模型中数字矩阵的计算流程及示例》
+
+`Gmeek-html<iframe src="https://drive.google.com/file/d/1qEXnKYhp7wJsh6Tle4qfZXKOOm9-uHyU/view?usp=drive_link" width="100%" height="1000px" frameborder="0" allowfullscreen="False"></iframe>`
+
+`Gmeek-html<iframe id="contentIframe" src="https://drive.google.com/file/d/1qEXnKYhp7wJsh6Tle4qfZXKOOm9-uHyU/view?usp=drive_link"
+        width="100%" height="1000px" frameborder="0" allowfullscreen="false"
+        class="max-w-3xl w-full rounded-md shadow-md"></iframe>`
 
 以下是一个简化的 **数字矩阵示例**，展示从输入到输出的全流程矩阵计算，假设模型参数如下：
 
-**词表大小** $  v_{\text{vocab}} = 4  $（词表：`["I", "love", "you", "<pad>"]`，`<pad>`为填充词）
+- **词表大小** \( v_{\text{vocab}} = 4 \)（词表：["I", "love", "you", "<pad>"]，<pad>为填充词）
 
-**模型维度** $  d_{\text{model}} = 3  $
+- **模型维度** \( d_{\text{model}} = 3 \)
 
-**序列长度** $  n = 2  $
+- **序列长度** \( n = 2 \)
 
-**注意力头数** $  h = 1  $（单头注意力）
+- **注意力头数** \( h = 1 \)（单头注意力）
 
-**前馈网络隐藏层维度** $  d_{\text{ff}} = 4  $
+- **前馈网络隐藏层维度** \( d_{\text{ff}} = 4 \)
 
-**层数** $  L = 1  $（单层 Transformer）
+- **层数** \( L = 1 \)（单层 Transformer）
 
-
-
-***
+---
 
 ### **1. 输入序列**
 
-假设输入为 `["I", "love"]`，根据词表中每个词对应的索引位置，将其转换为对应的 token IDs，即 `[0, 1]`。这里的 token IDs 用于后续将输入映射到词嵌入矩阵中。
+假设输入为 ["I", "love"]，根据词表中每个词对应的索引位置，将其转换为对应的 token IDs，即 [0, 1]。这里的 token IDs 用于后续将输入映射到词嵌入矩阵中。
 
-
-
-***
+---
 
 ### **2. 词嵌入（Embedding）**
 
-词嵌入矩阵 $  \mathbf{E} \in \mathbb{R}^{4 \times 3}  $（每行对应一个词的嵌入）：
+词嵌入矩阵 \( \mathbf{E} \in \mathbb{R}^{4 \times 3} \)（每行对应一个词的嵌入）：
 
-$ 
-\mathbf{E} = \begin{bmatrix}
-0.2 & 0.5 & -0.1 \quad (\text{"I"}) \\
--0.3 & 0.8 & 0.4 \quad (\text{"love"}) \\
-0.6 & -0.2 & 0.7 \quad (\text{"you"}) \\
-0.1 & 0.1 & 0.9 \quad (\text{"<pad>"})
-\end{bmatrix}
- $
+\( \mathbf{E} = \begin{bmatrix} 0.2 & 0.5 & -0.1 \quad (\text{"I"}) \\ -0.3 & 0.8 & 0.4 \quad (\text{"love"}) \\ 0.6 & -0.2 & 0.7 \quad (\text{"you"}) \\ 0.1 & 0.1 & 0.9 \quad (\text{"<pad>"}) \end{bmatrix} \)
 
 首先将输入序列进行 one-hot 编码，使得每个词都表示为一个长度为词表大小的向量，其中只有对应词的索引位置为 1，其余位置为 0。输入序列的 one-hot 编码：
 
-$ 
-\mathbf{X}_{\text{one-hot}} = \begin{bmatrix}
-1 & 0 & 0 & 0 \quad (\text{"I"}) \\
-0 & 1 & 0 & 0 \quad (\text{"love"})
-\end{bmatrix}
- $
+\( \mathbf{X}_{\text{one-hot}} = \begin{bmatrix} 1 & 0 & 0 & 0 \quad (\text{"I"}) \\ 0 & 1 & 0 & 0 \quad (\text{"love"}) \end{bmatrix} \)
 
 然后进行词嵌入计算，通过将 one-hot 编码后的矩阵与词嵌入矩阵相乘，将离散的 one-hot 向量转换为连续的词嵌入向量：
 
-$ 
-\mathbf{X}_{\text{embed}} = \mathbf{X}_{\text{one-hot}} \cdot \mathbf{E} = \begin{bmatrix}
-0.2 & 0.5 & -0.1 \\
--0.3 & 0.8 & 0.4
-\end{bmatrix}
- $
+\( \mathbf{X}_{\text{embed}} = \mathbf{X}_{\text{one-hot}} \cdot \mathbf{E} = \begin{bmatrix} 0.2 & 0.5 & -0.1 \\ -0.3 & 0.8 & 0.4 \end{bmatrix} \)
 
-
-
-***
+---
 
 ### **3. 位置编码（Positional Encoding）**
 
-在 Transformer 模型中，为了让模型能够区分不同位置的词，需要加入位置编码信息。假设位置编码矩阵 $  \mathbf{P} \in \mathbb{R}^{2 \times 3}  $：
+在 Transformer 模型中，为了让模型能够区分不同位置的词，需要加入位置编码信息。假设位置编码矩阵 \( \mathbf{P} \in \mathbb{R}^{2 \times 3} \)：
 
-$ 
-\mathbf{P} = \begin{bmatrix}
-0.1 & 0.1 & 0.1 \quad (\text{ä½ç½®0}) \\
-0.2 & 0.2 & 0.2 \quad (\text{ä½ç½®1})
-\end{bmatrix}
- $
+\( \mathbf{P} = \begin{bmatrix} 0.1 & 0.1 & 0.1 \quad (\text{ä½ç½®0}) \\ 0.2 & 0.2 & 0.2 \quad (\text{ä½ç½®1}) \end{bmatrix} \)
 
 将位置编码矩阵与词嵌入后的矩阵直接相加，得到加入位置编码后的输入：
 
-$ 
-\mathbf{H}^{(0)} = \mathbf{X}_{\text{embed}} + \mathbf{P} = \begin{bmatrix}
-0.2+0.1 & 0.5+0.1 & -0.1+0.1 \\
--0.3+0.2 & 0.8+0.2 & 0.4+0.2
-\end{bmatrix} = \begin{bmatrix}
-0.3 & 0.6 & 0.0 \\
--0.1 & 1.0 & 0.6
-\end{bmatrix}
- $
+\( \mathbf{H}^{(0)} = \mathbf{X}_{\text{embed}} + \mathbf{P} = \begin{bmatrix} 0.2+0.1 & 0.5+0.1 & -0.1+0.1 \\ -0.3+0.2 & 0.8+0.2 & 0.4+0.2 \end{bmatrix} = \begin{bmatrix} 0.3 & 0.6 & 0.0 \\ -0.1 & 1.0 & 0.6 \end{bmatrix} \)
 
-
-
-***
+---
 
 ### **4. 单头自注意力计算**
 
 #### **4.1 生成 Q, K, V**
 
-在多头自注意力机制中，首先需要通过线性投影生成 Query（Q）、Key（K）和 Value（V）矩阵。这里我们使用单头注意力，参数矩阵 $  \mathbf{W}_Q, \mathbf{W}_K, \mathbf{W}_V \in \mathbb{R}^{3 \times 3}  $：
+在多头自注意力机制中，首先需要通过线性投影生成 Query（Q）、Key（K）和 Value（V）矩阵。这里我们使用单头注意力，参数矩阵 \( \mathbf{W}_Q, \mathbf{W}_K, \mathbf{W}_V \in \mathbb{R}^{3 \times 3} \)：
 
-$ 
-\mathbf{W}_Q = \begin{bmatrix}
-1 & 0 & 0 \\
-0 & 1 & 0 \\
-0 & 0 & 1
-\end{bmatrix}, \quad
-\mathbf{W}_K = \begin{bmatrix}
-0.5 & 0 & 0 \\
-0 & 0.5 & 0 \\
-0 & 0 & 0.5
-\end{bmatrix}, \quad
-\mathbf{W}_V = \begin{bmatrix}
-1 & 0 & 0 \\
-0 & 1 & 0 \\
-0 & 0 & 1
-\end{bmatrix}
- $
+\( \mathbf{W}_Q = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}, \quad \mathbf{W}_K = \begin{bmatrix} 0.5 & 0 & 0 \\ 0 & 0.5 & 0 \\ 0 & 0 & 0.5 \end{bmatrix}, \quad \mathbf{W}_V = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} \)
 
-通过将加入位置编码后的输入矩阵 $  \mathbf{H}^{(0)}  $ 分别与 $  \mathbf{W}_Q  $、$  \mathbf{W}_K  $、$  \mathbf{W}_V  $ 相乘，得到 Q, K, V 矩阵：
+通过将加入位置编码后的输入矩阵 \( \mathbf{H}^{(0)} \) 分别与 \( \mathbf{W}_Q \)、\( \mathbf{W}_K \)、\( \mathbf{W}_V \) 相乘，得到 Q, K, V 矩阵：
 
-$ 
-\mathbf{Q} = \mathbf{H}^{(0)} \cdot \mathbf{W}_Q = \begin{bmatrix}
-0.3 & 0.6 & 0.0 \\
--0.1 & 1.0 & 0.6
-\end{bmatrix}
- $
+\( \mathbf{Q} = \mathbf{H}^{(0)} \cdot \mathbf{W}_Q = \begin{bmatrix} 0.3 & 0.6 & 0.0 \\ -0.1 & 1.0 & 0.6 \end{bmatrix} \)
 
-$ 
-\mathbf{K} = \mathbf{H}^{(0)} \cdot \mathbf{W}_K = \begin{bmatrix}
-0.15 & 0.3 & 0.0 \\
--0.05 & 0.5 & 0.3
-\end{bmatrix}
- $
+\( \mathbf{K} = \mathbf{H}^{(0)} \cdot \mathbf{W}_K = \begin{bmatrix} 0.15 & 0.3 & 0.0 \\ -0.05 & 0.5 & 0.3 \end{bmatrix} \)
 
-$ 
-\mathbf{V} = \mathbf{H}^{(0)} \cdot \mathbf{W}_V = \begin{bmatrix}
-0.3 & 0.6 & 0.0 \\
--0.1 & 1.0 & 0.6
-\end{bmatrix}
- $
+\( \mathbf{V} = \mathbf{H}^{(0)} \cdot \mathbf{W}_V = \begin{bmatrix} 0.3 & 0.6 & 0.0 \\ -0.1 & 1.0 & 0.6 \end{bmatrix} \)
 
 #### **4.2 计算注意力分数**
 
-注意力分数矩阵 $  \mathbf{A} = \text{softmax}\left( \frac{\mathbf{Q} \mathbf{K}^\top}{\sqrt{d_k}} \right)  $（$  d_k = 3  $），这里的 $  \mathbf{Q} \mathbf{K}^\top  $ 表示 Q 矩阵与 K 矩阵的转置相乘，得到的矩阵表示了输入序列中每个位置之间的注意力关系。具体计算如下：
+注意力分数矩阵 \( \mathbf{A} = \text{softmax}\left( \frac{\mathbf{Q} \mathbf{K}^\top}{\sqrt{d_k}} \right) \)（\( d_k = 3 \)），这里的 \( \mathbf{Q} \mathbf{K}^\top \) 表示 Q 矩阵与 K 矩阵的转置相乘，得到的矩阵表示了输入序列中每个位置之间的注意力关系。具体计算如下：
 
-$ 
-\mathbf{Q} \mathbf{K}^\top = \begin{bmatrix}
-0.3 \times 0.15 + 0.6 \times 0.3 + 0.0 \times 0.0 & 0.3 \times (-0.05) + 0.6 \times 0.5 + 0.0 \times 0.3 \\
--0.1 \times 0.15 + 1.0 \times 0.3 + 0.6 \times 0.0 & -0.1 \times (-0.05) + 1.0 \times 0.5 + 0.6 \times 0.3
-\end{bmatrix} = \begin{bmatrix}
-0.045 + 0.18 + 0.0 & -0.015 + 0.3 + 0.0 \\
--0.015 + 0.3 + 0.0 & 0.005 + 0.5 + 0.18
-\end{bmatrix} = \begin{bmatrix}
-0.225 & 0.285 \\
-0.285 & 0.685
-\end{bmatrix}
- $
+\( \mathbf{Q} \mathbf{K}^\top = \begin{bmatrix} 0.3 \times 0.15 + 0.6 \times 0.3 + 0.0 \times 0.0 & 0.3 \times (-0.05) + 0.6 \times 0.5 + 0.0 \times 0.3 \\ -0.1 \times 0.15 + 1.0 \times 0.3 + 0.6 \times 0.0 & -0.1 \times (-0.05) + 1.0 \times 0.5 + 0.6 \times 0.3 \end{bmatrix} = \begin{bmatrix} 0.045 + 0.18 + 0.0 & -0.015 + 0.3 + 0.0 \\ -0.015 + 0.3 + 0.0 & 0.005 + 0.5 + 0.18 \end{bmatrix} = \begin{bmatrix} 0.225 & 0.285 \\ 0.285 & 0.685 \end{bmatrix} \)
 
-为了避免注意力分数过大导致 softmax 函数的结果过于极端，我们将 $  \mathbf{Q} \mathbf{K}^\top  $ 的每个元素除以 $  \sqrt{d_k}  $（这里 $  d_k = 3  $）进行缩放，然后再应用 softmax 函数：
+为了避免注意力分数过大导致 softmax 函数的结果过于极端，我们将 \( \mathbf{Q} \mathbf{K}^\top \) 的每个元素除以 \( \sqrt{d_k} \)（这里 \( d_k = 3 \)）进行缩放，然后再应用 softmax 函数：
 
-$ 
-\frac{\mathbf{Q} \mathbf{K}^\top}{\sqrt{3}} \approx \begin{bmatrix}
-0.130 & 0.165 \\
-0.165 & 0.396
-\end{bmatrix}, \quad \text{softmaxç»æ} = \begin{bmatrix}
-0.48 & 0.52 \\
-0.34 & 0.66
-\end{bmatrix}
- $
+\( \frac{\mathbf{Q} \mathbf{K}^\top}{\sqrt{3}} \approx \begin{bmatrix} 0.130 & 0.165 \\ 0.165 & 0.396 \end{bmatrix}, \quad \text{softmaxç»æ} = \begin{bmatrix} 0.48 & 0.52 \\ 0.34 & 0.66 \end{bmatrix} \)
 
 #### **4.3 计算注意力输出**
 
 将 softmax 得到的注意力分数矩阵与 V 矩阵相乘，得到注意力输出矩阵：
 
-$ 
-\mathbf{A} = \text{softmaxç»æ} \cdot \mathbf{V} = \begin{bmatrix}
-0.48 \times 0.3 + 0.52 \times (-0.1) & 0.48 \times 0.6 + 0.52 \times 1.0 & 0.48 \times 0.0 + 0.52 \times 0.6 \\
-0.34 \times 0.3 + 0.66 \times (-0.1) & 0.34 \times 0.6 + 0.66 \times 1.0 & 0.34 \times 0.0 + 0.66 \times 0.6
-\end{bmatrix} = \begin{bmatrix}
-0.144 - 0.052 & 0.288 + 0.52 & 0.0 + 0.312 \\
-0.102 - 0.066 & 0.204 + 0.66 & 0.0 + 0.396
-\end{bmatrix} = \begin{bmatrix}
-0.092 & 0.808 & 0.312 \\
-0.036 & 0.864 & 0.396
-\end{bmatrix}
- $
+\( \mathbf{A} = \text{softmaxç»æ} \cdot \mathbf{V} = \begin{bmatrix} 0.48 \times 0.3 + 0.52 \times (-0.1) & 0.48 \times 0.6 + 0.52 \times 1.0 & 0.48 \times 0.0 + 0.52 \times 0.6 \\ 0.34 \times 0.3 + 0.66 \times (-0.1) & 0.34 \times 0.6 + 0.66 \times 1.0 & 0.34 \times 0.0 + 0.66 \times 0.6 \end{bmatrix} = \begin{bmatrix} 0.144 - 0.052 & 0.288 + 0.52 & 0.0 + 0.312 \\ 0.102 - 0.066 & 0.204 + 0.66 & 0.0 + 0.396 \end{bmatrix} = \begin{bmatrix} 0.092 & 0.808 & 0.312 \\ 0.036 & 0.864 & 0.396 \end{bmatrix} \)
 
-
-
-***
+---
 
 ### **5. 残差连接与层归一化**
 
-残差连接是为了让模型在训练过程中更容易学习，通过将输入 $  \mathbf{H}^{(0)}  $ 与注意力输出 $  \mathbf{A}  $ 相加，得到 $  \mathbf{H}_{\text{attn}}  $：
+残差连接是为了让模型在训练过程中更容易学习，通过将输入 \( \mathbf{H}^{(0)} \) 与注意力输出 \( \mathbf{A} \) 相加，得到 \( \mathbf{H}_{\text{attn}} \)：
 
-$ 
-\mathbf{H}_{\text{attn}} = \mathbf{H}^{(0)} + \mathbf{A} = \begin{bmatrix}
-0.3+0.092 & 0.6+0.808 & 0.0+0.312 \\
--0.1+0.036 & 1.0+0.864 & 0.6+0.396
-\end{bmatrix} = \begin{bmatrix}
-0.392 & 1.408 & 0.312 \\
--0.064 & 1.864 & 0.996
-\end{bmatrix}
- $
+\( \mathbf{H}_{\text{attn}} = \mathbf{H}^{(0)} + \mathbf{A} = \begin{bmatrix} 0.3+0.092 & 0.6+0.808 & 0.0+0.312 \\ -0.1+0.036 & 1.0+0.864 & 0.6+0.396 \end{bmatrix} = \begin{bmatrix} 0.392 & 1.408 & 0.312 \\ -0.064 & 1.864 & 0.996 \end{bmatrix} \)
 
 层归一化是对输入数据进行归一化处理，使得每一层的输入分布更加稳定，有助于模型的训练。这里假设层归一化后结果不变（实际中会有缩放和平移操作，即对矩阵的每一行进行归一化，使其均值为 0，方差为 1，然后再进行缩放和平移）。
 
-
-
-***
+---
 
 ### **6. 前馈网络（FFN）**
 
 #### **6.1 第一层线性变换**
 
-前馈网络由两层线性变换组成，首先进行第一层线性变换。参数矩阵 $  \mathbf{W}_1 \in \mathbb{R}^{3 \times 4}  $：
+前馈网络由两层线性变换组成，首先进行第一层线性变换。参数矩阵 \( \mathbf{W}_1 \in \mathbb{R}^{3 \times 4} \)：
 
-$ 
-\mathbf{W}_1 = \begin{bmatrix}
-0.1 & 0.2 & -0.1 & 0.3 \\
--0.2 & 0.3 & 0.4 & -0.1 \\
-0.3 & -0.1 & 0.2 & 0.0
-\end{bmatrix}
- $
+\( \mathbf{W}_1 = \begin{bmatrix} 0.1 & 0.2 & -0.1 & 0.3 \\ -0.2 & 0.3 & 0.4 & -0.1 \\ 0.3 & -0.1 & 0.2 & 0.0 \end{bmatrix} \)
 
-将经过残差连接和层归一化后的矩阵 $  \mathbf{H}_{\text{attn}}  $ 与 $  \mathbf{W}_1  $ 相乘，得到中间结果 $  \mathbf{F}_{\text{mid}}  $：
+将经过残差连接和层归一化后的矩阵 \( \mathbf{H}_{\text{attn}} \) 与 \( \mathbf{W}_1 \) 相乘，得到中间结果 \( \mathbf{F}_{\text{mid}} \)：
 
-$ 
-\mathbf{F}_{\text{mid}} = \mathbf{H}_{\text{attn}} \cdot \mathbf{W}_1 = \begin{bmatrix}
-0.392 \times 0.1 + 1.408 \times (-0.2) + 0.312 \times 0.3 & \cdots \\
--0.064 \times 0.1 + 1.864 \times (-0.2) + 0.996 \times 0.3 & \cdots
-\end{bmatrix}
- $
+\( \mathbf{F}_{\text{mid}} = \mathbf{H}_{\text{attn}} \cdot \mathbf{W}_1 = \begin{bmatrix} 0.392 \times 0.1 + 1.408 \times (-0.2) + 0.312 \times 0.3 & \cdots \\ -0.064 \times 0.1 + 1.864 \times (-0.2) + 0.996 \times 0.3 & \cdots \end{bmatrix} \)
 
 简化计算后（仅展示部分结果）：
 
-$ 
-\mathbf{F}_{\text{mid}} \approx \begin{bmatrix}
--0.225 & 0.450 & 0.600 & 0.100 \\
--0.350 & 0.200 & 0.800 & 0.050
-\end{bmatrix}
- $
+\( \mathbf{F}_{\text{mid}} \approx \begin{bmatrix} -0.225 & 0.450 & 0.600 & 0.100 \\ -0.350 & 0.200 & 0.800 & 0.050 \end{bmatrix} \)
 
-然后应用 ReLU 激活函数，将 $  \mathbf{F}_{\text{mid}}  $ 中所有小于 0 的元素置为 0，得到：
+然后应用 ReLU 激活函数，将 \( \mathbf{F}_{\text{mid}} \) 中所有小于 0 的元素置为 0，得到：
 
-$ 
-\mathbf{F}_{\text{mid}} = \text{ReLU}(\mathbf{F}_{\text{mid}}) = \begin{bmatrix}
-0 & 0.450 & 0.600 & 0.100 \\
-0 & 0.200 & 0.800 & 0.050
-\end{bmatrix}
- $
+\( \mathbf{F}_{\text{mid}} = \text{ReLU}(\mathbf{F}_{\text{mid}}) = \begin{bmatrix} 0 & 0.450 & 0.600 & 0.100 \\ 0 & 0.200 & 0.800 & 0.050 \end{bmatrix} \)
 
 #### **6.2 第二层线性变换**
 
-进行前馈网络的第二层线性变换，参数矩阵 $  \mathbf{W}_2 \in \mathbb{R}^{4 \times 3}  $：
+进行前馈网络的第二层线性变换，参数矩阵 \( \mathbf{W}_2 \in \mathbb{R}^{4 \times 3} \)：
 
-$ 
-\mathbf{W}_2 = \begin{bmatrix}
-0.2 & -0.1 & 0.3 \\
-0.1 & 0.2 & -0.2 \\
--0.3 & 0.4 & 0.1 \\
-0.0 & 0.1 & -0.1
-\end{bmatrix}
- $
+\( \mathbf{W}_2 = \begin{bmatrix} 0.2 & -0.1 & 0.3 \\ 0.1 & 0.2 & -0.2 \\ -0.3 & 0.4 & 0.1 \\ 0.0 & 0.1 & -0.1 \end{bmatrix} \)
 
-将经过 ReLU 激活后的矩阵 $  \mathbf{F}_{\text{mid}}  $ 与 $  \mathbf{W}_2  $ 相乘，得到：
+将经过 ReLU 激活后的矩阵 \( \mathbf{F}_{\text{mid}} \) 与 \( \mathbf{W}_2 \) 相乘，得到：
 
-$ 
-\mathbf{F}_{\text{out}} = \mathbf{F}_{\text{mid}} \cdot \mathbf{W}_2 = \begin{bmatrix}
-0 \times 0.2 + 0.450 \times 0.1 + 0.600 \times (-0.3) + 0.100 \times 0.0 & \cdots \\
-0 \times 0.2 + 0.200 \times 0.1 + 0.800 \times (-0.3) + 0.050 \times 0.0 & \cdots
-\end{bmatrix}
- $
+\( \mathbf{F}_{\text{out}} = \mathbf{F}_{\text{mid}} \cdot \mathbf{W}_2 = \begin{bmatrix} 0 \times 0.2 + 0.450 \times 0.1 + 0.600 \times (-0.3) + 0.100 \times 0.0 & \cdots \\ 0 \times 0.2 + 0.200 \times 0.1 + 0.800 \times (-0.3) + 0.050 \times 0.0 & \cdots \end{bmatrix} \)
 
 简化结果：
 
-$ 
-\mathbf{F}_{\text{out}} \approx \begin{bmatrix}
-0.045 - 0.180 & \cdots & \cdots \\
-0.020 - 0.240 & \cdots & \cdots
-\end{bmatrix} = \begin{bmatrix}
--0.135 & 0.210 & 0.040 \\
--0.220 & 0.360 & -0.150
-\end{bmatrix}
- $
+\( \mathbf{F}_{\text{out}} \approx \begin{bmatrix} 0.045 - 0.180 & \cdots & \cdots \\ 0.020 - 0.240 & \cdots & \cdots \end{bmatrix} = \begin{bmatrix} -0.135 & 0.210 & 0.040 \\ -0.220 & 0.360 & -0.150 \end{bmatrix} \)
 
 #### **6.3 残差连接与层归一化**
 
-再次进行残差连接，将经过前馈网络处理后的结果 $  \mathbf{F}_{\text{out}}  $ 与 $  \mathbf{H}_{\text{attn}}  $ 相加，得到：
+再次进行残差连接，将经过前馈网络处理后的结果 \( \mathbf{F}_{\text{out}} \) 与 \( \mathbf{H}_{\text{attn}} \) 相加，得到：
 
-$ 
-\mathbf{H}^{(1)} = \mathbf{H}_{\text{attn}} + \mathbf{F}_{\text{out}} = \begin{bmatrix}
-0.392 - 0.135 & 1.408 + 0.210 & 0.312 + 0.040 \\
--0.064 - 0.220 & 1.864 + 0.360 & 0.996 - 0.150
-\end{bmatrix} = \begin{bmatrix}
-0.257 & 1.618 & 0.352 \\
--0.284 & 2.224 & 0.846
-\end{bmatrix}
- $
+\( \mathbf{H}^{(1)} = \mathbf{H}_{\text{attn}} + \mathbf{F}_{\text{out}} = \begin{bmatrix} 0.392 - 0.135 & 1.408 + 0.210 & 0.312 + 0.040 \\ -0.064 - 0.220 & 1.864 + 0.360 & 0.996 - 0.150 \end{bmatrix} = \begin{bmatrix} 0.257 & 1.618 & 0.352 \\ -0.284 & 2.224 & 0.846 \end{bmatrix} \)
 
-
-
-***
+---
 
 ### **7. 输出生成**
 
 #### **7.1 提取最后一个位置的向量**
 
-在自回归生成中，我们通常只关注序列的最后一个位置的输出。从矩阵 $  \mathbf{H}^{(1)}  $ 中提取最后一行，得到：
+在自回归生成中，我们通常只关注序列的最后一个位置的输出。从矩阵 \( \mathbf{H}^{(1)} \) 中提取最后一行，得到：
 
-$ 
-\mathbf{h}_{\text{last}} = \mathbf{H}^{(1)}[1, :] = [-0.284, 2.224, 0.846]
- $
+\( \mathbf{h}_{\text{last}} = \mathbf{H}^{(1)}[1, :] = [-0.284, 2.224, 0.846] \)
 
 #### **7.2 Unembedding**
 
-Unembedding 是将模型输出的向量映射回词表空间的过程，通过与词嵌入矩阵的转置 $  \mathbf{E}^\top  $ 相乘来实现。词嵌入矩阵转置 $  \mathbf{E}^\top \in \mathbb{R}^{3 \times 4}  $：
+Unembedding 是将模型输出的向量映射回词表空间的过程，通过与词嵌入矩阵的转置 \( \mathbf{E}^\top \) 相乘来实现。词嵌入矩阵转置 \( \mathbf{E}^\top \in \mathbb{R}^{3 \times 4} \)：
 
 已为你补充完整后续内容：
 
-$ 
-\mathbf{E}^\top = \begin{bmatrix}
-0.2 & -0.3 & 0.6 & 0.1 \\
-0.5 & 0.8 & -0.2 & 0.1 \\
--0.1 & 0.4 & 0.7 & 0.9
-\end{bmatrix}
- $
+\( \mathbf{E}^\top = \begin{bmatrix} 0.2 & -0.3 & 0.6 & 0.1 \\ 0.5 & 0.8 & -0.2 & 0.1 \\ -0.1 & 0.4 & 0.7 & 0.9 \end{bmatrix} \)
 
 计算 logits：
 
-$ 
-\mathbf{l} = \mathbf{h}_{\text{last}} \cdot \mathbf{E}^\top = [-0.284 \times 0.2 + 2.224 \times 0.5 + 0.846 \times (-0.1), \cdots]
- $
+\( \mathbf{l} = \mathbf{h}_{\text{last}} \cdot \mathbf{E}^\top = [-0.284 \times 0.2 + 2.224 \times 0.5 + 0.846 \times (-0.1), \cdots] \)
 
 逐项计算：
 
-**词 1（"I"）**：$(-0.0568 + 1.112 - 0.0846 = 0.9706)$
+- **词 1（"I"）**：\((-0.0568 + 1.112 - 0.0846 = 0.9706)\)
 
-**词 2（"love"）**：$(-0.284 \times (-0.3) + 2.224 \times 0.8 + 0.846 \times 0.4 = 0.0852 + 1.7792 + 0.3384 = 2.2028)$
+- **词 2（"love"）**：\((-0.284 \times (-0.3) + 2.224 \times 0.8 + 0.846 \times 0.4 = 0.0852 + 1.7792 + 0.3384 = 2.2028)\)
 
-**词 3（"you"）**：$(-0.284 \times 0.6 + 2.224 \times (-0.2) + 0.846 \times 0.7 = -0.1704 - 0.4448 + 0.5922 = -0.023)$
+- **词 3（"you"）**：\((-0.284 \times 0.6 + 2.224 \times (-0.2) + 0.846 \times 0.7 = -0.1704 - 0.4448 + 0.5922 = -0.023)\)
 
-**词 4（""）**：$(-0.284 \times 0.1 + 2.224 \times 0.1 + 0.846 \times 0.9 = -0.0284 + 0.2224 + 0.7614 = 0.9554)$
+- **词 4（""）**：\((-0.284 \times 0.1 + 2.224 \times 0.1 + 0.846 \times 0.9 = -0.0284 + 0.2224 + 0.7614 = 0.9554)\)
 
 最终 logits：
 
-$ 
-\mathbf{l} = [0.9706, 2.2028, -0.023, 0.9554]
- $
+\( \mathbf{l} = [0.9706, 2.2028, -0.023, 0.9554] \)
 
 #### **7.3 Softmax 归一化**
 
-$ 
-\text{softmax}(\mathbf{l}) = \left[ \frac{e^{0.9706}}{e^{0.9706} + e^{2.2028} + e^{-0.023} + e^{0.9554}}, \cdots \right]
- $
+\( \text{softmax}(\mathbf{l}) = \left[ \frac{e^{0.9706}}{e^{0.9706} + e^{2.2028} + e^{-0.023} + e^{0.9554}}, \cdots \right] \)
 
 计算后概率：
 
-$ 
-\mathbf{p} \approx [0.15, 0.60, 0.05, 0.20]
- $
+\( \mathbf{p} \approx [0.15, 0.60, 0.05, 0.20] \)
+
+---
 
 
 
