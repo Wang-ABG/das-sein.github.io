@@ -95,7 +95,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p><strong>残差连接</strong> $I + f(x)$:</p>
 <p>恒等映射 $I$ 与子层输出相加：$x + f(x)$，确保梯度稳定。</p>
 <p><strong>时序生成算子</strong> $\triangleright$:</p>
-<p>解码器中自回归生成时，每一步依赖前序输出 $Y_{&amp;lt;t}$。</p>
+<p>解码器中自回归生成时，每一步依赖前序输出 $Y_{t(i-1)}$。</p>
 <h3><strong>三、编码器结构解剖</strong></h3>
 <p>编码器由 $N$ 个相同层堆叠，每层执行：</p>
 <p>$\text{Enc}_l(X) = \text{LN}\left( X + \text{FFN}\left( \text{LN}\left( X + \text{MultiHead}(X) \right) \right) \right)$</p>
@@ -122,7 +122,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>$\text{Enc-DecAttn}(Q, K, V) = \text{softmax}\left( \frac{Q \cdot K^\top}{\sqrt{d_k}} \right) V$</p>
 <p>查询 $Q$ 来自解码器，键值对 $K, V$ 来自编码器输出：</p>
 <p><strong>时序生成</strong>：自回归生成时，每一步输出 $y_t$ 作为下一步输入，形成循环依赖：</p>
-<p>$Y_{t} = \text{Dec}(Y_{&amp;lt;t}, \text{Enc}(X)) \cdot W_o$</p>
+<p>$Y_{t} = \text{Dec}(Y_{t(i-1)}, \text{Enc}(X)) \cdot W_o$</p>
 <h3><strong>五、认知压缩：三大特性编码</strong></h3>
 <p><strong>多头自注意力</strong>：</p>
 <p><strong>空间交互核</strong>：通过多组 $W_Q, W_K, W_V$ 映射，捕获序列不同子空间的依赖关系。</p>
@@ -134,7 +134,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p><strong>输入编码</strong>：</p>
 <p>$X \rightarrow \text{Enc}(X) = \text{特征蒸馏} \rightarrow \text{高层语义表示}$</p>
 <p><strong>解码生成</strong>：</p>
-<p>$\text{Enc}(X) + Y_{&amp;lt;t} \rightarrow \text{Dec}(Y_{&amp;lt;t}) \rightarrow \text{softmax} \rightarrow y_t$</p>
+<p>$\text{Enc}(X) +Y_{t(i-1)} \rightarrow \text{Dec}(Y_{&amp;lt;t}) \rightarrow \text{softmax} \rightarrow y_t$</p>
 <p>自回归循环直至生成终止符。</p>
 <h3><strong>七、公式优势与教学价值</strong></h3>
 <p><strong>架构完备性</strong>：以算子组合形式严格对齐原始 Transformer 结构，保留层归一化、残差连接等关键设计。</p>

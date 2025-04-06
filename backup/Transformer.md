@@ -16,7 +16,7 @@
 
 **时序生成算子** $\triangleright$:
 
-解码器中自回归生成时，每一步依赖前序输出 $Y_{\<t}$。
+解码器中自回归生成时，每一步依赖前序输出 $Y_{t(i-1)}$。
 
 
 ### **三、编码器结构解剖**
@@ -72,7 +72,7 @@ $\text{Enc-DecAttn}(Q, K, V) = \text{softmax}\left( \frac{Q \cdot K^\top}{\sqrt{
 
 **时序生成**：自回归生成时，每一步输出 $y_t$ 作为下一步输入，形成循环依赖：
 
-$Y_{t} = \text{Dec}(Y_{<t}, \text{Enc}(X)) \cdot W_o$
+$Y_{t} = \text{Dec}(Y_{t(i-1)}, \text{Enc}(X)) \cdot W_o$
 
 
 ### **五、认知压缩：三大特性编码**
@@ -99,7 +99,7 @@ $X \rightarrow \text{Enc}(X) = \text{特征蒸馏} \rightarrow \text{高层语�
 
 **解码生成**：
 
-$\text{Enc}(X) + Y_{<t} \rightarrow \text{Dec}(Y_{<t}) \rightarrow \text{softmax} \rightarrow y_t$
+$\text{Enc}(X) +Y_{t(i-1)} \rightarrow \text{Dec}(Y_{<t}) \rightarrow \text{softmax} \rightarrow y_t$
 
 自回归循环直至生成终止符。
 
