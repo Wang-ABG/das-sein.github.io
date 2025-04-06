@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Absoluter Geist</title><link>https://Wang-ABG.github.io/das-sein.github.io</link><description>纵使时光百年遥，将感我心在咫尺。</description><copyright>Absoluter Geist</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/101440642?s=400&amp;u=64734a1b6d25eddc0ac7e0729729e228193de187&amp;v=4</url><title>avatar</title><link>https://Wang-ABG.github.io/das-sein.github.io</link></image><lastBuildDate>Sun, 06 Apr 2025 03:44:23 +0000</lastBuildDate><managingEditor>Absoluter Geist</managingEditor><ttl>60</ttl><webMaster>Absoluter Geist</webMaster><item><title>【Transformer 】训练超参数符号系统与维度定义</title><link>https://Wang-ABG.github.io/das-sein.github.io/post/%E3%80%90Transformer%20%E3%80%91-xun-lian-chao-can-shu-fu-hao-xi-tong-yu-wei-du-ding-yi.html</link><description>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Absoluter Geist</title><link>https://Wang-ABG.github.io/das-sein.github.io</link><description>纵使时光百年遥，将感我心在咫尺。</description><copyright>Absoluter Geist</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/101440642?s=400&amp;u=64734a1b6d25eddc0ac7e0729729e228193de187&amp;v=4</url><title>avatar</title><link>https://Wang-ABG.github.io/das-sein.github.io</link></image><lastBuildDate>Sun, 06 Apr 2025 03:45:10 +0000</lastBuildDate><managingEditor>Absoluter Geist</managingEditor><ttl>60</ttl><webMaster>Absoluter Geist</webMaster><item><title>【Transformer 】训练超参数符号系统与维度定义</title><link>https://Wang-ABG.github.io/das-sein.github.io/post/%E3%80%90Transformer%20%E3%80%91-xun-lian-chao-can-shu-fu-hao-xi-tong-yu-wei-du-ding-yi.html</link><description>
 
 ***
 
@@ -77,7 +77,7 @@ $g_t = \nabla_{\theta} \mathcal{L}(\theta_t)$
 
 **更新一阶矩估计**：
 
- $= \beta_1 m_{t - 1} + (1 - \beta_1) g_t$
+ $m_t= \beta_1 m_{t - 1} + (1 - \beta_1) g_t$
 
 **更新二阶矩估计**：
 

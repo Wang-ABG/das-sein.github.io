@@ -88,7 +88,7 @@ $g_t = \nabla_{\theta} \mathcal{L}(\theta_t)$
 
 **更新一阶矩估计**：
 
- $= \beta_1 m_{t - 1} + (1 - \beta_1) g_t$
+ $m_t= \beta_1 m_{t - 1} + (1 - \beta_1) g_t$
 
 **更新二阶矩估计**：
 
@@ -244,7 +244,7 @@ $g_t = \nabla_{\theta} \mathcal{L}(\theta_t)$
 
 **更新一阶矩估计**：
 
- $= \beta_1 m_{t - 1} + (1 - \beta_1) g_t$
+ $m_t= \beta_1 m_{t - 1} + (1 - \beta_1) g_t$
 
 **更新二阶矩估计**：
 
@@ -552,7 +552,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p><strong>计算梯度</strong>：</p>
 <p>$g_t = \nabla_{\theta} \mathcal{L}(\theta_t)$</p>
 <p><strong>更新一阶矩估计</strong>：</p>
-<p>$= \beta_1 m_{t - 1} + (1 - \beta_1) g_t$</p>
+<p>$m_t= \beta_1 m_{t - 1} + (1 - \beta_1) g_t$</p>
 <p><strong>更新二阶矩估计</strong>：</p>
 <p>$v_t = \beta_2 v_{t - 1} + (1 - \beta_2) g_t^2$</p>
 <p><strong>修正偏差</strong>：</p>

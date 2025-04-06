@@ -76,7 +76,7 @@ $g_t = \nabla_{\theta} \mathcal{L}(\theta_t)$
 
 **更新一阶矩估计**：
 
- $= \beta_1 m_{t - 1} + (1 - \beta_1) g_t$
+ $m_t= \beta_1 m_{t - 1} + (1 - \beta_1) g_t$
 
 **更新二阶矩估计**：
 
