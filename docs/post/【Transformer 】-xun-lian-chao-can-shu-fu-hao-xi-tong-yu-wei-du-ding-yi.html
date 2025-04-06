@@ -18,7 +18,6 @@
 
 
 
-***
 
 #### **一、优化器参数**
 
@@ -35,7 +34,7 @@
 
 
 
-***
+
 
 #### **二、正则化参数**
 
@@ -49,7 +48,7 @@
 
 
 
-***
+
 
 #### **三、学习率调度参数**
 
@@ -64,7 +63,7 @@
 
 
 
-***
+
 
 #### **四、训练配置参数**
 
@@ -78,7 +77,6 @@
 
 
 
-***
 
 #### **五、参数更新公式示例（Adam 优化器）**
 
@@ -104,7 +102,6 @@ $\theta_{t + 1} = \theta_t - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \e
 
 
 
-***
 
 #### **六、参数初始化与训练流程**
 
@@ -158,9 +155,6 @@ for t in 1...T\_total:
 &#x20;   θ = θ - α\_t \* (m\_hat / (sqrt(v\_hat) + ε) + λ \* θ)
 ```
 
-
-
-***
 
 ### **总结**
 
@@ -174,7 +168,6 @@ for t in 1...T\_total:
 
 
 
-***
 
 #### **一、优化器参数**
 
@@ -191,7 +184,7 @@ for t in 1...T\_total:
 
 
 
-***
+
 
 #### **二、正则化参数**
 
@@ -205,7 +198,7 @@ for t in 1...T\_total:
 
 
 
-***
+
 
 #### **三、学习率调度参数**
 
@@ -220,7 +213,7 @@ for t in 1...T\_total:
 
 
 
-***
+
 
 #### **四、训练配置参数**
 
@@ -234,7 +227,6 @@ for t in 1...T\_total:
 
 
 
-***
 
 #### **五、参数更新公式示例（Adam 优化器）**
 
@@ -260,7 +252,6 @@ $\theta_{t + 1} = \theta_t - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \e
 
 
 
-***
 
 #### **六、参数初始化与训练流程**
 
@@ -314,9 +305,6 @@ for t in 1...T\_total:
 &#x20;   θ = θ - α\_t \* (m\_hat / (sqrt(v\_hat) + ε) + λ \* θ)
 ```
 
-
-
-***
 
 ### **总结**
 
@@ -387,7 +375,6 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><hr>
 <h3><strong>Transformer 训练超参数符号系统与维度定义</strong></h3>
-<hr>
 <h4><strong>一、优化器参数</strong></h4>
 <markdown-accessiblity-table><table role="table">
 <thead>
@@ -443,7 +430,6 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </tr>
 </tbody>
 </table></markdown-accessiblity-table>
-<hr>
 <h4><strong>二、正则化参数</strong></h4>
 <markdown-accessiblity-table><table role="table">
 <thead>
@@ -476,7 +462,6 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </tr>
 </tbody>
 </table></markdown-accessiblity-table>
-<hr>
 <h4><strong>三、学习率调度参数</strong></h4>
 <markdown-accessiblity-table><table role="table">
 <thead>
@@ -515,7 +500,6 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </tr>
 </tbody>
 </table></markdown-accessiblity-table>
-<hr>
 <h4><strong>四、训练配置参数</strong></h4>
 <markdown-accessiblity-table><table role="table">
 <thead>
@@ -547,7 +531,6 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </tr>
 </tbody>
 </table></markdown-accessiblity-table>
-<hr>
 <h4><strong>五、参数更新公式示例（Adam 优化器）</strong></h4>
 <p><strong>计算梯度</strong>：</p>
 <p>$g_t = \nabla_{\theta} \mathcal{L}(\theta_t)$</p>
@@ -559,7 +542,6 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>$\hat{m}_t = \frac{m_t}{1 - \beta_1^t}, \quad \hat{v}_t = \frac{v_t}{1 - \beta_2^t}$</p>
 <p><strong>参数更新</strong>：</p>
 <p>$\theta_{t + 1} = \theta_t - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon} - \alpha \lambda \theta_t$</p>
-<hr>
 <h4><strong>六、参数初始化与训练流程</strong></h4>
 <p><strong>初始化优化器状态</strong>：</p>
 <p>$m_0 = 0$, $v_0 = 0$（Adam 初始状态）</p>
@@ -602,13 +584,359 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 &amp;#x20;   θ = θ - α\_t \* (m\_hat / (sqrt(v\_hat) + ε) + λ \* θ)
 </code></pre>
-<hr>
 <h3><strong>总结</strong></h3>
 <p>此符号系统完整覆盖了 Transformer 模型的 <strong>可调模型参数</strong>（如权重矩阵、归一化参数）与 <strong>训练超参数</strong>（如学习率、优化器配置、正则化项），并通过数学公式与伪代码明确了各参数在训练流程中的作用。关键设计包括：</p>
 <p><strong>模型 - 训练解耦</strong>：区分架构参数（$W, \gamma, \beta$）与训练参数（$\alpha, \beta_1, \lambda$）。</p>
 <p><strong>动态学习率</strong>：通过预热、余弦退火等策略实现精细控制。</p>
 <p><strong>正则化协同</strong>：组合使用 Dropout、标签平滑与梯度裁剪提升泛化性。</p>
-<p>此框架为理论分析、超参数调优及代码实现提供了完备的数学参考。</p></div>
+<p>此框架为理论分析、超参数调优及代码实现提供了完备的数学参考。</p>
+<hr>
+<h3><strong>Transformer 训练超参数符号系统与维度定义（详细版）</strong></h3>
+<h4><strong>一、优化器参数</strong></h4>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>符号</strong></th>
+<th><strong>描述</strong></th>
+<th><strong>维度</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$\alpha$</td>
+<td>基础学习率（Learning Rate）</td>
+<td>标量</td>
+<td>决定每次参数更新的步长大小，在参数更新公式$\theta_{t + 1} = \theta_t - \alpha \cdot g_t$$(不许换行)$中，$\alpha$与梯度$g_t$相乘，控制参数$\theta$的更新幅度</td>
+</tr>
+<tr>
+<td>$\beta_1$</td>
+<td>Adam 优化器一阶矩衰减率</td>
+<td>标量</td>
+<td>用于计算移动平均梯度。在公式$m_t = \beta_1 m_{t - 1} + (1 - \beta_1)g_t$$(不许换行)$中，$m_t$表示$t$时刻的移动平均梯度，$\beta_1$决定了历史梯度信息在当前移动平均梯度计算中的权重，默认值为 0.9</td>
+</tr>
+<tr>
+<td>$\beta_2$</td>
+<td>Adam 优化器二阶矩衰减率</td>
+<td>标量</td>
+<td>用于计算梯度平方的移动平均。在公式$v_t = \beta_2 v_{t - 1} + (1 - \beta_2)g_t^2$$(不许换行)$中，$v_t$表示$t$时刻梯度平方的移动平均，$\beta_2$决定了历史梯度平方信息在当前计算中的权重，默认值为 0.999</td>
+</tr>
+<tr>
+<td>$\epsilon$</td>
+<td>Adam 优化器数值稳定项</td>
+<td>标量</td>
+<td>防止在参数更新过程中出现除零错误。在公式$\theta_{t + 1} = \theta_t - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}$$(不许换行)$中，$\epsilon$通常设置为一个极小值，如 1e - 8</td>
+</tr>
+<tr>
+<td>$\lambda$</td>
+<td>权重衰减系数（Weight Decay）</td>
+<td>标量</td>
+<td>用于 L2 正则化，控制模型复杂度。在参数更新公式$\theta_{t + 1} = \theta_t - \alpha \cdot (g_t + \lambda \theta_t)$$(不许换行)$中，$\lambda$与参数$\theta_t$相乘后加到梯度上，使参数更新时向零收缩，避免过拟合</td>
+</tr>
+<tr>
+<td>$\gamma_{\text{momentum}}$</td>
+<td>SGD 动量系数</td>
+<td>标量</td>
+<td>在传统随机梯度下降（SGD）带动量的更新中起作用。公式$v_t = \gamma v_{t - 1} + g_t$$(不许换行)$中，$v_t$为当前时刻的动量，$\gamma$决定了上一时刻动量在当前动量计算中的权重；在参数更新公式$\theta_{t + 1} = \theta_t - \alpha v_t$$(不许换行)$中，动量$v_t$影响参数$\theta$的更新</td>
+</tr>
+<tr>
+<td>$m_t$</td>
+<td>Adam 优化器一阶矩估计值</td>
+<td>向量（与参数$\theta$维度相同）</td>
+<td>是对梯度的移动平均估计，如公式$m_t = \beta_1 m_{t - 1} + (1 - \beta_1)g_t$$(不许换行)$所示，它综合考虑了历史梯度信息，帮助优化器在训练过程中更稳定地更新参数</td>
+</tr>
+<tr>
+<td>$v_t$</td>
+<td>Adam 优化器二阶矩估计值</td>
+<td>向量（与参数$\theta$维度相同）</td>
+<td>是对梯度平方的移动平均估计，通过公式$v_t = \beta_2 v_{t - 1} + (1 - \beta_2)g_t^2$$(不许换行)$计算得到，用于自适应调整学习率</td>
+</tr>
+<tr>
+<td>$\hat{m}_t$</td>
+<td>Adam 优化器修正后的一阶矩估计值</td>
+<td>向量（与参数$\theta$维度相同）</td>
+<td>通过公式$\hat{m}_t = \frac{m_t}{1 - \beta_1^t}$$(不许换行)$计算得到，用于修正由于初始阶段$\beta_1$的累积效应导致的偏差，使移动平均梯度估计更准确</td>
+</tr>
+<tr>
+<td>$\hat{v}_t$</td>
+<td>Adam 优化器修正后的二阶矩估计值</td>
+<td>向量（与参数$\theta$维度相同）</td>
+<td>通过公式$\hat{v}_t = \frac{v_t}{1 - \beta_2^t}$$(不许换行)$计算得到，用于修正由于初始阶段$\beta_2$的累积效应导致的偏差，用于参数更新公式中以更准确地调整学习率</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h4><strong>二、正则化参数</strong></h4>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>符号</strong></th>
+<th><strong>描述</strong></th>
+<th><strong>维度</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$p_{\text{drop}}$</td>
+<td>Dropout 丢弃概率</td>
+<td>标量</td>
+<td>在 Dropout 操作中，以该概率随机将激活值置零，如$x_{\text{drop}} = \text{Dropout}(x, p_{\text{drop}})$$(不许换行)$，通过随机失活神经元来防止过拟合</td>
+</tr>
+<tr>
+<td>$\epsilon_{\text{ls}}$</td>
+<td>标签平滑系数（Label Smoothing）</td>
+<td>标量</td>
+<td>用于软化目标分布。将真实标签概率设为 $1 - \epsilon_{\text {ls}} + \epsilon_{\text {ls}} /</td>
+</tr>
+<tr>
+<td>$\tau$</td>
+<td>梯度裁剪阈值（Gradient Clipping）</td>
+<td>标量</td>
+<td>用于限制梯度范数。在公式$g_{\text{clip}} = g \cdot \min\left(1, \frac{\tau}{|g|}\right)$$(不许换行)$中，当梯度范数$|g|$超过阈值$\tau$时，对梯度进行缩放，防止梯度爆炸</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h4><strong>三、学习率调度参数</strong></h4>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>符号</strong></th>
+<th><strong>描述</strong></th>
+<th><strong>维度</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$T_{\text{warmup}}$</td>
+<td>学习率预热步数</td>
+<td>标量</td>
+<td>在训练初始阶段，学习率会在这$T_{\text{warmup}}$步内线性增加至$\alpha$，如公式$\alpha_t = \alpha \cdot \min\left(1, \frac{t}{T_{\text{warmup}}}\right) \quad (0 &lt; t \leq T_{\text{warmup}})$$(不许换行)$所示，这样可以避免训练早期学习率过大导致不稳定</td>
+</tr>
+<tr>
+<td>$\alpha_{\text{max}}$</td>
+<td>最大学习率（余弦退火）</td>
+<td>标量</td>
+<td>在学习率调度周期内的峰值学习率，在余弦退火调度公式$\alpha_t = \alpha_{\text{min}} + \frac{1}{2}(\alpha_{\text{max}} - \alpha_{\text{min}})(1 + \cos(\pi t/T))$$(不许换行)$中，决定了学习率变化范围的上限</td>
+</tr>
+<tr>
+<td>$\alpha_{\text{min}}$</td>
+<td>最小学习率（余弦退火）</td>
+<td>标量</td>
+<td>在学习率调度周期内的谷值学习率，在余弦退火调度公式中，决定了学习率变化范围的下限</td>
+</tr>
+<tr>
+<td>$T_{\text{cycle}}$</td>
+<td>学习率调度周期长度</td>
+<td>标量</td>
+<td>定义了余弦退火或其他循环学习率策略的周期步数，在一个周期内学习率按照特定规律变化</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h4><strong>四、训练配置参数</strong></h4>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>符号</strong></th>
+<th><strong>描述</strong></th>
+<th><strong>维度</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$B$</td>
+<td>批量大小（Batch Size）</td>
+<td>标量</td>
+<td>表示单次参数更新所使用的样本数量，影响模型训练的稳定性和效率</td>
+</tr>
+<tr>
+<td>$T_{\text{total}}$</td>
+<td>总训练步数</td>
+<td>标量</td>
+<td>整个训练过程中模型参数更新的总次数</td>
+</tr>
+<tr>
+<td>$N_{\text{epoch}}$</td>
+<td>训练轮数（Epoch）</td>
+<td>标量</td>
+<td>完整遍历数据集的次数，通过公式 $N_{\text {epoch}} = \lceil T_{\text {total}} \cdot B /</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h4><strong>五、参数更新公式示例（Adam 优化器）涉及符号</strong></h4>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>符号</strong></th>
+<th><strong>描述</strong></th>
+<th><strong>维度</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$g_t$</td>
+<td>
+$t$时刻的梯度</td>
+<td>向量（与参数$\theta$维度相同）</td>
+<td>通过对损失函数$\mathcal{L}(\theta_t)$关于参数$\theta_t$求梯度得到，即$g_t = \nabla_{\theta} \mathcal{L}(\theta_t)$$(不许换行)$，它指示了参数更新的方向</td>
+</tr>
+<tr>
+<td>$\theta_t$</td>
+<td>
+$t$时刻的模型参数</td>
+<td>向量（模型参数维度）</td>
+<td>模型在$t$时刻的参数值，通过优化器不断更新，以最小化损失函数</td>
+</tr>
+<tr>
+<td>$\theta_{t + 1}$</td>
+<td>
+$t + 1$时刻的模型参数</td>
+<td>向量（模型参数维度）</td>
+<td>根据优化器的更新规则，基于$t$时刻的参数$\theta_t$和相关梯度信息计算得到的下一时刻参数值</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h4><strong>六、参数初始化与训练流程涉及符号</strong></h4>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th><strong>符号</strong></th>
+<th><strong>描述</strong></th>
+<th><strong>维度</strong></th>
+<th><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$X$</td>
+<td>输入数据样本</td>
+<td>张量（根据数据结构确定维度）</td>
+<td>在训练过程中，从数据集中采样得到的输入数据，用于前向传播计算模型预测值</td>
+</tr>
+<tr>
+<td>$Y$</td>
+<td>真实标签</td>
+<td>张量（根据数据结构确定维度）</td>
+<td>与输入数据$X$对应的真实标签，用于计算损失函数</td>
+</tr>
+<tr>
+<td>$Y_{pred}$</td>
+<td>模型预测值</td>
+<td>张量（根据模型输出结构确定维度）</td>
+<td>模型通过对输入$X$进行前向传播得到的预测结果</td>
+</tr>
+<tr>
+<td>$\text{loss}$</td>
+<td>损失值</td>
+<td>标量</td>
+<td>综合考虑模型预测值$Y_{pred}$与真实标签$Y$的差异，以及可能的正则化项（如$\lambda * L2_norm(\theta)$）计算得到的损失，用于衡量模型当前的性能</td>
+</tr>
+<tr>
+<td>$\text{gradients}$</td>
+<td>计算得到的梯度</td>
+<td>向量（与参数$\theta$维度相同）</td>
+<td>通过对损失函数关于参数$\theta$进行反向传播计算得到，即$\text{gradients} = \text{compute_gradients}(\text{loss}, \theta)$$(不许换行)$，用于指导参数更新</td>
+</tr>
+<tr>
+<td>$m_prev$</td>
+<td>上一时刻 Adam 优化器一阶矩估计值</td>
+<td>向量（与参数$\theta$维度相同）</td>
+<td>在 Adam 优化器参数更新过程中，用于计算当前时刻一阶矩估计值$m$的上一时刻值</td>
+</tr>
+<tr>
+<td>$v_prev$</td>
+<td>上一时刻 Adam 优化器二阶矩估计值</td>
+<td>向量（与参数$\theta$维度相同）</td>
+<td>在 Adam 优化器参数更新过程中，用于计算当前时刻二阶矩估计值$v$的上一时刻值</td>
+</tr>
+<tr>
+<td>$t$</td>
+<td>当前训练步数</td>
+<td>标量</td>
+<td>记录训练过程中的步数，从 1 开始递增，直到达到总训练步数$T_{\text{total}}$</td>
+</tr>
+<tr>
+<td>$\text{Data}$</td>
+<td>整个数据集</td>
+<td>-</td>
+<td>包含所有训练样本及其对应标签的集合，用于训练模型</td>
+</tr>
+<tr>
+<td>$\text{clip_by_norm}$</td>
+<td>梯度裁剪函数</td>
+<td>-</td>
+<td>实现梯度裁剪操作，将梯度$\text{gradients}$按照阈值$\tau$进行裁剪，返回裁剪后的梯度</td>
+</tr>
+<tr>
+<td>$\text{compute_gradients}$</td>
+<td>计算梯度函数</td>
+<td>-</td>
+<td>根据损失函数$\text{loss}$和模型参数$\theta$计算梯度的函数</td>
+</tr>
+<tr>
+<td>$\text{cross_entropy}$</td>
+<td>交叉熵损失函数</td>
+<td>-</td>
+<td>用于计算模型预测值$Y_{pred}$与真实标签$Y$之间差异的损失函数</td>
+</tr>
+<tr>
+<td>$L2_norm$</td>
+<td>L2 范数计算函数</td>
+<td>-</td>
+<td>计算参数$\theta$的 L2 范数，用于权重衰减（L2 正则化）项的计算</td>
+</tr>
+<tr>
+<td>$\text{sqrt}$</td>
+<td>平方根计算函数</td>
+<td>-</td>
+<td>在 Adam 优化器参数更新公式中，用于计算$\sqrt{\hat{v}_t}$$(不许换行)$</td>
+</tr>
+<tr>
+<td>$\text{min}$</td>
+<td>取最小值函数</td>
+<td>-</td>
+<td>在学习率预热公式和梯度裁剪公式中，用于取两个值中的较小值</td>
+</tr>
+<tr>
+<td>$\cos$</td>
+<td>余弦函数</td>
+<td>-</td>
+<td>在余弦退火学习率调度公式中，用于计算学习率随时间的变化</td>
+</tr>
+<tr>
+<td>$\pi$</td>
+<td>圆周率</td>
+<td>标量</td>
+<td>数学常数，在余弦退火学习率调度公式中用于计算</td>
+</tr>
+<tr>
+<td>$\lceil \cdot \rceil$</td>
+<td>向上取整函数</td>
+<td>-</td>
+<td>在计算训练轮数$N_{\text{epoch}}$时，用于对 $T_{\text {total}} \cdot B /</td>
+</tr>
+<tr>
+<td>$</td>
+<td>\cdot</td>
+<td>$</td>
+<td>求数据集样本数函数</td>
+</tr>
+<tr>
+<td>$\text{Vocab}$</td>
+<td>词汇表</td>
+<td>-</td>
+<td>在标签平滑中，用于计算标签平滑后的概率分布，$</td>
+</tr>
+<tr>
+<td>$\text{Dropout}$</td>
+<td>Dropout 操作函数</td>
+<td>-</td>
+<td>实现 Dropout 正则化，按照概率$p_{\text{drop}}$随机将输入激活值置零</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
