@@ -607,61 +607,61 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <td>$\alpha$</td>
 <td>基础学习率（Learning Rate）</td>
 <td>标量</td>
-<td>决定每次参数更新的步长大小，在参数更新公式$\theta_{t + 1} = \theta_t - \alpha \cdot g_t$$(不许换行)$中，$\alpha$与梯度$g_t$相乘，控制参数$\theta$的更新幅度</td>
+<td>决定每次参数更新的步长大小，在参数更新公式$\theta_{t + 1} = \theta_t - \alpha \cdot g_t$中，$\alpha$与梯度$g_t$相乘，控制参数$\theta$的更新幅度</td>
 </tr>
 <tr>
 <td>$\beta_1$</td>
 <td>Adam 优化器一阶矩衰减率</td>
 <td>标量</td>
-<td>用于计算移动平均梯度。在公式$m_t = \beta_1 m_{t - 1} + (1 - \beta_1)g_t$$(不许换行)$中，$m_t$表示$t$时刻的移动平均梯度，$\beta_1$决定了历史梯度信息在当前移动平均梯度计算中的权重，默认值为 0.9</td>
+<td>用于计算移动平均梯度。在公式$m_t = \beta_1 m_{t - 1} + (1 - \beta_1)g_t$中，$m_t$表示$t$时刻的移动平均梯度，$\beta_1$决定了历史梯度信息在当前移动平均梯度计算中的权重，默认值为 0.9</td>
 </tr>
 <tr>
 <td>$\beta_2$</td>
 <td>Adam 优化器二阶矩衰减率</td>
 <td>标量</td>
-<td>用于计算梯度平方的移动平均。在公式$v_t = \beta_2 v_{t - 1} + (1 - \beta_2)g_t^2$$(不许换行)$中，$v_t$表示$t$时刻梯度平方的移动平均，$\beta_2$决定了历史梯度平方信息在当前计算中的权重，默认值为 0.999</td>
+<td>用于计算梯度平方的移动平均。在公式$v_t = \beta_2 v_{t - 1} + (1 - \beta_2)g_t^2$中，$v_t$表示$t$时刻梯度平方的移动平均，$\beta_2$决定了历史梯度平方信息在当前计算中的权重，默认值为 0.999</td>
 </tr>
 <tr>
 <td>$\epsilon$</td>
 <td>Adam 优化器数值稳定项</td>
 <td>标量</td>
-<td>防止在参数更新过程中出现除零错误。在公式$\theta_{t + 1} = \theta_t - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}$$(不许换行)$中，$\epsilon$通常设置为一个极小值，如 1e - 8</td>
+<td>防止在参数更新过程中出现除零错误。在公式$\theta_{t + 1} = \theta_t - \alpha \cdot \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}$中，$\epsilon$通常设置为一个极小值，如 1e - 8</td>
 </tr>
 <tr>
 <td>$\lambda$</td>
 <td>权重衰减系数（Weight Decay）</td>
 <td>标量</td>
-<td>用于 L2 正则化，控制模型复杂度。在参数更新公式$\theta_{t + 1} = \theta_t - \alpha \cdot (g_t + \lambda \theta_t)$$(不许换行)$中，$\lambda$与参数$\theta_t$相乘后加到梯度上，使参数更新时向零收缩，避免过拟合</td>
+<td>用于 L2 正则化，控制模型复杂度。在参数更新公式$\theta_{t + 1} = \theta_t - \alpha \cdot (g_t + \lambda \theta_t)$中，$\lambda$与参数$\theta_t$相乘后加到梯度上，使参数更新时向零收缩，避免过拟合</td>
 </tr>
 <tr>
 <td>$\gamma_{\text{momentum}}$</td>
 <td>SGD 动量系数</td>
 <td>标量</td>
-<td>在传统随机梯度下降（SGD）带动量的更新中起作用。公式$v_t = \gamma v_{t - 1} + g_t$$(不许换行)$中，$v_t$为当前时刻的动量，$\gamma$决定了上一时刻动量在当前动量计算中的权重；在参数更新公式$\theta_{t + 1} = \theta_t - \alpha v_t$$(不许换行)$中，动量$v_t$影响参数$\theta$的更新</td>
+<td>在传统随机梯度下降（SGD）带动量的更新中起作用。公式$v_t = \gamma v_{t - 1} + g_t$中，$v_t$为当前时刻的动量，$\gamma$决定了上一时刻动量在当前动量计算中的权重；在参数更新公式$\theta_{t + 1} = \theta_t - \alpha v_t$中，动量$v_t$影响参数$\theta$的更新</td>
 </tr>
 <tr>
 <td>$m_t$</td>
 <td>Adam 优化器一阶矩估计值</td>
 <td>向量（与参数$\theta$维度相同）</td>
-<td>是对梯度的移动平均估计，如公式$m_t = \beta_1 m_{t - 1} + (1 - \beta_1)g_t$$(不许换行)$所示，它综合考虑了历史梯度信息，帮助优化器在训练过程中更稳定地更新参数</td>
+<td>是对梯度的移动平均估计，如公式$m_t = \beta_1 m_{t - 1} + (1 - \beta_1)g_t$所示，它综合考虑了历史梯度信息，帮助优化器在训练过程中更稳定地更新参数</td>
 </tr>
 <tr>
 <td>$v_t$</td>
 <td>Adam 优化器二阶矩估计值</td>
 <td>向量（与参数$\theta$维度相同）</td>
-<td>是对梯度平方的移动平均估计，通过公式$v_t = \beta_2 v_{t - 1} + (1 - \beta_2)g_t^2$$(不许换行)$计算得到，用于自适应调整学习率</td>
+<td>是对梯度平方的移动平均估计，通过公式$v_t = \beta_2 v_{t - 1} + (1 - \beta_2)g_t^2$计算得到，用于自适应调整学习率</td>
 </tr>
 <tr>
 <td>$\hat{m}_t$</td>
 <td>Adam 优化器修正后的一阶矩估计值</td>
 <td>向量（与参数$\theta$维度相同）</td>
-<td>通过公式$\hat{m}_t = \frac{m_t}{1 - \beta_1^t}$$(不许换行)$计算得到，用于修正由于初始阶段$\beta_1$的累积效应导致的偏差，使移动平均梯度估计更准确</td>
+<td>通过公式$\hat{m}_t = \frac{m_t}{1 - \beta_1^t}$计算得到，用于修正由于初始阶段$\beta_1$的累积效应导致的偏差，使移动平均梯度估计更准确</td>
 </tr>
 <tr>
 <td>$\hat{v}_t$</td>
 <td>Adam 优化器修正后的二阶矩估计值</td>
 <td>向量（与参数$\theta$维度相同）</td>
-<td>通过公式$\hat{v}_t = \frac{v_t}{1 - \beta_2^t}$$(不许换行)$计算得到，用于修正由于初始阶段$\beta_2$的累积效应导致的偏差，用于参数更新公式中以更准确地调整学习率</td>
+<td>通过公式$\hat{v}_t = \frac{v_t}{1 - \beta_2^t}$计算得到，用于修正由于初始阶段$\beta_2$的累积效应导致的偏差，用于参数更新公式中以更准确地调整学习率</td>
 </tr>
 </tbody>
 </table></markdown-accessiblity-table>
@@ -680,7 +680,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <td>$p_{\text{drop}}$</td>
 <td>Dropout 丢弃概率</td>
 <td>标量</td>
-<td>在 Dropout 操作中，以该概率随机将激活值置零，如$x_{\text{drop}} = \text{Dropout}(x, p_{\text{drop}})$$(不许换行)$，通过随机失活神经元来防止过拟合</td>
+<td>在 Dropout 操作中，以该概率随机将激活值置零，如$x_{\text{drop}} = \text{Dropout}(x, p_{\text{drop}})$，通过随机失活神经元来防止过拟合</td>
 </tr>
 <tr>
 <td>$\epsilon_{\text{ls}}$</td>
@@ -692,7 +692,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <td>$\tau$</td>
 <td>梯度裁剪阈值（Gradient Clipping）</td>
 <td>标量</td>
-<td>用于限制梯度范数。在公式$g_{\text{clip}} = g \cdot \min\left(1, \frac{\tau}{|g|}\right)$$(不许换行)$中，当梯度范数$|g|$超过阈值$\tau$时，对梯度进行缩放，防止梯度爆炸</td>
+<td>用于限制梯度范数。在公式$g_{\text{clip}} = g \cdot \min\left(1, \frac{\tau}{|g|}\right)$中，当梯度范数$|g|$超过阈值$\tau$时，对梯度进行缩放，防止梯度爆炸</td>
 </tr>
 </tbody>
 </table></markdown-accessiblity-table>
@@ -711,13 +711,13 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <td>$T_{\text{warmup}}$</td>
 <td>学习率预热步数</td>
 <td>标量</td>
-<td>在训练初始阶段，学习率会在这$T_{\text{warmup}}$步内线性增加至$\alpha$，如公式$\alpha_t = \alpha \cdot \min\left(1, \frac{t}{T_{\text{warmup}}}\right) \quad (0 &lt; t \leq T_{\text{warmup}})$$(不许换行)$所示，这样可以避免训练早期学习率过大导致不稳定</td>
+<td>在训练初始阶段，学习率会在这$T_{\text{warmup}}$步内线性增加至$\alpha$，如公式$\alpha_t = \alpha \cdot \min\left(1, \frac{t}{T_{\text{warmup}}}\right) \quad (0 &lt; t \leq T_{\text{warmup}})$所示，这样可以避免训练早期学习率过大导致不稳定</td>
 </tr>
 <tr>
 <td>$\alpha_{\text{max}}$</td>
 <td>最大学习率（余弦退火）</td>
 <td>标量</td>
-<td>在学习率调度周期内的峰值学习率，在余弦退火调度公式$\alpha_t = \alpha_{\text{min}} + \frac{1}{2}(\alpha_{\text{max}} - \alpha_{\text{min}})(1 + \cos(\pi t/T))$$(不许换行)$中，决定了学习率变化范围的上限</td>
+<td>在学习率调度周期内的峰值学习率，在余弦退火调度公式$\alpha_t = \alpha_{\text{min}} + \frac{1}{2}(\alpha_{\text{max}} - \alpha_{\text{min}})(1 + \cos(\pi t/T))$中，决定了学习率变化范围的上限</td>
 </tr>
 <tr>
 <td>$\alpha_{\text{min}}$</td>
@@ -780,7 +780,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <td>
 $t$时刻的梯度</td>
 <td>向量（与参数$\theta$维度相同）</td>
-<td>通过对损失函数$\mathcal{L}(\theta_t)$关于参数$\theta_t$求梯度得到，即$g_t = \nabla_{\theta} \mathcal{L}(\theta_t)$$(不许换行)$，它指示了参数更新的方向</td>
+<td>通过对损失函数$\mathcal{L}(\theta_t)$关于参数$\theta_t$求梯度得到，即$g_t = \nabla_{\theta} \mathcal{L}(\theta_t)$，它指示了参数更新的方向</td>
 </tr>
 <tr>
 <td>$\theta_t$</td>
@@ -837,7 +837,7 @@ $t + 1$时刻的模型参数</td>
 <td>$\text{gradients}$</td>
 <td>计算得到的梯度</td>
 <td>向量（与参数$\theta$维度相同）</td>
-<td>通过对损失函数关于参数$\theta$进行反向传播计算得到，即$\text{gradients} = \text{compute_gradients}(\text{loss}, \theta)$$(不许换行)$，用于指导参数更新</td>
+<td>通过对损失函数关于参数$\theta$进行反向传播计算得到，即$\text{gradients} = \text{compute_gradients}(\text{loss}, \theta)$，用于指导参数更新</td>
 </tr>
 <tr>
 <td>$m_prev$</td>
@@ -891,7 +891,7 @@ $t + 1$时刻的模型参数</td>
 <td>$\text{sqrt}$</td>
 <td>平方根计算函数</td>
 <td>-</td>
-<td>在 Adam 优化器参数更新公式中，用于计算$\sqrt{\hat{v}_t}$$(不许换行)$</td>
+<td>在 Adam 优化器参数更新公式中，用于计算$\sqrt{\hat{v}_t}$</td>
 </tr>
 <tr>
 <td>$\text{min}$</td>
