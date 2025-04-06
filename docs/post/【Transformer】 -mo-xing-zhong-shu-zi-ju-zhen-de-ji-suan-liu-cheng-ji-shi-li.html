@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/101440642?s=400&u=64734a1b6d25eddc0ac7e0729729e228193de187&v=4"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="# 《Transformer 模型中数字矩阵的计算流程及示例》
+
+以下是一个简化的 **数字矩阵示例**，展示从输入到输出的全流程矩阵计算，假设模型参数如下：
+
+**词表大小** $  v_{\text{vocab}} = 4  $（词表：`['I', 'love', 'you', '<pad>']`，`<pad>`为填充词）
+
+**模型维度** $  d_{\text{model}} = 3  $
+
+**序列长度** $  n = 2  $
+
+**注意力头数** $  h = 1  $（单头注意力）
+
+**前馈网络隐藏层维度** $  d_{\text{ff}} = 4  $
+
+**层数** $  L = 1  $（单层 Transformer）
+
+
+
+***
+
+### **1. 输入序列**
+
+假设输入为 `['I', 'love']`，根据词表中每个词对应的索引位置，将其转换为对应的 token IDs，即 `[0, 1]`。">
+<meta property="og:title" content="【Transformer】 模型中数字矩阵的计算流程及示例">
+<meta property="og:description" content="# 《Transformer 模型中数字矩阵的计算流程及示例》
+
+以下是一个简化的 **数字矩阵示例**，展示从输入到输出的全流程矩阵计算，假设模型参数如下：
+
+**词表大小** $  v_{\text{vocab}} = 4  $（词表：`['I', 'love', 'you', '<pad>']`，`<pad>`为填充词）
+
+**模型维度** $  d_{\text{model}} = 3  $
+
+**序列长度** $  n = 2  $
+
+**注意力头数** $  h = 1  $（单头注意力）
+
+**前馈网络隐藏层维度** $  d_{\text{ff}} = 4  $
+
+**层数** $  L = 1  $（单层 Transformer）
+
+
+
+***
+
+### **1. 输入序列**
+
+假设输入为 `['I', 'love']`，根据词表中每个词对应的索引位置，将其转换为对应的 token IDs，即 `[0, 1]`。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://Wang-ABG.github.io/das-sein.github.io/post/%E3%80%90Transformer%E3%80%91%20-mo-xing-zhong-shu-zi-ju-zhen-de-ji-suan-liu-cheng-ji-shi-li.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/101440642?s=400&u=64734a1b6d25eddc0ac7e0729729e228193de187&v=4">
+<title>【Transformer】 模型中数字矩阵的计算流程及示例</title>
+
+
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">【Transformer】 模型中数字矩阵的计算流程及示例</h1>
+<div class="title-right">
+    <a href="https://Wang-ABG.github.io/das-sein.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h1>《Transformer 模型中数字矩阵的计算流程及示例》</h1>
+<p>以下是一个简化的 <strong>数字矩阵示例</strong>，展示从输入到输出的全流程矩阵计算，假设模型参数如下：</p>
+<p><strong>词表大小</strong> $  v_{\text{vocab}} = 4  $（词表：<code class="notranslate">["I", "love", "you", "&lt;pad&gt;"]</code>，<code class="notranslate">&lt;pad&gt;</code>为填充词）</p>
+<p><strong>模型维度</strong> $  d_{\text{model}} = 3  $</p>
+<p><strong>序列长度</strong> $  n = 2  $</p>
+<p><strong>注意力头数</strong> $  h = 1  $（单头注意力）</p>
+<p><strong>前馈网络隐藏层维度</strong> $  d_{\text{ff}} = 4  $</p>
+<p><strong>层数</strong> $  L = 1  $（单层 Transformer）</p>
+<hr>
+<h3><strong>1. 输入序列</strong></h3>
+<p>假设输入为 <code class="notranslate">["I", "love"]</code>，根据词表中每个词对应的索引位置，将其转换为对应的 token IDs，即 <code class="notranslate">[0, 1]</code>。这里的 token IDs 用于后续将输入映射到词嵌入矩阵中。</p>
+<hr>
+<h3><strong>2. 词嵌入（Embedding）</strong></h3>
+<p>词嵌入矩阵 $  \mathbf{E} \in \mathbb{R}^{4 \times 3}  $（每行对应一个词的嵌入）：</p>
+<p>$<br>
+\mathbf{E} = \begin{bmatrix}<br>
+0.2 &amp; 0.5 &amp; -0.1 \quad (\text{"I"}) \<br>
+-0.3 &amp; 0.8 &amp; 0.4 \quad (\text{"love"}) \<br>
+0.6 &amp; -0.2 &amp; 0.7 \quad (\text{"you"}) \<br>
+0.1 &amp; 0.1 &amp; 0.9 \quad (\text{""})<br>
+\end{bmatrix}<br>
+$</p>
+<p>首先将输入序列进行 one-hot 编码，使得每个词都表示为一个长度为词表大小的向量，其中只有对应词的索引位置为 1，其余位置为 0。输入序列的 one-hot 编码：</p>
+<p>$<br>
+\mathbf{X}_{\text{one-hot}} = \begin{bmatrix}<br>
+1 &amp; 0 &amp; 0 &amp; 0 \quad (\text{"I"}) \<br>
+0 &amp; 1 &amp; 0 &amp; 0 \quad (\text{"love"})<br>
+\end{bmatrix}<br>
+$</p>
+<p>然后进行词嵌入计算，通过将 one-hot 编码后的矩阵与词嵌入矩阵相乘，将离散的 one-hot 向量转换为连续的词嵌入向量：</p>
+<p>$<br>
+\mathbf{X}<em>{\text{embed}} = \mathbf{X}</em>{\text{one-hot}} \cdot \mathbf{E} = \begin{bmatrix}<br>
+0.2 &amp; 0.5 &amp; -0.1 \<br>
+-0.3 &amp; 0.8 &amp; 0.4<br>
+\end{bmatrix}<br>
+$</p>
+<hr>
+<h3><strong>3. 位置编码（Positional Encoding）</strong></h3>
+<p>在 Transformer 模型中，为了让模型能够区分不同位置的词，需要加入位置编码信息。假设位置编码矩阵 $  \mathbf{P} \in \mathbb{R}^{2 \times 3}  $：</p>
+<p>$<br>
+\mathbf{P} = \begin{bmatrix}<br>
+0.1 &amp; 0.1 &amp; 0.1 \quad (\text{ä½�ç½®0}) \<br>
+0.2 &amp; 0.2 &amp; 0.2 \quad (\text{ä½�ç½®1})<br>
+\end{bmatrix}<br>
+$</p>
+<p>将位置编码矩阵与词嵌入后的矩阵直接相加，得到加入位置编码后的输入：</p>
+<p>$<br>
+\mathbf{H}^{(0)} = \mathbf{X}_{\text{embed}} + \mathbf{P} = \begin{bmatrix}<br>
+0.2+0.1 &amp; 0.5+0.1 &amp; -0.1+0.1 \<br>
+-0.3+0.2 &amp; 0.8+0.2 &amp; 0.4+0.2<br>
+\end{bmatrix} = \begin{bmatrix}<br>
+0.3 &amp; 0.6 &amp; 0.0 \<br>
+-0.1 &amp; 1.0 &amp; 0.6<br>
+\end{bmatrix}<br>
+$</p>
+<hr>
+<h3><strong>4. 单头自注意力计算</strong></h3>
+<h4><strong>4.1 生成 Q, K, V</strong></h4>
+<p>在多头自注意力机制中，首先需要通过线性投影生成 Query（Q）、Key（K）和 Value（V）矩阵。这里我们使用单头注意力，参数矩阵 $  \mathbf{W}_Q, \mathbf{W}_K, \mathbf{W}_V \in \mathbb{R}^{3 \times 3}  $：</p>
+<p>$<br>
+\mathbf{W}_Q = \begin{bmatrix}<br>
+1 &amp; 0 &amp; 0 \<br>
+0 &amp; 1 &amp; 0 \<br>
+0 &amp; 0 &amp; 1<br>
+\end{bmatrix}, \quad<br>
+\mathbf{W}_K = \begin{bmatrix}<br>
+0.5 &amp; 0 &amp; 0 \<br>
+0 &amp; 0.5 &amp; 0 \<br>
+0 &amp; 0 &amp; 0.5<br>
+\end{bmatrix}, \quad<br>
+\mathbf{W}_V = \begin{bmatrix}<br>
+1 &amp; 0 &amp; 0 \<br>
+0 &amp; 1 &amp; 0 \<br>
+0 &amp; 0 &amp; 1<br>
+\end{bmatrix}<br>
+$</p>
+<p>通过将加入位置编码后的输入矩阵 $  \mathbf{H}^{(0)}  $ 分别与 $  \mathbf{W}_Q  $、$  \mathbf{W}_K  $、$  \mathbf{W}_V  $ 相乘，得到 Q, K, V 矩阵：</p>
+<p>$<br>
+\mathbf{Q} = \mathbf{H}^{(0)} \cdot \mathbf{W}_Q = \begin{bmatrix}<br>
+0.3 &amp; 0.6 &amp; 0.0 \<br>
+-0.1 &amp; 1.0 &amp; 0.6<br>
+\end{bmatrix}<br>
+$</p>
+<p>$<br>
+\mathbf{K} = \mathbf{H}^{(0)} \cdot \mathbf{W}_K = \begin{bmatrix}<br>
+0.15 &amp; 0.3 &amp; 0.0 \<br>
+-0.05 &amp; 0.5 &amp; 0.3<br>
+\end{bmatrix}<br>
+$</p>
+<p>$<br>
+\mathbf{V} = \mathbf{H}^{(0)} \cdot \mathbf{W}_V = \begin{bmatrix}<br>
+0.3 &amp; 0.6 &amp; 0.0 \<br>
+-0.1 &amp; 1.0 &amp; 0.6<br>
+\end{bmatrix}<br>
+$</p>
+<h4><strong>4.2 计算注意力分数</strong></h4>
+<p>注意力分数矩阵 $  \mathbf{A} = \text{softmax}\left( \frac{\mathbf{Q} \mathbf{K}^\top}{\sqrt{d_k}} \right)  $（$  d_k = 3  $），这里的 $  \mathbf{Q} \mathbf{K}^\top  $ 表示 Q 矩阵与 K 矩阵的转置相乘，得到的矩阵表示了输入序列中每个位置之间的注意力关系。具体计算如下：</p>
+<p>$<br>
+\mathbf{Q} \mathbf{K}^\top = \begin{bmatrix}<br>
+0.3 \times 0.15 + 0.6 \times 0.3 + 0.0 \times 0.0 &amp; 0.3 \times (-0.05) + 0.6 \times 0.5 + 0.0 \times 0.3 \<br>
+-0.1 \times 0.15 + 1.0 \times 0.3 + 0.6 \times 0.0 &amp; -0.1 \times (-0.05) + 1.0 \times 0.5 + 0.6 \times 0.3<br>
+\end{bmatrix} = \begin{bmatrix}<br>
+0.045 + 0.18 + 0.0 &amp; -0.015 + 0.3 + 0.0 \<br>
+-0.015 + 0.3 + 0.0 &amp; 0.005 + 0.5 + 0.18<br>
+\end{bmatrix} = \begin{bmatrix}<br>
+0.225 &amp; 0.285 \<br>
+0.285 &amp; 0.685<br>
+\end{bmatrix}<br>
+$</p>
+<p>为了避免注意力分数过大导致 softmax 函数的结果过于极端，我们将 $  \mathbf{Q} \mathbf{K}^\top  $ 的每个元素除以 $  \sqrt{d_k}  $（这里 $  d_k = 3  $）进行缩放，然后再应用 softmax 函数：</p>
+<p>$<br>
+\frac{\mathbf{Q} \mathbf{K}^\top}{\sqrt{3}} \approx \begin{bmatrix}<br>
+0.130 &amp; 0.165 \<br>
+0.165 &amp; 0.396<br>
+\end{bmatrix}, \quad \text{softmaxç»�æ��} = \begin{bmatrix}<br>
+0.48 &amp; 0.52 \<br>
+0.34 &amp; 0.66<br>
+\end{bmatrix}<br>
+$</p>
+<h4><strong>4.3 计算注意力输出</strong></h4>
+<p>将 softmax 得到的注意力分数矩阵与 V 矩阵相乘，得到注意力输出矩阵：</p>
+<p>$<br>
+\mathbf{A} = \text{softmaxç»�æ��} \cdot \mathbf{V} = \begin{bmatrix}<br>
+0.48 \times 0.3 + 0.52 \times (-0.1) &amp; 0.48 \times 0.6 + 0.52 \times 1.0 &amp; 0.48 \times 0.0 + 0.52 \times 0.6 \<br>
+0.34 \times 0.3 + 0.66 \times (-0.1) &amp; 0.34 \times 0.6 + 0.66 \times 1.0 &amp; 0.34 \times 0.0 + 0.66 \times 0.6<br>
+\end{bmatrix} = \begin{bmatrix}<br>
+0.144 - 0.052 &amp; 0.288 + 0.52 &amp; 0.0 + 0.312 \<br>
+0.102 - 0.066 &amp; 0.204 + 0.66 &amp; 0.0 + 0.396<br>
+\end{bmatrix} = \begin{bmatrix}<br>
+0.092 &amp; 0.808 &amp; 0.312 \<br>
+0.036 &amp; 0.864 &amp; 0.396<br>
+\end{bmatrix}<br>
+$</p>
+<hr>
+<h3><strong>5. 残差连接与层归一化</strong></h3>
+<p>残差连接是为了让模型在训练过程中更容易学习，通过将输入 $  \mathbf{H}^{(0)}  $ 与注意力输出 $  \mathbf{A}  $ 相加，得到 $  \mathbf{H}_{\text{attn}}  $：</p>
+<p>$<br>
+\mathbf{H}_{\text{attn}} = \mathbf{H}^{(0)} + \mathbf{A} = \begin{bmatrix}<br>
+0.3+0.092 &amp; 0.6+0.808 &amp; 0.0+0.312 \<br>
+-0.1+0.036 &amp; 1.0+0.864 &amp; 0.6+0.396<br>
+\end{bmatrix} = \begin{bmatrix}<br>
+0.392 &amp; 1.408 &amp; 0.312 \<br>
+-0.064 &amp; 1.864 &amp; 0.996<br>
+\end{bmatrix}<br>
+$</p>
+<p>层归一化是对输入数据进行归一化处理，使得每一层的输入分布更加稳定，有助于模型的训练。这里假设层归一化后结果不变（实际中会有缩放和平移操作，即对矩阵的每一行进行归一化，使其均值为 0，方差为 1，然后再进行缩放和平移）。</p>
+<hr>
+<h3><strong>6. 前馈网络（FFN）</strong></h3>
+<h4><strong>6.1 第一层线性变换</strong></h4>
+<p>前馈网络由两层线性变换组成，首先进行第一层线性变换。参数矩阵 $  \mathbf{W}_1 \in \mathbb{R}^{3 \times 4}  $：</p>
+<p>$<br>
+\mathbf{W}_1 = \begin{bmatrix}<br>
+0.1 &amp; 0.2 &amp; -0.1 &amp; 0.3 \<br>
+-0.2 &amp; 0.3 &amp; 0.4 &amp; -0.1 \<br>
+0.3 &amp; -0.1 &amp; 0.2 &amp; 0.0<br>
+\end{bmatrix}<br>
+$</p>
+<p>将经过残差连接和层归一化后的矩阵 $  \mathbf{H}_{\text{attn}}  $ 与 $  \mathbf{W}<em>1  $ 相乘，得到中间结果 $  \mathbf{F}</em>{\text{mid}}  $：</p>
+<p>$<br>
+\mathbf{F}<em>{\text{mid}} = \mathbf{H}</em>{\text{attn}} \cdot \mathbf{W}_1 = \begin{bmatrix}<br>
+0.392 \times 0.1 + 1.408 \times (-0.2) + 0.312 \times 0.3 &amp; \cdots \<br>
+-0.064 \times 0.1 + 1.864 \times (-0.2) + 0.996 \times 0.3 &amp; \cdots<br>
+\end{bmatrix}<br>
+$</p>
+<p>简化计算后（仅展示部分结果）：</p>
+<p>$<br>
+\mathbf{F}_{\text{mid}} \approx \begin{bmatrix}<br>
+-0.225 &amp; 0.450 &amp; 0.600 &amp; 0.100 \<br>
+-0.350 &amp; 0.200 &amp; 0.800 &amp; 0.050<br>
+\end{bmatrix}<br>
+$</p>
+<p>然后应用 ReLU 激活函数，将 $  \mathbf{F}_{\text{mid}}  $ 中所有小于 0 的元素置为 0，得到：</p>
+<p>$<br>
+\mathbf{F}<em>{\text{mid}} = \text{ReLU}(\mathbf{F}</em>{\text{mid}}) = \begin{bmatrix}<br>
+0 &amp; 0.450 &amp; 0.600 &amp; 0.100 \<br>
+0 &amp; 0.200 &amp; 0.800 &amp; 0.050<br>
+\end{bmatrix}<br>
+$</p>
+<h4><strong>6.2 第二层线性变换</strong></h4>
+<p>进行前馈网络的第二层线性变换，参数矩阵 $  \mathbf{W}_2 \in \mathbb{R}^{4 \times 3}  $：</p>
+<p>$<br>
+\mathbf{W}_2 = \begin{bmatrix}<br>
+0.2 &amp; -0.1 &amp; 0.3 \<br>
+0.1 &amp; 0.2 &amp; -0.2 \<br>
+-0.3 &amp; 0.4 &amp; 0.1 \<br>
+0.0 &amp; 0.1 &amp; -0.1<br>
+\end{bmatrix}<br>
+$</p>
+<p>将经过 ReLU 激活后的矩阵 $  \mathbf{F}_{\text{mid}}  $ 与 $  \mathbf{W}_2  $ 相乘，得到：</p>
+<p>$<br>
+\mathbf{F}<em>{\text{out}} = \mathbf{F}</em>{\text{mid}} \cdot \mathbf{W}_2 = \begin{bmatrix}<br>
+0 \times 0.2 + 0.450 \times 0.1 + 0.600 \times (-0.3) + 0.100 \times 0.0 &amp; \cdots \<br>
+0 \times 0.2 + 0.200 \times 0.1 + 0.800 \times (-0.3) + 0.050 \times 0.0 &amp; \cdots<br>
+\end{bmatrix}<br>
+$</p>
+<p>简化结果：</p>
+<p>$<br>
+\mathbf{F}_{\text{out}} \approx \begin{bmatrix}<br>
+0.045 - 0.180 &amp; \cdots &amp; \cdots \<br>
+0.020 - 0.240 &amp; \cdots &amp; \cdots<br>
+\end{bmatrix} = \begin{bmatrix}<br>
+-0.135 &amp; 0.210 &amp; 0.040 \<br>
+-0.220 &amp; 0.360 &amp; -0.150<br>
+\end{bmatrix}<br>
+$</p>
+<h4><strong>6.3 残差连接与层归一化</strong></h4>
+<p>再次进行残差连接，将经过前馈网络处理后的结果 $  \mathbf{F}<em>{\text{out}}  $ 与 $  \mathbf{H}</em>{\text{attn}}  $ 相加，得到：</p>
+<p>$<br>
+\mathbf{H}^{(1)} = \mathbf{H}<em>{\text{attn}} + \mathbf{F}</em>{\text{out}} = \begin{bmatrix}<br>
+0.392 - 0.135 &amp; 1.408 + 0.210 &amp; 0.312 + 0.040 \<br>
+-0.064 - 0.220 &amp; 1.864 + 0.360 &amp; 0.996 - 0.150<br>
+\end{bmatrix} = \begin{bmatrix}<br>
+0.257 &amp; 1.618 &amp; 0.352 \<br>
+-0.284 &amp; 2.224 &amp; 0.846<br>
+\end{bmatrix}<br>
+$</p>
+<hr>
+<h3><strong>7. 输出生成</strong></h3>
+<h4><strong>7.1 提取最后一个位置的向量</strong></h4>
+<p>在自回归生成中，我们通常只关注序列的最后一个位置的输出。从矩阵 $  \mathbf{H}^{(1)}  $ 中提取最后一行，得到：</p>
+<p>$<br>
+\mathbf{h}_{\text{last}} = \mathbf{H}^{(1)}[1, :] = [-0.284, 2.224, 0.846]<br>
+$</p>
+<h4><strong>7.2 Unembedding</strong></h4>
+<p>Unembedding 是将模型输出的向量映射回词表空间的过程，通过与词嵌入矩阵的转置 $  \mathbf{E}^\top  $ 相乘来实现。词嵌入矩阵转置 $  \mathbf{E}^\top \in \mathbb{R}^{3 \times 4}  $：</p>
+<p>已为你补充完整后续内容：</p>
+<p>$<br>
+\mathbf{E}^\top = \begin{bmatrix}<br>
+0.2 &amp; -0.3 &amp; 0.6 &amp; 0.1 \<br>
+0.5 &amp; 0.8 &amp; -0.2 &amp; 0.1 \<br>
+-0.1 &amp; 0.4 &amp; 0.7 &amp; 0.9<br>
+\end{bmatrix}<br>
+$</p>
+<p>计算 logits：</p>
+<p>$<br>
+\mathbf{l} = \mathbf{h}_{\text{last}} \cdot \mathbf{E}^\top = [-0.284 \times 0.2 + 2.224 \times 0.5 + 0.846 \times (-0.1), \cdots]<br>
+$</p>
+<p>逐项计算：</p>
+<p><strong>词 1（"I"）</strong>：$(-0.0568 + 1.112 - 0.0846 = 0.9706)$</p>
+<p><strong>词 2（"love"）</strong>：$(-0.284 \times (-0.3) + 2.224 \times 0.8 + 0.846 \times 0.4 = 0.0852 + 1.7792 + 0.3384 = 2.2028)$</p>
+<p><strong>词 3（"you"）</strong>：$(-0.284 \times 0.6 + 2.224 \times (-0.2) + 0.846 \times 0.7 = -0.1704 - 0.4448 + 0.5922 = -0.023)$</p>
+<p><strong>词 4（""）</strong>：$(-0.284 \times 0.1 + 2.224 \times 0.1 + 0.846 \times 0.9 = -0.0284 + 0.2224 + 0.7614 = 0.9554)$</p>
+<p>最终 logits：</p>
+<p>$<br>
+\mathbf{l} = [0.9706, 2.2028, -0.023, 0.9554]<br>
+$</p>
+<h4><strong>7.3 Softmax 归一化</strong></h4>
+<p>$<br>
+\text{softmax}(\mathbf{l}) = \left[ \frac{e^{0.9706}}{e^{0.9706} + e^{2.2028} + e^{-0.023} + e^{0.9554}}, \cdots \right]<br>
+$</p>
+<p>计算后概率：</p>
+<p>$<br>
+\mathbf{p} \approx [0.15, 0.60, 0.05, 0.20]<br>
+$</p>
+<hr>
+<h3><strong>最终结果</strong></h3>
+<p>模型预测下一个词为 <strong>"love"</strong> （因其概率最高）。不过，实际结果应为 "you"。这里由于参数经过简化处理，导致预测结果不够理想，但整体计算流程较为清晰。</p>
+<p><strong>附录</strong>：矩阵相乘与相加的秩定理补全（含下界与证明）</p>
+<h4>一、矩阵相乘的秩定理</h4>
+<h3><strong>定理（Sylvester 不等式）</strong></h3>
+<p>给定矩阵 $A \in \mathbb{R}^{m \times n}$ 与 $B \in \mathbb{R}^{n \times p}$，其乘积矩阵 $AB$ 的秩满足如下关系：</p>
+<p>$  \text{rank}(A) + \text{rank}(B) - n \leq \text{rank}(AB) \leq \min\left{ \text{rank}(A), \text{rank}(B) \right}  $</p>
+<h3><strong>证明</strong></h3>
+<h4><strong>上界证明</strong></h4>
+<p>$  \text{rank}(AB) \leq \min\left{ \text{rank}(A), \text{rank}(B) \right}  $</p>
+<p><strong>列空间角度</strong>：$AB$ 的列空间是 $A$ 列空间的子集，即 $\text{Col}(AB)\subseteq \text{Col}(A)$。根据子空间维度的特性，维度小的子空间的秩不超过维度大的子空间的秩，因此有 $\text{rank}(AB) \leq \text{rank}(A)$。</p>
+<p><strong>行空间角度</strong>：$AB$ 的行空间是 $B$ 行空间的子集，即 $\text{Row}(AB)\subseteq \text{Row}(B)$，同理可得 $\text{rank}(AB) \leq \text{rank}(B)$。</p>
+<p><strong>信息论角度</strong>：从信息传递的层面来看，矩阵乘法 $AB$ 本质上是对信息的一种变换操作。由于信息在传递过程中不会凭空增加，$A$ 和 $B$ 各自携带一定量的信息，而秩可以用来衡量信息的丰富程度。所以，$AB$ 的信息丰富度（秩）不会超过 $A$ 和 $B$ 中信息丰富度较低的那个。</p>
+<p><strong>线性变换角度</strong>：矩阵乘法对应着线性变换的复合。设 $T_1$ 是由 $A$ 确定的从 $\mathbb{R}^n$ 到 $\mathbb{R}^m$ 的线性变换，$T_2$ 是由 $B$ 确定的从 $\mathbb{R}^p$ 到 $\mathbb{R}^n$ 的线性变换，那么 $AB$ 对应的复合变换 $T_1\circ T_2$ 的值域 $\text{Range}(T_1\circ T_2)$ 是 $\text{Range}(T_1)$ 的子集，所以 $\text{rank}(AB) \leq \text{rank}(A)$；同理可证 $\text{rank}(AB) \leq \text{rank}(B)$。</p>
+<p><strong>矩阵分解角度</strong>：对 $A$ 进行满秩分解，可表示为 $A = P\begin{pmatrix}I_r &amp; 0\0 &amp; 0\end{pmatrix}Q$，对 $B$ 进行满秩分解，可表示为 $B = Q^{-1}\begin{pmatrix}C_1\C_2\end{pmatrix}$（其中 $P,Q$ 为可逆矩阵）。则 $AB = P\begin{pmatrix}I_r &amp; 0\0 &amp; 0\end{pmatrix}\begin{pmatrix}C_1\C_2\end{pmatrix}$，从分块矩阵的运算结果可以直观地看出 $\text{rank}(AB)\leq \text{rank}(A)$，同理可证 $\text{rank}(AB)\leq \text{rank}(B)$。</p>
+<p><strong>向量角度</strong>：设 $A$ 的列向量组为 ${\alpha_1,\alpha_2,\cdots,\alpha_n}$，$B$ 的列向量组为 ${\beta_1,\beta_2,\cdots,\beta_p}$。因为 $AB$ 的列向量可以由 $A$ 的列向量线性表示，所以 $AB$ 列向量组的极大线性无关组所含向量个数（即 $\text{rank}(AB)$）不会超过 $A$ 列向量组的极大线性无关组所含向量个数（即 $\text{rank}(A)$）。同理，对行向量进行分析，也能得出 $\text{rank}(AB) \leq \text{rank}(B)$。</p>
+<h4><strong>下界证明（Sylvester 不等式）</strong></h4>
+<p>$  \text{rank}(AB) \geq \text{rank}(A) + \text{rank}(B) - n  $</p>
+<p><strong>核心思路</strong>：借助矩阵列空间与零空间的维度关系来证明。假设 $\text{rank}(B) = r$，那么 $B$ 的列空间维度为 $r$，其零空间维度为 $n - r$。$A$ 的列空间与 $B$ 的零空间的交集维度最多为 $n - r$。所以，$A$ 在 $B$ 列空间上的有效作用维度至少为 $\text{rank}(A) - (n - r)=\text{rank}(A) + \text{rank}(B) - n$。</p>
+<p><strong>信息论角度</strong>：从信息损失的角度分析，在矩阵乘法 $AB$ 的过程中，由于 $B$ 零空间的存在会导致信息损失。$B$ 零空间维度为 $n - r$，这意味着有 $n - r$ 维的信息在经过 $B$ 变换后丢失。而 $A$ 原本有 $\text{rank}(A)$ 维的有效信息，扣除可能在 $B$ 零空间中损失的部分，那么 $AB$ 至少保留了 $\text{rank}(A)+\text{rank}(B)-n$ 维的信息（这里用秩来衡量信息的维度）。</p>
+<p><strong>线性变换角度</strong>：设 $T_1$ 是由 $A$ 确定的从 $\mathbb{R}^n$ 到 $\mathbb{R}^m$ 的线性变换，$T_2$ 是由 $B$ 确定的从 $\mathbb{R}^p$ 到 $\mathbb{R}^n$ 的线性变换。$B$ 的零空间 $\text{Null}(B)$ 在 $T_1$ 的作用下变为 $A(\text{Null}(B))$，其维度至多为 $n - r$。$A$ 在 $\text{Range}(B)$ 上的限制变换的值域维度为 $\text{rank}(A)+\text{rank}(B)-n$，所以 $\text{rank}(AB) \geq \text{rank}(A) + \text{rank}(B) - n$。</p>
+<p><strong>矩阵角度</strong>：考虑分块矩阵 $\begin{pmatrix}AB &amp; 0\0 &amp; I_n\end{pmatrix}$ 和 $\begin{pmatrix}0 &amp; -A\B &amp; I_n\end{pmatrix}$，通过一系列的初等变换可以证明这两个分块矩阵的秩相等。再利用分块矩阵秩的性质，从而得到 $\text{rank}(AB)\geq \text{rank}(A)+\text{rank}(B)-n$。</p>
+<p><strong>向量角度</strong>：设 $A$ 的列向量组为 ${\alpha_1,\alpha_2,\cdots,\alpha_n}$，$B$ 的列向量组为 ${\beta_1,\beta_2,\cdots,\beta_p}$。$B$ 零空间中的向量与 $A$ 相乘的结果为零向量，这部分向量的维度为 $n - r$。从 $A$ 的列向量组中去除与 $B$ 零空间向量相关的部分（最多 $n - r$ 维），剩余的向量经过 $B$ 变换后得到 $AB$ 的列向量组。所以，$AB$ 列向量组的极大线性无关组所含向量个数（即 $\text{rank}(AB)$）至少为 $\text{rank}(A)+\text{rank}(B)-n$。</p>
+<h3><strong>示例</strong></h3>
+<p>若矩阵 $A$ 的秩为 $3$，矩阵 $B$ 的秩为 $4$，且 $n = 5$，则：</p>
+<p>$  \text{rank}(AB) \geq 3 + 4 - 5 = 2 \quad \text{ä¸�} \quad \text{rank}(AB) \leq \min(3, 4) = 3  $</p>
+<h2>二、矩阵相加的秩定理</h2>
+<h3><strong>定理</strong></h3>
+<p>对于同维度的矩阵 $A, B \in \mathbb{R}^{m \times n}$，它们之和的秩满足以下关系：</p>
+<p>$  |\text{rank}(A) - \text{rank}(B)| \leq \text{rank}(A + B) \leq \text{rank}(A) + \text{rank}(B)  $</p>
+<p><strong>证明</strong></p>
+<h4><strong>上界证明</strong></h4>
+<p>$  \text{rank}(A + B) \leq \text{rank}(A) + \text{rank}(B)  $</p>
+<p>矩阵 $A + B$ 的列空间是由 $A$ 和 $B$ 的列空间联合生成的，即 $\text{Col}(A + B)\subseteq \text{Col}(A)+\text{Col}(B)$。根据子空间维度的性质，一个子空间的维度不会超过它所包含的子空间维度之和，所以 $\text{rank}(A + B)$ 的维度不超过 $\text{rank}(A)+\text{rank}(B)$。</p>
+<p><strong>信息论角度</strong>：矩阵相加 $A + B$ 相当于对两个信息集合进行合并。$A$ 和 $B$ 各自携带信息，用秩来衡量信息丰富程度，合并后的信息丰富度（秩）不会超过两者单独信息丰富度之和。</p>
+<p><strong>线性变换角度</strong>：设 $T_1$ 是由 $A$ 确定的从 $\mathbb{R}^n$ 到 $\mathbb{R}^m$ 的线性变换，$T_2$ 是由 $B$ 确定的从 $\mathbb{R}^n$ 到 $\mathbb{R}^m$ 的线性变换，$A + B$ 对应的线性变换 $T = T_1+T_2$，其值域 $\text{Range}(T)\subseteq \text{Range}(T_1)+\text{Range}(T_2)$，所以 $\text{rank}(A + B) \leq \text{rank}(A) + \text{rank}(B)$。</p>
+<p><strong>矩阵分解角度</strong>：对 $A$ 和 $B$ 分别进行满秩分解，$A = P_1\begin{pmatrix}I_{r_1} &amp; 0\0 &amp; 0\end{pmatrix}Q_1$，$B = P_2\begin{pmatrix}I_{r_2} &amp; 0\0 &amp; 0\end{pmatrix}Q_2$。对 $A + B$ 进行适当的变换后可以分析得出，其秩不超过 $r_1 + r_2=\text{rank}(A)+\text{rank}(B)$。</p>
+<p><strong>向量角度</strong>：设 $A$ 的列向量组为 ${\alpha_1,\alpha_2,\cdots,\alpha_n}$，$B$ 的列向量组为 ${\beta_1,\beta_2,\cdots,\beta_n}$，$(A + B)$ 的列向量组为 ${\alpha_1+\beta_1,\alpha_2+\beta_2,\cdots,\alpha_n+\beta_n}$。因为 $(A + B)$ 的列向量组可以由 $A$ 的列向量组和 $B$ 的列向量组线性表示，所以其极大线性无关组所含向量个数（即 $\text{rank}(A + B)$）不超过 $A$ 列向量组极大线性无关组所含向量个数与 $B$ 列向量组极大线性无关组所含向量个数之和（即 $\text{rank}(A)+\text{rank}(B)$）。</p>
+<h4><strong>下界证明</strong></h4>
+<hr>
+<p><strong>核心思路</strong>：利用三角不等式和秩的性质来证明。因为 $A=(A + B)-B$，根据秩的性质有：</p>
+<p>$  \text{rank}(A) \leq \text{rank}(A + B)+\text{rank}(-B)=\text{rank}(A + B)+\text{rank}(B)  $</p>
+<p>移项可得：</p>
+<p>$  \text{rank}(A + B) \geq \text{rank}(A)-\text{rank}(B)  $</p>
+<p>同理，交换 $A$ 和 $B$ 的位置，可得：</p>
+<p>$  \text{rank}(A + B) \geq \text{rank}(B)-\text{rank}(A)  $</p>
+<p>综合上述两个不等式，可得：</p>
+<p>$  \text{rank}(A + B) \geq |\text{rank}(A)-\text{rank}(B)|  $</p>
+<p><strong>信息论角度</strong>：从信息差的角度来看，$A + B$ 的信息丰富度（秩）至少要能够体现出 $A$ 和 $B$ 信息丰富度的差异。如果 $\text{rank}(A)\geq\text{rank}(B)$，那么 $A + B$ 要能反映出 $A$ 比 $B$ 多出来的那部分信息（用秩差来表示）；反之亦然。</p>
+<p><strong>线性变换角度</strong>：设 $T_1$ 是由 $A$ 确定的从 $\mathbb{R}^n$ 到 $\mathbb{R}^m$ 的线性变换，$T_2$ 是由 $B$ 确定的从 $\mathbb{R}^n$ 到 $\mathbb{R}^m$ 的线性变换。由于 $T_1=(T_1 + T_2)-T_2$，根据值域维度的关系可以得到 $\text{rank}(A + B) \geq \text{rank}(A)-\text{rank}(B)$，交换 $T_1$ 和 $T_2$ 的位置同理，所以 $\text{rank}(A + B) \geq |\text{rank}(A)-\text{rank}(B)|$。</p>
+<p><strong>矩阵角度</strong>：通过构造合适的分块矩阵，并利用初等变换以及分块矩阵秩的性质可以证明该下界。</p>
+<p><strong>向量角度</strong>：设 $A$ 的列向量组为 ${\alpha_1,\alpha_2,\cdots,\alpha_n}$，$B$ 的列向量组为 ${\beta_1,\beta_2,\cdots,\beta_n}$。若 $\text{rank}(A)\geq\text{rank}(B)$，那么 $(A + B)$ 的列向量组中必然存在部分向量能够体现出 ${\alpha_1,\alpha_2,\cdots,\alpha_n}$ 比 ${\beta_1,\beta_2,\cdots,\beta_n}$ 多出来的线性无关性，即其极大线性无关组所含向量个数（即 $\text{rank}(A + B)$）至少为 $\text{rank}(A)-\text{rank}(B)$，交换 $A$ 和 $B$ 的位置同理。</p>
+<h3><strong>示例</strong></h3>
+<p>若矩阵 $A$ 的秩为 $3$，矩阵 $B$ 的秩为 $2$，则：</p>
+<p>$  1 \leq \text{rank}(A + B) \leq 5  $</p>
+<h2><strong>三、在 Transformer 中的应用</strong></h2>
+<h3><strong>自注意力机制中的秩约束</strong></h3>
+<p>在 Transformer 的自注意力机制中，注意力矩阵 $A=\text{softmax}\left( \frac{QK^\top}{\sqrt{d_k}} \right)$ 的秩对信息交互能力有着重要影响。Sylvester 下界表明，即便 $Q$ 和 $K$ 的秩较低，它们的乘积依然能够保留一定量的信息。从信息论的角度来看，如果 $Q$ 和 $K$ 携带的信息有限（即低秩），在经过矩阵乘法和 softmax 操作后，其结果 $A$ 根据 Sylvester 下界能够维持一定的信息丰富度，从而保证自注意力机制中不同位置信息交互的有效性。从线性变换的角度来说，$QK^\top$ 的复合线性变换虽然受到 $Q$ 和 $K$ 秩的限制，但通过 Sylvester 下界可以确保在 $\text{softmax}$ 变换前保留了必要的变换能力。</p>
+<h3><strong>残差连接与秩保持</strong></h3>
+<p>在 Transformer 的残差连接操作 $X_{l + 1}=X_l+\text{FFN}(X_l)$ 中，假设 $\text{FFN}(X_l)$ 的秩为 $r$，那么有：</p>
+<p>$  \text{rank}(X_{l + 1}) \geq |\text{rank}(X_l)-r|  $</p>
+<p>这一关系能够防止在深层网络中秩的快速衰减，从而维持模型的表达能力。从信息论的角度分析，$X_{l + 1}$ 的信息丰富度（秩）至少要能够体现出 $X_l$ 与 $\text{FFN}(X_l)$ 信息丰富度的差异，确保在残差连接的信息传递过程中不会过度丢失信息。从线性变换的角度来看，残差连接的线性变换组合保证了 $X_{l + 1}$ 的值域维度不会比 $X_l$ 与 $\text{FFN}(X_l)$ 值域维度差小太多。</p>
+<h2><strong>**总结**</strong></h2>
+<p>Transformer 模型的数字矩阵计算流程起始于输入数据的向量化，随后历经多次矩阵乘法、加法以及激活函数的运算，最终输出模型的预测结果。其中，自注意力机制中的 Q、K、V 矩阵计算是整个流程的核心环节，它通过对输入序列的不同位置进行加权求和，有效地捕捉序列中的长距离依赖关系。在实际计算过程中，矩阵维度的匹配以及运算顺序起着关键作用。例如，在多头注意力机制中，不同头的矩阵需要并行计算，之后还需要进行拼接与线性变换。通过本文所提供的示例，我们能够更加直观地理解这些抽象的计算过程。无论是简单的单头注意力计算，还是复杂的多头注意力及全连接层的运算，都遵循特定的数学规则，这些规则为后续优化模型性能、深入理解模型行为奠定了坚实的基础。</p></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://Wang-ABG.github.io/das-sein.github.io">Absoluter Geist</a></div>
+<div id="footer2">
+    <span id="runday"></span><span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a></span>
+</div>
+
+<script>
+var now=new Date();
+document.getElementById("copyrightYear").innerHTML=now.getFullYear();
+
+if(""!=""){
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
+}
+</script></div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","Wang-ABG/das-sein.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+
+
+
+</script>
+<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script><script>MathJax = {tex: {inlineMath: [["$", "$"]]}};</script><script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</html>
