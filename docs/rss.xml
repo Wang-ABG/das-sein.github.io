@@ -1,27 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Absoluter Geist</title><link>https://Wang-ABG.github.io/das-sein.github.io</link><description>纵使时光百年遥，将感我心在咫尺。</description><copyright>Absoluter Geist</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/101440642?s=400&amp;u=64734a1b6d25eddc0ac7e0729729e228193de187&amp;v=4</url><title>avatar</title><link>https://Wang-ABG.github.io/das-sein.github.io</link></image><lastBuildDate>Sat, 05 Apr 2025 20:12:42 +0000</lastBuildDate><managingEditor>Absoluter Geist</managingEditor><ttl>60</ttl><webMaster>Absoluter Geist</webMaster><item><title>Transformer</title><link>https://Wang-ABG.github.io/das-sein.github.io/post/Transformer.html</link><description>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Absoluter Geist</title><link>https://Wang-ABG.github.io/das-sein.github.io</link><description>纵使时光百年遥，将感我心在咫尺。</description><copyright>Absoluter Geist</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://avatars.githubusercontent.com/u/101440642?s=400&amp;u=64734a1b6d25eddc0ac7e0729729e228193de187&amp;v=4</url><title>avatar</title><link>https://Wang-ABG.github.io/das-sein.github.io</link></image><lastBuildDate>Sun, 06 Apr 2025 03:10:23 +0000</lastBuildDate><managingEditor>Absoluter Geist</managingEditor><ttl>60</ttl><webMaster>Absoluter Geist</webMaster><item><title>Transformer</title><link>https://Wang-ABG.github.io/das-sein.github.io/post/Transformer.html</link><description>### **一、Transformer 统一推理公式**
 
----
+`Gmeek-html&lt;img src='https://i.stardots.io/math/svg_1743906371623.png'&gt;`
 
-### **一、Transformer 统一推理公式**
-\[
-Y = \text{softmax}\left(
-\underbrace{
-\bigcirc_{l=1}^N \left[ \text{LN} \circ \left( I + \text{FFN} \circ \text{LN} \circ \left( I + \text{MultiHead} \right) \right) \right]
-}_{\text{编码器}}
-\cdot
-\underbrace{
-\bigcirc_{l=1}^M \left[ \text{MaskedAttn} \triangleright \text{Enc-DecAttn} \triangleright \text{FFN} \right]
-}_{\text{解码器}}
-(X) \cdot W_o
-\right)
-\]
 
----
 
 ### **二、符号系统与算子定义**
-1. **函数组合算子** \( \bigcirc \):  
-   - 表示多层的堆叠，例如 \( \bigcirc_{l=1}^N f_l = f_N \circ \cdots \circ f_1 \)。</description><guid isPermaLink="true">https://Wang-ABG.github.io/das-sein.github.io/post/Transformer.html</guid><pubDate>Sat, 05 Apr 2025 20:12:23 +0000</pubDate></item><item><title>【天到夜半起悲吟】87版红楼梦配乐（转载）</title><link>https://Wang-ABG.github.io/das-sein.github.io/post/%E3%80%90-tian-dao-ye-ban-qi-bei-yin-%E3%80%9187-ban-hong-lou-meng-pei-le-%EF%BC%88-zhuan-zai-%EF%BC%89.html</link><description>`Gmeek-html&lt;iframe src='https://player.bilibili.com/player.html?isOutside=true&amp;bvid=BV1cM2rYkE4q' scrolling='no' border='0' frameborder='no' framespacing='0' allowfullscreen='true' width='100%' height='460px'&gt;&lt;/iframe&gt;`
+
+**函数组合算子** $\bigcirc$:
+
+表示多层的堆叠，例如 $\bigcirc_{l=1}^N f_l = f_N \circ \cdots \circ f_1$。</description><guid isPermaLink="true">https://Wang-ABG.github.io/das-sein.github.io/post/Transformer.html</guid><pubDate>Sat, 05 Apr 2025 20:12:23 +0000</pubDate></item><item><title>【天到夜半起悲吟】87版红楼梦配乐（转载）</title><link>https://Wang-ABG.github.io/das-sein.github.io/post/%E3%80%90-tian-dao-ye-ban-qi-bei-yin-%E3%80%9187-ban-hong-lou-meng-pei-le-%EF%BC%88-zhuan-zai-%EF%BC%89.html</link><description>`Gmeek-html&lt;iframe src='https://player.bilibili.com/player.html?isOutside=true&amp;bvid=BV1cM2rYkE4q' scrolling='no' border='0' frameborder='no' framespacing='0' allowfullscreen='true' width='100%' height='460px'&gt;&lt;/iframe&gt;`
 
 
 。</description><guid isPermaLink="true">https://Wang-ABG.github.io/das-sein.github.io/post/%E3%80%90-tian-dao-ye-ban-qi-bei-yin-%E3%80%9187-ban-hong-lou-meng-pei-le-%EF%BC%88-zhuan-zai-%EF%BC%89.html</guid><pubDate>Sat, 05 Apr 2025 17:19:32 +0000</pubDate></item><item><title>【反殖民漫谈】殖民时代的延续：论在日东南亚劳工与日本左派的国际主义前景（笔记）</title><link>https://Wang-ABG.github.io/das-sein.github.io/post/%E3%80%90-fan-zhi-min-man-tan-%E3%80%91-zhi-min-shi-dai-de-yan-xu-%EF%BC%9A-lun-zai-ri-dong-nan-ya-lao-gong-yu-ri-ben-zuo-pai-de-guo-ji-zhu-yi-qian-jing-%EF%BC%88-bi-ji-%EF%BC%89.html</link><description>`Gmeek-html&lt;iframe src='https://player.bilibili.com/player.html?isOutside=true&amp;bvid=BV1Z2oyYBEM9' scrolling='no' border='0' frameborder='no' framespacing='0' allowfullscreen='true' width='100%' height='460px'&gt;&lt;/iframe&gt;`

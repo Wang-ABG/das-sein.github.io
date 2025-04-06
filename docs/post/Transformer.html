@@ -10,53 +10,29 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="
+<meta name="description" content="### **一、Transformer 统一推理公式**
 
----
+`Gmeek-html<img src='https://i.stardots.io/math/svg_1743906371623.png'>`
 
-### **一、Transformer 统一推理公式**
-\[
-Y = \text{softmax}\left(
-\underbrace{
-\bigcirc_{l=1}^N \left[ \text{LN} \circ \left( I + \text{FFN} \circ \text{LN} \circ \left( I + \text{MultiHead} \right) \right) \right]
-}_{\text{编码器}}
-\cdot
-\underbrace{
-\bigcirc_{l=1}^M \left[ \text{MaskedAttn} \triangleright \text{Enc-DecAttn} \triangleright \text{FFN} \right]
-}_{\text{解码器}}
-(X) \cdot W_o
-\right)
-\]
 
----
 
 ### **二、符号系统与算子定义**
-1. **函数组合算子** \( \bigcirc \):  
-   - 表示多层的堆叠，例如 \( \bigcirc_{l=1}^N f_l = f_N \circ \cdots \circ f_1 \)。">
+
+**函数组合算子** $\bigcirc$:
+
+表示多层的堆叠，例如 $\bigcirc_{l=1}^N f_l = f_N \circ \cdots \circ f_1$。">
 <meta property="og:title" content="Transformer">
-<meta property="og:description" content="
+<meta property="og:description" content="### **一、Transformer 统一推理公式**
 
----
+`Gmeek-html<img src='https://i.stardots.io/math/svg_1743906371623.png'>`
 
-### **一、Transformer 统一推理公式**
-\[
-Y = \text{softmax}\left(
-\underbrace{
-\bigcirc_{l=1}^N \left[ \text{LN} \circ \left( I + \text{FFN} \circ \text{LN} \circ \left( I + \text{MultiHead} \right) \right) \right]
-}_{\text{编码器}}
-\cdot
-\underbrace{
-\bigcirc_{l=1}^M \left[ \text{MaskedAttn} \triangleright \text{Enc-DecAttn} \triangleright \text{FFN} \right]
-}_{\text{解码器}}
-(X) \cdot W_o
-\right)
-\]
 
----
 
 ### **二、符号系统与算子定义**
-1. **函数组合算子** \( \bigcirc \):  
-   - 表示多层的堆叠，例如 \( \bigcirc_{l=1}^N f_l = f_N \circ \cdots \circ f_1 \)。">
+
+**函数组合算子** $\bigcirc$:
+
+表示多层的堆叠，例如 $\bigcirc_{l=1}^N f_l = f_N \circ \cdots \circ f_1$。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://Wang-ABG.github.io/das-sein.github.io/post/Transformer.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/u/101440642?s=400&u=64734a1b6d25eddc0ac7e0729729e228193de187&v=4">
@@ -111,176 +87,59 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><hr>
-<h3><strong>一、Transformer 统一推理公式</strong></h3>
-<p>[<br>
-Y = \text{softmax}\left(<br>
-\underbrace{<br>
-\bigcirc_{l=1}^N \left[ \text{LN} \circ \left( I + \text{FFN} \circ \text{LN} \circ \left( I + \text{MultiHead} \right) \right) \right]<br>
-}<em>{\text{编码器}}<br>
-\cdot<br>
-\underbrace{<br>
-\bigcirc</em>{l=1}^M \left[ \text{MaskedAttn} \triangleright \text{Enc-DecAttn} \triangleright \text{FFN} \right]<br>
-}_{\text{解码器}}<br>
-(X) \cdot W_o<br>
-\right)<br>
-]</p>
-<hr>
+<div class="markdown-body" id="postBody"><h3><strong>一、Transformer 统一推理公式</strong></h3>
+<p><img src="https://i.stardots.io/math/svg_1743906371623.png"></p>
 <h3><strong>二、符号系统与算子定义</strong></h3>
-<ol>
-<li>
-<p><strong>函数组合算子</strong> ( \bigcirc ):</p>
-<ul>
-<li>表示多层的堆叠，例如 ( \bigcirc_{l=1}^N f_l = f_N \circ \cdots \circ f_1 )。</li>
-</ul>
-</li>
-<li>
-<p><strong>残差连接</strong> ( I + f(x) ):</p>
-<ul>
-<li>恒等映射 ( I ) 与子层输出相加：( x + f(x) )，确保梯度稳定。</li>
-</ul>
-</li>
-<li>
-<p><strong>时序生成算子</strong> ( \triangleright ):</p>
-<ul>
-<li>解码器中自回归生成时，每一步依赖前序输出 ( Y_{&lt;t} )。</li>
-</ul>
-</li>
-</ol>
-<hr>
+<p><strong>函数组合算子</strong> $\bigcirc$:</p>
+<p>表示多层的堆叠，例如 $\bigcirc_{l=1}^N f_l = f_N \circ \cdots \circ f_1$。</p>
+<p><strong>残差连接</strong> $I + f(x)$:</p>
+<p>恒等映射 $I$ 与子层输出相加：$x + f(x)$，确保梯度稳定。</p>
+<p><strong>时序生成算子</strong> $\triangleright$:</p>
+<p>解码器中自回归生成时，每一步依赖前序输出 $Y_{&amp;lt;t}$。</p>
 <h3><strong>三、编码器结构解剖</strong></h3>
-<p>编码器由 ( N ) 个相同层堆叠，每层执行：<br>
-[<br>
-\text{Enc}_l(X) = \text{LN}\left( X + \text{FFN}\left( \text{LN}\left( X + \text{MultiHead}(X) \right) \right) \right)<br>
-]<br>
-<strong>分步解析</strong>：</p>
-<ol>
-<li>
-<p><strong>多头自注意力</strong>：<br>
-[<br>
-\text{MultiHead}(Q, K, V) = \text{concat}(\text{head}_1, \dots, \text{head}_h) W_O<br>
-]</p>
-<ul>
-<li>每个注意力头：<br>
-[<br>
-\text{head}_i = \text{softmax}\left( \frac{Q W_Q^{(i)} (K W_K^{(i)})^\top}{\sqrt{d_k}} \right) V W_V^{(i)}<br>
-]</li>
-<li>其中 ( Q = K = V = X )。</li>
-</ul>
-</li>
-<li>
-<p><strong>层归一化 (LN)</strong>：<br>
-[<br>
-\text{LN}(x) = \gamma \odot \frac{x - \mu}{\sigma} + \beta<br>
-]</p>
-<ul>
-<li>标准化输入并引入可学习参数 ( \gamma, \beta )。</li>
-</ul>
-</li>
-<li>
-<p><strong>前馈网络 (FFN)</strong>：<br>
-[<br>
-\text{FFN}(x) = \text{ReLU}(x W_1 + b_1) W_2 + b_2<br>
-]</p>
-<ul>
-<li>非线性变换提升模型容量。</li>
-</ul>
-</li>
-</ol>
-<hr>
-<h3><strong>四、解码器动力学解析</strong></h3>
-<p>解码器由 ( M ) 个层堆叠，每层执行：<br>
-[<br>
-\text{Dec}<em>l(Y</em>{&lt;t}) = \text{FFN}\left( \text{Enc-DecAttn}\left( \text{MaskedAttn}(Y_{&lt;t}), \text{Enc}(X) \right) \right)<br>
-]<br>
-<strong>核心操作</strong>：</p>
-<ol>
-<li>
-<p><strong>掩码自注意力 (MaskedAttn)</strong>:</p>
-<ul>
-<li>自注意力矩阵上三角部分设为 (-\infty)，确保当前位置仅依赖左侧信息：<br>
-[<br>
-\text{MaskedAttn}(Q, K, V) = \text{softmax}\left( \frac{Q K^\top + \text{Mask}}{\sqrt{d_k}} \right) V<br>
-]</li>
-</ul>
-</li>
-<li>
-<p><strong>编码-解码注意力 (Enc-DecAttn)</strong>:</p>
-<ul>
-<li>查询 ( Q ) 来自解码器，键值对 ( K, V ) 来自编码器输出：<br>
-[<br>
-\text{Enc-DecAttn}(Q, K, V) = \text{softmax}\left( \frac{Q \cdot K^\top}{\sqrt{d_k}} \right) V<br>
-]</li>
-</ul>
-</li>
-<li>
-<p><strong>时序生成</strong>：<br>
-自回归生成时，每一步输出 ( y_t ) 作为下一步输入，形成循环依赖：<br>
-[<br>
-Y_{t} = \text{Dec}(Y_{&lt;t}, \text{Enc}(X)) \cdot W_o<br>
-]</p>
-</li>
-</ol>
-<hr>
-<h3><strong>五、认知压缩：三大特性编码</strong></h3>
-<ol>
-<li>
+<p>编码器由 $N$ 个相同层堆叠，每层执行：</p>
+<p>$\text{Enc}_l(X) = \text{LN}\left( X + \text{FFN}\left( \text{LN}\left( X + \text{MultiHead}(X) \right) \right) \right)$</p>
+<p><strong>分步解析</strong>：</p>
 <p><strong>多头自注意力</strong>：</p>
-<ul>
-<li><strong>空间交互核</strong>：通过多组 ( W_Q, W_K, W_V ) 映射，捕获序列不同子空间的依赖关系。</li>
-</ul>
-</li>
-<li>
+<p>$\text{MultiHead}(Q, K, V) = \text{concat}(\text{head}_1, \dots, \text{head}_h) W_O$</p>
+<p>$\text{head}_i = \text{softmax}\left( \frac{Q W_Q^{(i)} (K W_K^{(i)})^\top}{\sqrt{d_k}} \right) V W_V^{(i)}$</p>
+<p>每个注意力头：</p>
+<p>其中 $Q = K = V = X$。</p>
+<p><strong>层归一化 (LN)</strong>：</p>
+<p>$\text{LN}(x) = \gamma \odot \frac{x - \mu}{\sigma} + \beta$</p>
+<p>标准化输入并引入可学习参数 $\gamma, \beta$。</p>
+<p><strong>前馈网络 (FFN)</strong>：</p>
+<p>$\text{FFN}(x) = \text{ReLU}(x W_1 + b_1) W_2 + b_2$</p>
+<p>非线性变换提升模型容量。</p>
+<h3><strong>四、解码器动力学解析</strong></h3>
+<p>解码器由 $M$ 个层堆叠，每层执行：</p>
+<p><img src="https://i.stardots.io/math/math2025-04-06 11-04-47.png"></p>
+<p><strong>核心操作</strong>：</p>
+<p><strong>掩码自注意力 (MaskedAttn)</strong>:</p>
+<p>$\text{MaskedAttn}(Q, K, V) = \text{softmax}\left( \frac{Q K^\top + \text{Mask}}{\sqrt{d_k}} \right) V$</p>
+<p>自注意力矩阵上三角部分设为 $-\infty$，确保当前位置仅依赖左侧信息：</p>
+<p><strong>编码 - 解码注意力 (Enc-DecAttn)</strong>:</p>
+<p>$\text{Enc-DecAttn}(Q, K, V) = \text{softmax}\left( \frac{Q \cdot K^\top}{\sqrt{d_k}} \right) V$</p>
+<p>查询 $Q$ 来自解码器，键值对 $K, V$ 来自编码器输出：</p>
+<p><strong>时序生成</strong>：自回归生成时，每一步输出 $y_t$ 作为下一步输入，形成循环依赖：</p>
+<p>$Y_{t} = \text{Dec}(Y_{&amp;lt;t}, \text{Enc}(X)) \cdot W_o$</p>
+<h3><strong>五、认知压缩：三大特性编码</strong></h3>
+<p><strong>多头自注意力</strong>：</p>
+<p><strong>空间交互核</strong>：通过多组 $W_Q, W_K, W_V$ 映射，捕获序列不同子空间的依赖关系。</p>
 <p><strong>残差学习</strong>：</p>
-<ul>
-<li><strong>拓扑保序性</strong>：残差连接 ( I + f(x) ) 确保深层网络可优化，避免梯度消失。</li>
-</ul>
-</li>
-<li>
+<p><strong>拓扑保序性</strong>：残差连接 $I + f(x)$ 确保深层网络可优化，避免梯度消失。</p>
 <p><strong>位置感知</strong>：</p>
-<ul>
-<li>通过输入 ( X ) 中注入的位置编码（如正弦函数或学习式编码），隐式编码序列顺序信息。</li>
-</ul>
-</li>
-</ol>
-<hr>
+<p>通过输入 $X$ 中注入的位置编码（如正弦函数或学习式编码），隐式编码序列顺序信息。</p>
 <h3><strong>六、计算图可视化</strong></h3>
-<ol>
-<li>
-<p><strong>输入编码</strong>：<br>
-[<br>
-X \rightarrow \text{Enc}(X) = \text{特征蒸馏} \rightarrow \text{高层语义表示}<br>
-]</p>
-</li>
-<li>
-<p><strong>解码生成</strong>：<br>
-[<br>
-\text{Enc}(X) + Y_{&lt;t} \rightarrow \text{Dec}(Y_{&lt;t}) \rightarrow \text{softmax} \rightarrow y_t<br>
-]</p>
-<ul>
-<li>自回归循环直至生成终止符。</li>
-</ul>
-</li>
-</ol>
-<hr>
+<p><strong>输入编码</strong>：</p>
+<p>$X \rightarrow \text{Enc}(X) = \text{特征蒸馏} \rightarrow \text{高层语义表示}$</p>
+<p><strong>解码生成</strong>：</p>
+<p>$\text{Enc}(X) + Y_{&amp;lt;t} \rightarrow \text{Dec}(Y_{&amp;lt;t}) \rightarrow \text{softmax} \rightarrow y_t$</p>
+<p>自回归循环直至生成终止符。</p>
 <h3><strong>七、公式优势与教学价值</strong></h3>
-<ol>
-<li>
-<p><strong>数学完备性</strong>：<br>
-以算子组合形式严格对齐原始Transformer结构，保留层归一化、残差连接等关键设计。</p>
-</li>
-<li>
-<p><strong>认知压缩</strong>：<br>
-将多层堆叠、多头机制、位置编码等特性编码为紧凑公式，便于理论分析。</p>
-</li>
-<li>
-<p><strong>教学直观性</strong>：<br>
-通过符号抽象，分离关注点（如空间交互 vs. 时序生成），降低理解门槛。</p>
-</li>
-</ol>
-<hr>
-<h3><strong>总结</strong></h3>
-<p>此公式以数学算子的形式，将Transformer的编码-解码架构、自注意力机制与残差学习等核心思想凝练为统一框架。通过符号化表达，既满足理论推导的严谨性，又实现复杂模型的可解释性压缩，是理解现代序列建模范式的关键工具。</p></div>
+<p><strong>架构完备性</strong>：以算子组合形式严格对齐原始 Transformer 结构，保留层归一化、残差连接等关键设计。</p>
+<p><strong>认知压缩</strong>：将多层堆叠、多头机制、位置编码等特性编码为紧凑公式，便于理论分析。</p>
+<p><strong>教学直观性</strong>：通过符号抽象，分离关注点（如空间交互 vs. 时序生成），降低理解门槛。</p></div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
@@ -382,6 +241,6 @@ function iFrameLoading(){
 
 
 </script>
-<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script>
+<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script><script>MathJax = {tex: {inlineMath: [["$", "$"]]}};</script><script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
 </html>
