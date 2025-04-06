@@ -1,10 +1,3 @@
-
-`Gmeek-html<iframe src="https://drive.google.com/file/d/1qEXnKYhp7wJsh6Tle4qfZXKOOm9-uHyU/view?usp=drive_link" width="100%" height="1000px" frameborder="0" allowfullscreen="False"></iframe>`
-
-`Gmeek-html<iframe id="contentIframe" src="https://drive.google.com/file/d/1qEXnKYhp7wJsh6Tle4qfZXKOOm9-uHyU/view?usp=drive_link"
-        width="100%" height="1000px" frameborder="0" allowfullscreen="false"
-        class="max-w-3xl w-full rounded-md shadow-md"></iframe>`
-
 以下是一个简化的 **数字矩阵示例**，展示从输入到输出的全流程矩阵计算，假设模型参数如下：
 
 - **词表大小** \( v_{\text{vocab}} = 4 \)（词表：["I", "love", "you", "<pad>"]，<pad>为填充词）
