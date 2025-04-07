@@ -1,4 +1,4 @@
-`Gmeek-html<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=1604800941&bvid=BV1EzfuY5EQ9&p=1&autoplay=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" width="100%" height="460px"></iframe>`
+`Gmeek-html<iframe src="//player.bilibili.com/player.html?isOutside=true&bvid=BV1EzfuY5EQ9&p=1&autoplay=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" width="100%" height="460px"></iframe>`
 
 
 我们开门见山地说，特朗普政府对美国国际开发署（USAID）改组为美国国际人道主义援助署（US International Humanitarian Assistance, USIHA）的计划，值得反帝国主义者的警惕。当前互联网上仍将讨论焦点固化于一龙马，大手一挥，裁撤臃肿低效的USAID，这类娱乐化叙事的言论，不仅反映了对国际发展援助体系当下复杂性的无知，更是对后殖民时代新型霸权运作机制的严重误判。
