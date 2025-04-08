@@ -1,5 +1,6 @@
 
-`Gmeek-html <iframe class="scribd_iframe_embed" title="页面提取自－宇宙工程学" src="https://www.scribd.com/embeds/847475902/content?start_page=1&view_mode=scroll&access_key=key-2be1SeA9IObZOABxyKh9" tabindex="0" data-auto-height="true" data-aspect-ratio="0.7080062794348508" scrolling="no" width="100%" height="900" frameborder="0" ></iframe> <p style="margin: 12px auto 6px auto; font-family: Helvetica,Arial,Sans-serif; font-size: 14px; line-height: normal; display: block;"> <a title="View 页面提取自－宇宙工程学 on Scribd" href="https://www.scribd.com/document/847475902/%E9%A1%B5%E9%9D%A2%E6%8F%90%E5%8F%96%E8%87%AA-%E5%AE%87%E5%AE%99%E5%B7%A5%E7%A8%8B%E5%AD%A6#from_embed" style="text-decoration: underline;"> 页面提取自－宇宙工程学 </a> by <a title="View xiaoyaoguaia's profile on Scribd" href="https://www.scribd.com/user/853079313/xiaoyaoguaia#from_embed" style="text-decoration: underline;" > xiaoyaoguaia </a> </p> `
+
+`Gmeek-html<iframe src="https://www.hostize.com/zh/r/pWIGIYcypF" width="100%" height="900px" frameborder="0" allowfullscreen="true"></iframe>`
 
 以下是一个简化的 **数字矩阵示例**，展示从输入到输出的全流程矩阵计算，假设模型参数如下：
 
@@ -312,3 +313,12 @@ $  \text{rank}(X_{l + 1}) \geq |\text{rank}(X_l)-r|  $
 ## **\*\*总结\*\***
 
 Transformer 模型的数字矩阵计算流程起始于输入数据的向量化，随后历经多次矩阵乘法、加法以及激活函数的运算，最终输出模型的预测结果。其中，自注意力机制中的 Q、K、V 矩阵计算是整个流程的核心环节，它通过对输入序列的不同位置进行加权求和，有效地捕捉序列中的长距离依赖关系。在实际计算过程中，矩阵维度的匹配以及运算顺序起着关键作用。例如，在多头注意力机制中，不同头的矩阵需要并行计算，之后还需要进行拼接与线性变换。通过本文所提供的示例，我们能够更加直观地理解这些抽象的计算过程。无论是简单的单头注意力计算，还是复杂的多头注意力及全连接层的运算，都遵循特定的数学规则，这些规则为后续优化模型性能、深入理解模型行为奠定了坚实的基础。
+
+
+`Gmeek-html <iframe class="scribd_iframe_embed" title="页面提取自－宇宙工程学" src="https://www.scribd.com/embeds/847475902/content?start_page=1&view_mode=scroll&access_key=key-2be1SeA9IObZOABxyKh9" tabindex="0" data-auto-height="true" data-aspect-ratio="0.7080062794348508" scrolling="no" width="100%" height="200" frameborder="0" ></iframe> <p style="margin: 12px auto 6px auto; font-family: Helvetica,Arial,Sans-serif; font-size: 14px; line-height: normal; display: block;"> <a title="View 页面提取自－宇宙工程学 on Scribd" href="https://www.scribd.com/document/847475902/%E9%A1%B5%E9%9D%A2%E6%8F%90%E5%8F%96%E8%87%AA-%E5%AE%87%E5%AE%99%E5%B7%A5%E7%A8%8B%E5%AD%A6#from_embed" style="text-decoration: underline;"> 页面提取自－宇宙工程学 </a> by <a title="View xiaoyaoguaia's profile on Scribd" href="https://www.scribd.com/user/853079313/xiaoyaoguaia#from_embed" style="text-decoration: underline;" > xiaoyaoguaia </a> </p> `
+
+`Gmeek-html <iframe class="scribd_iframe_embed" title="页面提取自－宇宙工程学" src="https://www.hostize.com/zh/r/pWIGIYcypF" tabindex="0" data-auto-height="true" data-aspect-ratio="0.7080062794348508" scrolling="no" width="100%" height="900" frameborder="0" ></iframe> 
+
+<p style="margin: 12px auto 6px auto; font-family: Helvetica,Arial,Sans-serif; font-size: 14px; line-height: normal; display: block;"> 
+<a title="View 页面提取自－宇宙工程学 " href="https://www.scribd.com/document/847475902/%E9%A1%B5%E9%9D%A2%E6%8F%90%E5%8F%96%E8%87%AA-%E5%AE%87%E5%AE%99%E5%B7%A5%E7%A8%8B%E5%AD%A6#from_embed" style="text-decoration: underline;"> 页面提取自－宇宙工程学 
+</a> by <a title="View xiaoyaoguaia's profile on Scribd" href="https://www.scribd.com/user/853079313/xiaoyaoguaia#from_embed" style="text-decoration: underline;" > xiaoyaoguaia </a> </p> `
