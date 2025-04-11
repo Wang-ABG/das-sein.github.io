@@ -99,6 +99,9 @@ body { font-family: 'Roboto', sans-serif; background-color: #0a192f; color: #ccd
 <p>所有反帝反殖主义者都不应该以一种纯有纯无的视角看待美国对其他国家操控力的变化。这种变化需要被量化，更需要得到各方足够的重视。不能说因为某个小国的现行政府在军事或政治方面在某种程度上被美国操控，就将其视为在方方面面完全被美国操控。因为对许多仍在夹缝中求存的小国而言，一场脆弱的谈判换取的30天喘息期就可能成为当地进步力量命运的分水岭。这短暂的喘息窗口虽不一定能让摇摇欲坠的火种在狂风中多燃一刻，却足以让当权者不得不亲手掘开土壤，将几代人积攒的变革火种仓促掩埋，为仍聚能量的政治遗产。</p></div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
 </div>
     <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://Wang-ABG.github.io/das-sein.github.io">Absoluter Geist</a></div>
 <div id="footer2">
@@ -155,6 +158,42 @@ document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
 
 
 
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.disabled=true;
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","Wang-ABG/das-sein.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
 
 
 
