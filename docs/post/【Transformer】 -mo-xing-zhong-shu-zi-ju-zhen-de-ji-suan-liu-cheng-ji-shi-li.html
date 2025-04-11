@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<html data-color-mode="light" data-dark-theme="dark_colorblind" data-light-theme="light" lang="zh-CN">
 <head>
     <meta content="text/html; charset=utf-8" http-equiv="content-type" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
     
-    <link rel="icon" href="https://avatars.githubusercontent.com/u/101440642?s=400&u=64734a1b6d25eddc0ac7e0729729e228193de187&v=4"><script>
+    <link rel="icon" href="https://github.githubassets.com/favicons/favicon.svg"><script>
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
@@ -59,7 +59,7 @@
 假设输入为 ['I', 'love']，根据词表中每个词对应的索引位置，将其转换为对应的 token IDs，即 [0, 1]。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://Wang-ABG.github.io/das-sein.github.io/post/%E3%80%90Transformer%E3%80%91%20-mo-xing-zhong-shu-zi-ju-zhen-de-ji-suan-liu-cheng-ji-shi-li.html">
-<meta property="og:image" content="https://avatars.githubusercontent.com/u/101440642?s=400&u=64734a1b6d25eddc0ac7e0729729e228193de187&v=4">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Meekdai/meekdai.github.io/logo64.jpg">
 <title>【Transformer】 模型中数字矩阵的计算流程及示例</title>
 
 
@@ -98,6 +98,12 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <a href="https://Wang-ABG.github.io/das-sein.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
             <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/Wang-ABG/das-sein.github.io/issues/21" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
         </svg>
     </a>
     
@@ -293,10 +299,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>Transformer 模型的数字矩阵计算流程起始于输入数据的向量化，随后历经多次矩阵乘法、加法以及激活函数的运算，最终输出模型的预测结果。其中，自注意力机制中的 Q、K、V 矩阵计算是整个流程的核心环节，它通过对输入序列的不同位置进行加权求和，有效地捕捉序列中的长距离依赖关系。在实际计算过程中，矩阵维度的匹配以及运算顺序起着关键作用。例如，在多头注意力机制中，不同头的矩阵需要并行计算，之后还需要进行拼接与线性变换。通过本文所提供的示例，我们能够更加直观地理解这些抽象的计算过程。无论是简单的单头注意力计算，还是复杂的多头注意力及全连接层的运算，都遵循特定的数学规则，这些规则为后续优化模型性能、深入理解模型行为奠定了坚实的基础。</p>
 <p> <iframe class="scribd_iframe_embed" title="页面提取自－宇宙工程学" src="https://www.scribd.com/embeds/847475902/content?start_page=1&view_mode=scroll&access_key=key-2be1SeA9IObZOABxyKh9" tabindex="0" data-auto-height="true" data-aspect-ratio="0.7080062794348508" scrolling="no" width="100%" height="900" frameborder="0" ></iframe> <p style="margin: 12px auto 6px auto; font-family: Helvetica,Arial,Sans-serif; font-size: 14px; line-height: normal; display: block;"> <a title="View 页面提取自－宇宙工程学 on Scribd" href="https://www.scribd.com/document/847475902/%E9%A1%B5%E9%9D%A2%E6%8F%90%E5%8F%96%E8%87%AA-%E5%AE%87%E5%AE%99%E5%B7%A5%E7%A8%8B%E5%AD%A6#from_embed" style="text-decoration: underline;"> 页面提取自－宇宙工程学 </a> by <a title="View xiaoyaoguaia's profile on Scribd" href="https://www.scribd.com/user/853079313/xiaoyaoguaia#from_embed" style="text-decoration: underline;" > xiaoyaoguaia </a> </p> </p>
 <p> <iframe class="scribd_iframe_embed" title="页面提取自－宇宙工程学" src="https://zcngtrkxss08.feishu.cn/file/QCu8bA2nNoXMgNxtqT9cWrdKn6g" tabindex="0" data-auto-height="true" data-aspect-ratio="0.7080062794348508" scrolling="no" width="100%" height="900" frameborder="0" ></iframe> </p></div>
-<div style="font-size:small;margin-top:8px;float:right;"></div>
-
-<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
-<div class="comments" id="comments"></div>
+<div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 
 </div>
     <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://Wang-ABG.github.io/das-sein.github.io">Absoluter Geist</a></div>
@@ -308,8 +311,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 var now=new Date();
 document.getElementById("copyrightYear").innerHTML=now.getFullYear();
 
-if(""!=""){
-    var startSite=new Date("");
+if("02/16/2024"!=""){
+    var startSite=new Date("02/16/2024");
     var diff=now.getTime()-startSite.getTime();
     var diffDay=Math.floor(diff/(1000*60*60*24));
     document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
@@ -350,46 +353,10 @@ console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 
 
 <script>
 document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
 
 
 
-
-function openComments(){
-    cm=document.getElementById("comments");
-    cmButton=document.getElementById("cmButton");
-    cmButton.disabled=true;
-    cmButton.innerHTML="loading";
-    span=document.createElement("span");
-    span.setAttribute("class","AnimatedEllipsis");
-    cmButton.appendChild(span);
-
-    script=document.createElement("script");
-    script.setAttribute("src","https://utteranc.es/client.js");
-    script.setAttribute("repo","Wang-ABG/das-sein.github.io");
-    script.setAttribute("issue-term","title");
-    
-    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
-    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
-    else{script.setAttribute("theme","preferred-color-scheme");}
-    
-    script.setAttribute("crossorigin","anonymous");
-    script.setAttribute("async","");
-    cm.appendChild(script);
-
-    int=self.setInterval("iFrameLoading()",200);
-}
-
-function iFrameLoading(){
-    var utterances=document.getElementsByClassName('utterances');
-    if(utterances.length==1){
-        if(utterances[0].style.height!=""){
-            utterancesLoad=1;
-            int=window.clearInterval(int);
-            document.getElementById("cmButton").style.display="none";
-            console.log("utterances Load OK");
-        }
-    }
-}
 
 
 

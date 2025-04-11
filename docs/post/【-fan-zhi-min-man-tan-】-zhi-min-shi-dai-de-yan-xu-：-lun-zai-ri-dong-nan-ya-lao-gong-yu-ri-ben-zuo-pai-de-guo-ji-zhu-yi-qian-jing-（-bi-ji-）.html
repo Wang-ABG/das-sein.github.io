@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<html data-color-mode="light" data-dark-theme="dark_colorblind" data-light-theme="light" lang="zh-CN">
 <head>
     <meta content="text/html; charset=utf-8" http-equiv="content-type" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
     
-    <link rel="icon" href="https://avatars.githubusercontent.com/u/101440642?s=400&u=64734a1b6d25eddc0ac7e0729729e228193de187&v=4"><script>
+    <link rel="icon" href="https://github.githubassets.com/favicons/favicon.svg"><script>
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
@@ -23,7 +23,7 @@
 **跨国劳动力**业已成为当下全球资本主义的重要组成部分，发达国家通过引进外籍劳工来填补本国劳动力市场的缺口，从而维持其在国际竞争中的优势。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://Wang-ABG.github.io/das-sein.github.io/post/%E3%80%90-fan-zhi-min-man-tan-%E3%80%91-zhi-min-shi-dai-de-yan-xu-%EF%BC%9A-lun-zai-ri-dong-nan-ya-lao-gong-yu-ri-ben-zuo-pai-de-guo-ji-zhu-yi-qian-jing-%EF%BC%88-bi-ji-%EF%BC%89.html">
-<meta property="og:image" content="https://avatars.githubusercontent.com/u/101440642?s=400&u=64734a1b6d25eddc0ac7e0729729e228193de187&v=4">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Meekdai/meekdai.github.io/logo64.jpg">
 <title>【反殖民漫谈】殖民时代的延续：论在日东南亚劳工与日本左派的国际主义前景（笔记）</title>
 
 
@@ -62,6 +62,12 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <a href="https://Wang-ABG.github.io/das-sein.github.io" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
             <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+    <a href="https://github.com/Wang-ABG/das-sein.github.io/issues/16" target="_blank" class="btn btn-invisible circle" title="Issue">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathIssue" fill-rule="evenodd"></path>
         </svg>
     </a>
     
@@ -108,10 +114,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>通过设立表面上与自身无关的基金会或其他去政治化的市民团体，可以为跨国劳工提供法律援助，语言培训和生活支援。这些活动不仅在表面上改善了劳工的生存条件，在实际上更为先锋队组织提供了接触和培养积极分子的机会。通过选拔并教育其中的积极分子，构建纪律化的政治利益关系，从而逐步建立起隐蔽的劳工网络。</p>
 <p>同时，跨国协作是地下网络有效运作的关键，日本的共产主义者需要积极与东南亚及其他地区的反帝势力建立紧密联系，通过跨国劳工的出入境活动，双方可以传递关键信息，战略情报和资金支持。总而言之，东南亚地域内的反帝反殖民局势和各个共产主义组之间建立的联系和协作息息相关。在全球资本主义日益对地缘性产业进行收割的当下，左翼的当务之急是达成现实的物质层面的联系，促成更有希望的反抗力量。</p>
 <p>我们期待日本境内的共产主义组织以更加开放的姿态促进反帝反殖民战线的形成。</p></div>
-<div style="font-size:small;margin-top:8px;float:right;"></div>
-
-<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
-<div class="comments" id="comments"></div>
+<div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 
 </div>
     <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://Wang-ABG.github.io/das-sein.github.io">Absoluter Geist</a></div>
@@ -123,8 +126,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 var now=new Date();
 document.getElementById("copyrightYear").innerHTML=now.getFullYear();
 
-if(""!=""){
-    var startSite=new Date("");
+if("02/16/2024"!=""){
+    var startSite=new Date("02/16/2024");
     var diff=now.getTime()-startSite.getTime();
     var diffDay=Math.floor(diff/(1000*60*60*24));
     document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";
@@ -165,46 +168,10 @@ console.log("\n %c Gmeek main https://github.com/Meekdai/Gmeek \n","padding:5px 
 
 <script>
 document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
 
 
 
-
-function openComments(){
-    cm=document.getElementById("comments");
-    cmButton=document.getElementById("cmButton");
-    cmButton.disabled=true;
-    cmButton.innerHTML="loading";
-    span=document.createElement("span");
-    span.setAttribute("class","AnimatedEllipsis");
-    cmButton.appendChild(span);
-
-    script=document.createElement("script");
-    script.setAttribute("src","https://utteranc.es/client.js");
-    script.setAttribute("repo","Wang-ABG/das-sein.github.io");
-    script.setAttribute("issue-term","title");
-    
-    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
-    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
-    else{script.setAttribute("theme","preferred-color-scheme");}
-    
-    script.setAttribute("crossorigin","anonymous");
-    script.setAttribute("async","");
-    cm.appendChild(script);
-
-    int=self.setInterval("iFrameLoading()",200);
-}
-
-function iFrameLoading(){
-    var utterances=document.getElementsByClassName('utterances');
-    if(utterances.length==1){
-        if(utterances[0].style.height!=""){
-            utterancesLoad=1;
-            int=window.clearInterval(int);
-            document.getElementById("cmButton").style.display="none";
-            console.log("utterances Load OK");
-        }
-    }
-}
 
 
 
