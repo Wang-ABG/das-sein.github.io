@@ -13,15 +13,27 @@
 <meta name="description" content="
 
 > [!NOTE]
-> 假定存在 5 台机器，每台机器都运行着 1 个 Redis 实例主节点，这样一来，主节点的数量便呈现**奇数**状态。">
+> 假定存在 5 台机器，每台机器都运行着 1 个 Redis 实例主节点，这样一来，主节点的数量便呈现**奇数**状态。基于此状况，我们运用**一主二从**的架构来开展部署工作，如此总共就需要**15 个 Redis 实例**。那么，当我们借助 **Docker 与 Docker Compose** 实施部署操作时，究竟需要对哪些**配置文件**予以配置？又需要执行哪些具体的**命令**呢？本篇文章将会围绕这一核心要点逐步展开深入探讨，与此同时，还会对所需的配置文件数量以及命令数量进行精确统计。
+>
+> 我将这一套行文思路命名为文字版部署可视化，通过这样的方式，能够以文字描述的形式清晰呈现整个部署流程的关键要素与步骤。
+
+下面将详细描述如何在5台机器上部署15个 Redis 实例，并使用 Docker 和 Docker Compose 配置它们。这个过程包括 Redis 配置文件、Docker Compose 配置文件以及每个步骤所需的命令和说明。
+
+#">
 <meta property="og:title" content="【草履虫版Redis教程(7)】Redis分片集群部署">
 <meta property="og:description" content="
 
 > [!NOTE]
-> 假定存在 5 台机器，每台机器都运行着 1 个 Redis 实例主节点，这样一来，主节点的数量便呈现**奇数**状态。">
+> 假定存在 5 台机器，每台机器都运行着 1 个 Redis 实例主节点，这样一来，主节点的数量便呈现**奇数**状态。基于此状况，我们运用**一主二从**的架构来开展部署工作，如此总共就需要**15 个 Redis 实例**。那么，当我们借助 **Docker 与 Docker Compose** 实施部署操作时，究竟需要对哪些**配置文件**予以配置？又需要执行哪些具体的**命令**呢？本篇文章将会围绕这一核心要点逐步展开深入探讨，与此同时，还会对所需的配置文件数量以及命令数量进行精确统计。
+>
+> 我将这一套行文思路命名为文字版部署可视化，通过这样的方式，能够以文字描述的形式清晰呈现整个部署流程的关键要素与步骤。
+
+下面将详细描述如何在5台机器上部署15个 Redis 实例，并使用 Docker 和 Docker Compose 配置它们。这个过程包括 Redis 配置文件、Docker Compose 配置文件以及每个步骤所需的命令和说明。
+
+#">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://Wang-ABG.github.io/das-sein.github.io/post/%E3%80%90-cao-lv-chong-ban-Redis-jiao-cheng-%287%29%E3%80%91Redis-fen-pian-ji-qun-bu-shu.html">
-<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Meekdai/meekdai.github.io/logo64.jpg">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/101440642?s=400&u=64734a1b6d25eddc0ac7e0729729e228193de187&v=4">
 <title>【草履虫版Redis教程(7)】Redis分片集群部署</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
@@ -59,7 +71,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     font-size: 12px;
 }
 </style>
-body { font-family: 'Roboto', sans-serif; background-color: #0a192f; color: #ccd6f6; --year-color-1: #bc4c00; --year-color-2: #0969da; --year-color-3: #1f883d; --year-color-4: #A333D0; } header { background-color: #0a192f; padding: 20px 0; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); } nav a { margin: 0 15px; text-decoration: none; color: #555; font-weight: bold; } .container { width: 80%; margin: 0 auto; overflow: hidden; } section { padding: 20px 0; } footer { background-color: #333; color: #fff; text-align: center; padding: 10px 0; position: fixed; bottom: 0; width: 100%; } .avatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; } .article-container { max-width: 800px; margin: 0 auto; padding: 2rem; background-color: rgba(10, 25, 47, 0.8); box-shadow: 0 0 10px rgba(100, 255, 218, 0.3); border-radius: 8px; margin-top: 2rem; border: 1px solid rgba(100, 255, 218, 0.1); animation: fadeIn 0.5s ease-in-out; } @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } } h1 { font-size: 2.5rem; font-weight: 700; color: #ff9900; margin-bottom: 1rem; line-height: 1.2; text-shadow: 0 0 5px rgba(100, 255, 218, 0.5); } .article-meta { color: #8892b0; margin-bottom: 2rem; font-size: 0.9rem; } p { font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem; } blockquote { border-left: 4px solid #64ffda; padding-left: 1rem; font-style: italic; color: #ccd6f6; margin: 2rem 0; transition: all 0.3s ease; } blockquote:hover { transform: translateX(5px); } h2 { font-size: 2rem; font-weight: 600; color: #64ffda; margin-top: 2rem; margin-bottom: 1rem; line-height: 1.2; text-shadow: 0 0 5px rgba(100, 255, 218, 0.5); } h3 { font-size: 1.5rem; font-weight: 600; color: #64ffda; margin-top: 2rem; margin-bottom: 1rem; line-height: 1.2; text-shadow: 0 0 5px rgba(100, 255, 218, 0.5); } img { max-width: 100%; height: auto; border-radius: 4px; margin: 2rem 0; box-shadow: 0 0 10px rgba(100, 255, 218, 0.3); transition: all 0.3s ease; } img:hover { transform: scale(1.02); } .article-footer { border-top: 1px solid rgba(100, 255, 218, 0.1); padding-top: 1rem; margin-top: 2rem; color: #8892b0; font-size: 0.9rem; } a { color: #00ffcc; text-decoration: none; } a:hover { text-decoration: underline; } /* 响应式设计 */ @media (max-width: 768px) { .article-container { padding: 1.5rem; } h1 { font-size: 2rem; } h2 { font-size: 1.75rem; } h3 { font-size: 1.25rem; } }<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-note {border-left-color:var(--borderColor-accent-emphasis, var(--color-accent-emphasis));background-color:var(--color-accent-subtle);}.markdown-alert.markdown-alert-note .markdown-alert-title {color: var(--fgColor-accent,var(--color-accent-fg));}</style><style>.markdown-alert.markdown-alert-tip {border-left-color:var(--borderColor-success-emphasis, var(--color-success-emphasis));background-color:var(--color-success-subtle);}.markdown-alert.markdown-alert-tip .markdown-alert-title {color: var(--fgColor-success,var(--color-success-fg));}</style>
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-note {border-left-color:var(--borderColor-accent-emphasis, var(--color-accent-emphasis));background-color:var(--color-accent-subtle);}.markdown-alert.markdown-alert-note .markdown-alert-title {color: var(--fgColor-accent,var(--color-accent-fg));}</style><style>.markdown-alert.markdown-alert-tip {border-left-color:var(--borderColor-success-emphasis, var(--color-success-emphasis));background-color:var(--color-success-subtle);}.markdown-alert.markdown-alert-tip .markdown-alert-title {color: var(--fgColor-success,var(--color-success-fg));}</style>
 
 
 
@@ -250,9 +262,6 @@ docker-compose --version</pre></div>
 </div></div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 
-<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
-<div class="comments" id="comments"></div>
-
 </div>
     <div id="footer"><div id="footer1">Copyright © <span id="copyrightYear"></span> <a href="https://Wang-ABG.github.io/das-sein.github.io">Absoluter Geist</a></div>
 <div id="footer2">
@@ -309,42 +318,6 @@ document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
 
 
 
-function openComments(){
-    cm=document.getElementById("comments");
-    cmButton=document.getElementById("cmButton");
-    cmButton.disabled=true;
-    cmButton.innerHTML="loading";
-    span=document.createElement("span");
-    span.setAttribute("class","AnimatedEllipsis");
-    cmButton.appendChild(span);
-
-    script=document.createElement("script");
-    script.setAttribute("src","https://utteranc.es/client.js");
-    script.setAttribute("repo","Wang-ABG/das-sein.github.io");
-    script.setAttribute("issue-term","title");
-    
-    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
-    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
-    else{script.setAttribute("theme","preferred-color-scheme");}
-    
-    script.setAttribute("crossorigin","anonymous");
-    script.setAttribute("async","");
-    cm.appendChild(script);
-
-    int=self.setInterval("iFrameLoading()",200);
-}
-
-function iFrameLoading(){
-    var utterances=document.getElementsByClassName('utterances');
-    if(utterances.length==1){
-        if(utterances[0].style.height!=""){
-            utterancesLoad=1;
-            int=window.clearInterval(int);
-            document.getElementById("cmButton").style.display="none";
-            console.log("utterances Load OK");
-        }
-    }
-}
 
 document.addEventListener('DOMContentLoaded', () => {
     const createClipboardHTML = (codeContent, additionalClasses = '') => `
