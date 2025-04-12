@@ -1,139 +1,262 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>赛博木鱼</title>
     <style>
+        html,
         body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
             background-color: #121212;
             color: #FFFFFF;
-            font-family: 'PingFang SC', sans-serif;
-            margin: 0;
+            font-family: 'Kaiti SC', 'PingFang SC', sans-serif;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             align-items: center;
-            height: 100vh;
+            justify-content: center;
+            position: relative;
             overflow: hidden;
         }
-        header {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .gradient-text {
-            font-family: 'Kaiti SC', sans-serif;
-            font-size: 25vw;
-            background: linear-gradient(180deg, rgba(255, 176, 103, 0.05), rgba(115, 55, 0, 0.02));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .score {
-            font-family: 'PingFang SC', sans-serif;
-            font-size: 10vh;
-            font-weight: 900;
-            margin: 10px 0;
-        }
-        .description {
-            font-family: 'PingFang SC', sans-serif;
-            font-size: 5vh;
-        }
-        .content {
-            position: relative;
-            text-align: center;
-            margin: auto;
-        }
-        .fish {
-            width: 284px;
-            height: 236px;
-            transition: transform 0.1s ease-in-out;
-            cursor: pointer;
-        }
-        .hammer {
+
+        /* 背景动画 */
+        body::before {
+            content: "";
             position: absolute;
-            top: -20px;
-            right: -20px;
-            width: 119px;
-            height: 69px;
-            transform-origin: bottom left;
-            transition: transform 0.1s ease-in-out;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #00ffcc, #ff00ff, #00ffff);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            z-index: -1;
+            opacity: 0.2;
         }
-        .floating-text {
-            position: absolute;
-            top: -100px;
-            font-family: 'PingFang SC', sans-serif;
-            font-size: 1.5em;
-            opacity: 0;
-            animation: floatUp 0.4s forwards;
-        }
-        @keyframes floatUp {
-            to {
-                top: -200px;
-                opacity: 1;
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
             }
         }
-        footer {
-            font-family: 'Kaiti SC', sans-serif;
+
+        .title-area {
+            text-align: center;
+            width: 100%;
+            position: absolute;
+            top: 5vh;
+        }
+
+        .main-title {
+            font-size: 25vw;
+            font-family: 'Kaiti SC';
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.1));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .score {
+            font-size: 10vh;
+            font-family: 'PingFang SC';
+            font-weight: 900;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .description {
+            font-size: 5vh;
+            font-family: 'PingFang SC';
+            text-align: center;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .wooden-fish-area {
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .wooden-fish {
+            width: 284px;
+            height: 236px;
+            background-image: url(https://img.alicdn.com/imgextra/i3/O1CN012CO0YU1VSfNs506ZS_!!6000000002652-2-tps-284-236.png);
+            background-size: cover;
+            transition: transform 0.1s;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+        }
+
+        .hammer {
+            width: 119px;
+            height: 69px;
+            background-image: url(https://img.alicdn.com/imgextra/i1/O1CN01tKb5Et1aSjWRjCHK3_!!6000000003329-2-tps-119-69.png);
+            background-size: cover;
+            position: absolute;
+            top: 40px;
+            right: 20px;
+            transform-origin: bottom left;
+            transition: transform 0.1s, top 0.1s, right 0.1s;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+        }
+
+        .floating-text {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'PingFang SC';
+            font-size: 1.5em;
+            opacity: 0;
+            color: #FFFFFF;
+            transition: opacity 0.4s, transform 0.4s, scale 0.4s, rotate 0.4s;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        .bottom-tip {
+            font-family: 'Kaiti SC';
             font-size: 1.2em;
-            margin-bottom: 20px;
+            text-align: center;
+            position: absolute;
+            bottom: 5vh;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .score-and-description {
+            position: absolute;
+            bottom: 12vh;
+            text-align: center;
+        }
+
+        .wooden-fish.clicked {
+            transform: scale(1.1) rotate(2deg);
+            animation: shake 0.1s ease-in-out;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.6));
+        }
+
+        .hammer.clicked {
+            transform: rotate(-25deg) translate(5px, -5px);
+            top: 35px;
+            right: 15px;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.6));
+        }
+
+        .floating-text.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-30px) scale(1.2) rotate(10deg);
+        }
+
+        @keyframes shake {
+            0% {
+                transform: scale(1.1) rotate(2deg);
+            }
+            25% {
+                transform: scale(1.1) rotate(-2deg);
+            }
+            50% {
+                transform: scale(1.1) rotate(2deg);
+            }
+            75% {
+                transform: scale(1.1) rotate(-2deg);
+            }
+            100% {
+                transform: scale(1.1) rotate(2deg);
+            }
+        }
+
+        /* 星星动画 */
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: starFlow 10s linear infinite;
+        }
+
+        @keyframes starFlow {
+            0% {
+                transform: translateY(0);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100vh);
+                opacity: 0;
+            }
         }
     </style>
 </head>
+
 <body>
-    <header>
-        <div class="gradient-text">赛博木鱼</div>
-        <div class="score" id="score">0</div>
-        <div class="description">功德</div>
-    </header>
-
-    <div class="content">
-        <img src="https://img.alicdn.com/imgextra/i3/O1CN012CO0YU1VSfNs506ZS_!!6000000002652-2-tps-284-236.png" alt="木鱼" class="fish" id="fish">
-        <img src="https://img.alicdn.com/imgextra/i1/O1CN01tKb5Et1aSjWRjCHK3_!!6000000003329-2-tps-119-69.png" alt="锤子" class="hammer" id="hammer">
-        <div class="floating-text" id="floatingText"></div>
+    <div class="title-area">
+        <h1 class="main-title">赛博木鱼</h1>
     </div>
-
-    <footer>
-        轻敲木鱼，细悟赛博真经。
-    </footer>
-
-    <audio id="clickSound" src="https://qianwen.alicdn.com/resource/qiaomuyu.mp3" preload="auto"></audio>
-
+    <div class="wooden-fish-area" id="wooden-fish-area">
+        <div class="wooden-fish" id="wooden-fish"></div>
+        <div class="hammer" id="hammer"></div>
+        <div class="floating-text" id="floating-text">功德+1</div>
+    </div>
+    <div class="score-and-description">
+        <p class="score" id="score">0</p>
+        <p class="description">功德</p>
+    </div>
+    <p class="bottom-tip">轻敲木鱼，细悟赛博真经。</p>
+    <audio id="click-sound" src="https://qianwen.alicdn.com/resource/qiaomuyu.mp3"></audio>
     <script>
-        const fish = document.getElementById('fish');
+        const woodenFish = document.getElementById('wooden-fish');
         const hammer = document.getElementById('hammer');
-        const scoreDisplay = document.getElementById('score');
-        const floatingText = document.getElementById('floatingText');
-        const clickSound = document.getElementById('clickSound');
-
+        const floatingText = document.getElementById('floating-text');
+        const scoreElement = document.getElementById('score');
+        const clickSound = document.getElementById('click-sound');
         let score = 0;
 
-        fish.addEventListener('click', () => {
-            // 播放音效
+        // 生成星星
+        const numStars = 50;
+        for (let i = 0; i < numStars; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.left = `${Math.random() * 100}vw`;
+            star.style.top = `${Math.random() * 100}vh`;
+            star.style.animationDelay = `${Math.random() * 10}s`;
+            document.body.appendChild(star);
+        }
+
+        woodenFish.addEventListener('click', () => {
+            clickSound.pause();
             clickSound.currentTime = 0;
-            clickSound.play();
-
-            // 锤子旋转动画
-            hammer.style.transform = 'rotate(-25deg)';
-            setTimeout(() => {
-                hammer.style.transform = 'rotate(0deg)';
-            }, 100);
-
-            // 木鱼放大动画
-            fish.style.transform = 'scale(1.1)';
-            setTimeout(() => {
-                fish.style.transform = 'scale(1)';
-            }, 100);
-
-            // 显示动态漂浮字幕
-            floatingText.textContent = '功德+1';
-            floatingText.style.opacity = 1;
-            floatingText.style.top = '-100px';
-            floatingText.style.animation = 'floatUp 0.4s forwards';
-
-            // 更新分数
+            clickSound.play().catch(error => {
+                console.error('播放音频时出错:', error);
+            });
+            woodenFish.classList.add('clicked');
+            hammer.classList.add('clicked');
+            floatingText.classList.add('show');
             score++;
-            scoreDisplay.textContent = score;
+            scoreElement.textContent = score;
+
+            setTimeout(() => {
+                woodenFish.classList.remove('clicked');
+                hammer.classList.remove('clicked');
+            }, 100);
+
+            setTimeout(() => {
+                floatingText.classList.remove('show');
+            }, 400);
         });
     </script>
 </body>
+
 </html>
+    
