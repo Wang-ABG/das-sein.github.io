@@ -5,23 +5,11 @@
     "showPostSource": 0,
     "script": "<script src='https://blog.meekdai.com/Gmeek/plugins/GmeekTOC.js'></script><script src='https://blog.meekdai.com/Gmeek/plugins/lightbox.js'></script>",
     "GMEEK_VERSION": "main",
-    "faviconUrl": "https://github.githubassets.com/favicons/favicon.svg",
-    "email": "wang@das-sein.top",
     "startSite": "02/17/2024",
     "onePageListNum": 15,
-    "singlePage": [
-        "about"
-    ],
-    "iconList": {
-        "muyu": "M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13Z"
-    },
+    "iconList": {"muyu": "M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13Z"},
     "exlink":{"muyu":"https://blog.das-sein.top/%E8%B5%9B%E5%8D%9A%E6%9C%A8%E9%B1%BC.html"},
-    "yearColorList": [
-        "#bc4c00",
-        "#0969da",
-        "#1f883d",
-        "#A333D0"
-    ],
+    "yearColorList": ["#bc4c00","#0969da","#1f883d","#A333D0"],
     "i18n": "CN",
     "UTC": 8,
     "themeMode": "manual",
