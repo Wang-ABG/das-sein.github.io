@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人博客</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <style>
+        /* 引入现代无衬线字体 */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        /* 自定义动画效果 */
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* 渐变背景 */
+        .bg-radical-gradient {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+        }
+
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* 标题样式 */
+        .blog-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        }
+
+        /* 导航栏样式 */
+        .navigation a {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ffffff;
+            transition: color 0.3s ease;
+        }
+
+        .navigation a:hover {
+            color: #00ffcc;
+        }
+
+        /* 笔记卡片样式 */
+        .note-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-right: 20px;
+            padding: 10px;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .note-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+        }
+
+        .note-card p:first-child {
+            font-size: 1.2rem;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .note-card p:last-child {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0;
+        }
+
+        /* 博客文章样式 */
+        .blog-item img {
+            width: 100%;
+            max-width: 450px;
+            height: auto;
+            object-fit: cover;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .blog-item img:hover {
+            transform: scale(1.05);
+        }
+
+        .blog-item h3 {
+            font-size: 1.6rem;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        .blog-item p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0;
+        }
+
+        .blog-item {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .blog-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+        }
+
+        /* 文章列表项样式 */
+        .article-item {
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            color: #ffffff;
+        }
+
+        .article-item::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        .article-item i {
+            margin-right: 0.5rem;
+            color: #00ffcc;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+
+<body class="bg-radical-gradient font-sans flex justify-center items-start min-h-screen overflow-x-hidden">
+    <div class="container w-9/10 max-w-6xl mt-4 flex shadow-lg rounded-xl overflow-hidden animate-fade-in">
+        <!-- 左侧导航栏 -->
+        <div class="left-column w-1/6 bg-gray-900/50 p-4 flex flex-col items-center backdrop-blur-md">
+            <h1 class="blog-title mb-4">个人博客</h1>
+            <nav class="navigation space-y-2">
+                <a href="#" class="hover:text-tech hover:font-bold transition duration-300">主页</a>
+                <a href="#" class="hover:text-tech hover:font-bold transition duration-300">关于我</a>
+                <a href="#" class="hover:text-tech hover:font-bold transition duration-300">博客</a>
+                <a href="#" class="hover:text-tech hover:font-bold transition duration-300">笔记</a>
+                <a href="#" class="hover:text-tech hover:font-bold transition duration-300">知识库</a>
+                <a href="#" class="hover:text-tech hover:font-bold transition duration-300">智能体</a>
+            </nav>
+        </div>
+        <!-- 右侧内容区 -->
+        <div class="right-column w-5/6 bg-gray-800/50 p-4 backdrop-blur-md">
+            <!-- 文章列表 -->
+            <div class="mb-8">
+                <a href="#" class="article-item card-hover">
+                    <i class="fa-solid fa-file"></i>
+                    <span class="listTitle">测试14</span>
+                </a>
+                <a href="post/%E3%80%90-shi-ci-zheng-li-%E3%80%91-na-xie-yong-AI-xie-de-shi-ci.html" class="article-item card-hover">
+                    <i class="fa-solid fa-file"></i>
+                    <span class="listTitle">【诗词整理】那些用AI写的诗词</span>
+                </a>
+                <a href="post/%E3%80%90-gu-jin-shi-ci-xuan-%E3%80%91-di-yi-lun-zheng-li.html" class="article-item card-hover">
+                    <i class="fa-solid fa-file"></i>
+                    <span class="listTitle">【古今诗词选】第一轮整理</span>
+                </a>
+                <a href="post/%E3%80%90-fan-zhi-min-jing-jie-%E3%80%91USAID%EF%BC%88-xian-geng-ming-wei-USIHA%EF%BC%89-de-gai-zu-ji-hua-zhi-de-suo-you-fan-zhi-min-zhu-yi-zhe-de-jing-ti-%EF%BC%81%EF%BC%88-shi-pin-wen-gao-bi-ji-%EF%BC%89.html" class="article-item card-hover">
+                    <i class="fa-solid fa-file"></i>
+                    <span class="listTitle">【反殖民警戒】USAID（现更名为USIHA）的改组计划值得所有反殖民主义者的警惕！（视频文稿笔记）</span>
+                </a>
+                <a href="post/%E3%80%90Transformer%E3%80%91%20-mo-xing-zhong-shu-zi-ju-zhen-de-ji-suan-liu-cheng-ji-shi-li.html" class="article-item card-hover">
+                    <i class="fa-solid fa-file"></i>
+                    <span class="listTitle">【Transformer】 模型中数字矩阵的计算流程及示例</span>
+                </a>
+                <a href="post/%E3%80%90Transformer%20%E3%80%91%20-mo-xing-tui-li-quan-liu-cheng-ju-zhen-ji-suan-liu-zhuan-jie-xi.html" class="article-item card-hover">
+                    <i class="fa-solid fa-file"></i>
+                    <span class="listTitle">【Transformer 】 模型推理全流程矩阵计算流转解析</span>
+                </a>
+                <a href="post/%E3%80%90Transformer%20%E3%80%91-xun-lian-chao-can-shu-fu-hao-xi-tong-yu-wei-du-ding-yi.html" class="article-item card-hover">
+                    <i class="fa-solid fa-file"></i>
+                    <span class="listTitle">【Transformer 】训练超参数符号系统与维度定义</span>
+                </a>
+                <a href="post/Transformer.html" class="article-item card-hover">
+                    <i class="fa-solid fa-file"></i>
+                    <span class="listTitle">Transformer</span>
+                </a>
+                <a href="post/%E3%80%90-tian-dao-ye-ban-%E3%80%9187-ban-hong-lou-meng-pei-le-%EF%BC%88-zhuan-zai-%EF%BC%89.html" class="article-item card-hover">
+                    <i class="fa-solid fa-file"></i>
+                    <span class="listTitle">【天到夜半】87版红楼梦配乐（转载）</span>
+                </a>
+                <a href="post/%E3%80%90-fan-zhi-min-man-tan-%E3%80%91-zhi-min-shi-dai-de-yan-xu-%EF%BC%9A-lun-zai-ri-dong-nan-ya-lao-gong-yu-ri-ben-zuo-pai-de-guo-ji-zhu-yi-qian-jing-%EF%BC%88-bi-ji-%EF%BC%89.html" class="article-item card-hover">
+                    <i class="fa-solid fa-file"></i>
+                    <span class="listTitle">【反殖民漫谈】殖民时代的延续：论在日东南亚劳工与日本左派的国际主义前景（笔记）</span>
+                </a>
+                <a href="post/AI-xie-de-shi.html" class="article-item card-hover">
+                    <i class="fa-solid fa-file"></i>
+                    <span class="listTitle">AI写的诗</span>
+                </a>
+                <a href="post/wu-ti.html" class="article-item card-hover">
+                    <i class="fa-solid fa-file"></i>
+                    <span class="listTitle">无题</span>
+                </a>
+                <a href="post/lai-jing-yi-yue-%EF%BC%8C-zi-mian.html" class="article-item card-hover">
+                    <i class="fa-solid fa-file"></i>
+                    <span class="listTitle">来京一月，自勉</span>
+                </a>
+                <a href="post/%E3%80%90JUC%20-yuan-ma-yue-du-%283%29%E3%80%91-CountDownLatch%20.html" class="article-item card-hover">
+                    <i class="fa-solid fa-file"></i>
+                    <span class="listTitle">【JUC 源码阅读(3)】:CountDownLatch </span>
+                </a>
+                <a href="post/%E3%80%90JUC%20-yuan-ma-yue-du-%282%29%E3%80%91%EF%BC%9AAQS%20-yuan-ma-quan-jie-xi.html" class="article-item card-hover">
+                    <i class="fa-solid fa-file"></i>
+                    <span class="listTitle">【JUC 源码阅读(2)】：AQS 源码全解析</span>
+                </a>
+            </div>
+            <!-- 最近博客 -->
+            <div class="blogs-section">
+                <h2 class="text-2xl font-bold text-white mb-4">最近博客</h2>
+                <div class="blog-item card-hover">
+                    <img src="https://img.alicdn.com/imgextra/i2/O1CN01VjWLAB21Zb4eAatD8_!!6000000006999-2-tps-928-1232.png" alt="活力的源泉">
+                    <h3>活力的源泉：健康生活的艺术与科学</h3>
+                    <p>健康生活不仅仅是关于身体的活力，它是一种全面的生活方式，涉及到身体、心灵和精神的和谐统一。</p>
+                </div>
+                <div class="blog-item card-hover">
+                    <img src="https://img.alicdn.com/imgextra/i1/O1CN01n5bYVC1LISOAf9gSM_!!6000000001276-2-tps-1232-928.png" alt="在风景与人群中寻找内心的宁静角落">
+                    <h3>在风景与人群中寻找内心的宁静角落</h3>
+                    <p>在喧嚣的城市中，我们常常感到内心的喧哗和不安。然而，即使在最繁忙的街道和最拥挤的人群中，我们也能找到一片属于自己的宁静角落。</p>
+                </div>
+                <div class="blog-item card-hover">
+                    <img src="https://img.alicdn.com/imgextra/i2/O1CN01Fi9JNQ1e59aJxBRji_!!6000000003819-2-tps-1232-928.png" alt="记录艺术中时间与记忆的交汇">
+                    <h3>记录艺术中时间与记忆的交汇</h3>
+                    <p>艺术是时间的容器，它捕捉并保存了特定时刻的情感和体验。每一件艺术作品都是艺术家与时间对话的结果...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
