@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>诗词网页 - 启动器</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background-color: #f8f9fa;
+        }
+        
+        .btn-poetry {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-poetry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .title-font {
+            font-family: 'Ma Shan Zheng', cursive;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md mx-auto">
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <h1 class="text-3xl font-bold text-center mb-8 title-font text-purple-800">
+                <i class="fas fa-book-open mr-2"></i>诗词网页
+            </h1>
+            
+            <div class="space-y-4">
+                <a href="首页.html" class="btn-poetry flex items-center justify-center px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors">
+                    <i class="fas fa-home mr-2"></i>首页
+                </a>
+                
+                <a href="诗.html" class="btn-poetry flex items-center justify-center px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors">
+                    <i class="fas fa-feather-alt mr-2"></i>诗专题
+                </a>
+                
+                <a href="词.html" class="btn-poetry flex items-center justify-center px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors">
+                    <i class="fas fa-music mr-2"></i>词专题
+                </a>
+                
+                <a href="歌.html" class="btn-poetry flex items-center justify-center px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors">
+                    <i class="fas fa-microphone-alt mr-2"></i>歌专题
+                </a>
+                
+                <a href="诗歌.html" class="btn-poetry flex items-center justify-center px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors">
+                    <i class="fas fa-pen-fancy mr-2"></i>诗歌专题
+                </a>
+                
+                <a href="杂记.html" class="btn-poetry flex items-center justify-center px-4 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-colors">
+                    <i class="fas fa-lightbulb mr-2"></i>杂记
+                </a>
+            </div>
+            
+            <div class="mt-8 text-center text-gray-600">
+                <p class="text-sm">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    点击上方链接直接访问对应专题页面
+                </p>
+                <p class="text-xs mt-2 text-gray-500">
+                    提示：空
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

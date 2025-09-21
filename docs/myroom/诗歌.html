@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>诗韵集 - 现代诗歌</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4F46E5',
+            poem: '#EC4899',
+            ci: '#8B5CF6',
+            ge: '#10B981',
+            neutral: {
+              100: '#F9FAFB',
+              200: '#F3F4F6',
+              800: '#1F2937',
+              900: '#111827'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            poetry: ['"Noto Serif SC"', 'serif'],
+            display: ['"Ma Shan Zheng"', 'cursive']
+          },
+        }
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      .bg-blur {
+        backdrop-filter: blur(8px);
+      }
+      .line-clamp-15 {
+        display: -webkit-box;
+        -webkit-line-clamp: 15;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .poetry-card {
+                @apply bg-white dark:bg-neutral-800 rounded-lg shadow-md p-6 md:p-8 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-l-4 border-primary max-h-[300px] flex flex-col justify-start relative overflow-hidden;
+            }
+      .view-details-btn {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        padding: 6px 12px;
+        background-color: rgba(79, 70, 229, 0.9);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        z-index: 10;
+      }
+      .view-details-btn:hover {
+        background-color: rgba(79, 70, 229, 1);
+        transform: scale(1.05);
+      }
+      .poetry-content {
+        @apply font-poetry text-neutral-700 dark:text-neutral-200 leading-relaxed line-clamp-15 pb-12; /* 添加底部内边距避免被按钮遮挡 */
+      }
+      .section-divider {
+        @apply w-20 h-1 bg-primary my-12 mx-auto rounded-full;
+      }
+      .poetry-line {
+        @apply mb-2 leading-relaxed transition-colors duration-300;
+      }
+      .poetry-stanza {
+        @apply mb-6 list-none;
+      }
+    }
+  </style>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body class="bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 transition-colors duration-300">
+  <!-- 导航栏 -->
+  <header
+    class="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-neutral-900/90 bg-blur border-b border-neutral-200 dark:border-neutral-700 transition-all duration-300">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="首页.html" class="flex items-center space-x-2">
+        <i class="fa fa-pencil text-primary text-2xl"></i>
+        <span class="font-display text-xl md:text-2xl text-primary">诗韵集 · 现代诗歌</span>
+      </a>
+
+      <nav class="hidden md:flex items-center space-x-6">
+        <a href="首页.html" class="hover:text-primary transition-colors">首页</a>
+        <a href="诗.html" class="hover:text-poem transition-colors">诗</a>
+        <a href="词.html" class="hover:text-ci transition-colors">词</a>
+        <a href="歌.html" class="hover:text-ge transition-colors">歌</a>
+        <a href="诗歌.html" class="text-primary font-medium">诗歌</a>
+        <a href="杂记.html" class="hover:text-primary transition-colors">杂记</a>
+        <button id="theme-toggle"
+          class="p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
+          <i class="fa fa-moon-o dark:hidden"></i>
+          <i class="fa fa-sun-o hidden dark:inline"></i>
+        </button>
+      </nav>
+
+      <button id="menu-toggle"
+        class="md:hidden p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
+        <i class="fa fa-bars"></i>
+      </button>
+    </div>
+
+    <div id="mobile-menu"
+      class="hidden md:hidden bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700">
+      <div class="container mx-auto px-4 py-3 flex flex-col space-y-4">
+        <a href="首页.html" class="py-2 hover:text-primary transition-colors">首页</a>
+        <a href="诗.html" class="py-2 hover:text-poem transition-colors">诗</a>
+        <a href="词.html" class="py-2 hover:text-ci transition-colors">词</a>
+        <a href="歌.html" class="py-2 hover:text-ge transition-colors">歌</a>
+        <a href="诗歌.html" class="py-2 text-primary">诗歌</a>
+        <a href="理念.html" class="py-2 hover:text-primary transition-colors">理念</a>
+        <button id="mobile-theme-toggle"
+          class="p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors w-fit">
+          <i class="fa fa-moon-o dark:hidden"></i>
+          <i class="fa fa-sun-o hidden dark:inline"></i>
+          <span class="ml-2">切换主题</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="pt-16">
+    <!-- 英雄区域 -->
+    <section id="hero" class="relative h-[70vh] flex items-center justify-center overflow-hidden">
+      <div class="absolute inset-0 z-0">
+        <img src="https://picsum.photos/id/175/1920/1080" alt="现代诗歌主题背景：自然风景与文字意境"
+          class="w-full h-full object-cover opacity-30 dark:opacity-20" aria-hidden="true">
+        <div
+          class="absolute inset-0 bg-gradient-to-b from-neutral-900/40 to-neutral-100/30 dark:from-neutral-900/80 dark:to-neutral-900/60">
+        </div>
+      </div>
+
+      <div class="container mx-auto px-4 z-10 text-center">
+        <h1 class="font-display text-4xl md:text-6xl lg:text-7xl mb-6 text-shadow text-primary">现代诗歌</h1>
+        <p class="text-lg md:text-xl max-w-2xl mx-auto mb-8 text-neutral-800 dark:text-neutral-100">
+          文字是未说出口的呐喊，是不肯沉睡的灵魂在深夜里的低语
+        </p>
+        <a href="#poetry-list"
+          class="inline-flex items-center px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-full transition-all shadow-lg hover:shadow-xl">
+          品读诗歌
+          <i class="fa fa-arrow-down ml-2"></i>
+        </a>
+      </div>
+    </section>
+
+    <!-- 诗歌介绍 -->
+    <section id="about-poetry"
+      class="py-16 bg-gradient-to-b from-primary/5 to-white dark:from-primary/10 dark:to-neutral-900">
+      <div class="container mx-auto px-4">
+        <div class="max-w-3xl mx-auto">
+          <h2 class="font-display text-2xl md:text-3xl mb-6 text-center text-primary">写在前面</h2>
+          <p class="text-neutral-700 dark:text-neutral-200 leading-relaxed mb-4">
+            这些文字不是为了成为经典，也不是为了获得掌声。它们只是在某个瞬间，突然从心里涌出来，带着温度，带着棱角，带着未说出口的情绪。
+          </p>
+          <p class="text-neutral-700 dark:text-neutral-200 leading-relaxed mb-4">
+            有时候，沉默太久，就需要用文字来打破寂静。不是为了证明什么，只是为了告诉自己：我还活着，还有感受，还有不肯麻木的灵魂。
+          </p>
+          <p class="text-neutral-700 dark:text-neutral-200 leading-relaxed">
+            或许这些诗歌不够完美，不够深刻，但它们足够真实。真实地记录着每一次心跳，每一次叹息，每一次对生活的追问。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 诗歌列表区域（动态填充内容） -->
+    <section id="poetry-list" class="py-20">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+          <h2 class="font-display text-3xl md:text-4xl mb-4">诗歌集</h2>
+          <p class="max-w-2xl mx-auto text-neutral-600 dark:text-neutral-400">
+            每一行，都是生命的痕迹
+          </p>
+          <div class="section-divider"></div>
+        </div>
+
+        <!-- 诗歌网格容器（由JS动态填充） -->
+        <div id="poetry-container" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+          <!-- 内容将通过JavaScript动态生成 -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 跳转区域 -->
+    <section id="首页-page"
+      class="py-16 bg-gradient-to-b from-primary/10 to-white dark:from-primary/15 dark:to-neutral-900">
+      <div class="container mx-auto px-4 text-center">
+        <h2 class="font-display text-2xl md:text-3xl mb-6 text-primary">探索更多</h2>
+        <p class="max-w-2xl mx-auto mb-8 text-neutral-600 dark:text-neutral-400">
+          除了“现代诗歌”，还有“诗”“词”“歌”等更多文学形式等你来赏，点击下方按钮前往汇总页
+        </p>
+        <a href="index.html"
+          class="inline-flex items-center px-6 py-3 bg-white dark:bg-neutral-800 border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-full transition-all shadow-md hover:shadow-lg">
+          <i class="fa fa-th-large mr-2"></i> 前往首页
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-neutral-800 text-neutral-300 py-10">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="flex items-center space-x-2 mb-4 md:mb-0">
+          <i class="fa fa-pencil text-primary text-2xl"></i>
+          <span class="font-display text-xl text-white">诗韵集 · 现代诗歌</span>
+        </div>
+        <div class="text-sm">
+          <p>© 2024 诗韵集 | 专注古典与现代文学展示与传承</p>
+          <p class="mt-1 text-neutral-500"><a href="首页.html" class="text-primary hover:underline">首页</a> · 诗 · 词 · 歌
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 回到顶部按钮 -->
+  <button id="back-to-top"
+    class="fixed bottom-6 right-6 p-3 bg-primary text-white rounded-full shadow-lg opacity-0 invisible transition-all duration-300 hover:bg-primary/90 z-50">
+    <i class="fa fa-arrow-up"></i>
+  </button>
+
+  <!-- JavaScript：交互功能 + 数据渲染 -->
+  <script>
+    // 从JSON文件加载诗歌数据（数据与代码分离）
+    async function loadPoetryData () {
+      try {
+        // 加载外部JSON数据文件
+        const response = await fetch('shigeData.json');
+        if (!response.ok) {
+          throw new Error('数据加载失败');
+        }
+        const data = await response.json();
+        return data.poems;
+      } catch (error) {
+        console.error('诗歌数据加载出错：', error);
+        // 加载失败时显示友好提示
+        const container = document.getElementById('poetry-container');
+        container.innerHTML = `
+          <div class="text-center py-10 text-neutral-600 dark:text-neutral-400">
+            <i class="fa fa-exclamation-circle text-xl mb-2"></i>
+            <p>诗歌数据加载失败，请稍后重试</p>
+          </div>
+        `;
+        return [];
+      }
+    }
+
+    // 渲染诗歌列表
+    async function renderPoetry () {
+      const container = document.getElementById('poetry-container');
+      // 显示加载状态
+      container.innerHTML = '<div class="text-center py-10"><i class="fa fa-spinner fa-spin text-primary"></i></div>';
+
+      // 加载数据并渲染
+      const poetryData = await loadPoetryData();
+      if (poetryData.length === 0) return;
+
+      container.innerHTML = ''; // 清空加载提示
+
+      // 设置最大可见行数
+      const maxVisibleLines = 15;
+
+      poetryData.forEach(poem => {
+        // 创建诗歌卡片
+        const card = document.createElement('article');
+        card.className = `poetry-card ${poem.isInitialVisible
+          ? 'opacity-100 translate-x-0'
+          : 'transition-all duration-700 opacity-0 translate-x-4'}`;
+        card.setAttribute('data-id', poem.id);
+
+        // 创建标题
+        const title = document.createElement('h3');
+        title.className = 'font-poetry text-xl md:text-2xl mb-6 text-primary border-b border-primary/20 pb-2';
+        title.textContent = poem.title;
+
+        // 创建诗歌内容容器
+        const content = document.createElement('blockquote');
+        content.className = 'poetry-content';
+
+        // 计算总行数
+        let totalLines = 0;
+        let visibleLines = 0;
+        let truncated = false;
+
+        // 渲染诗节和诗句，只显示前maxVisibleLines行
+        poem.stanzas.forEach(stanzaLines => {
+          if (truncated) return;
+          
+          const stanza = document.createElement('ul');
+          stanza.className = 'poetry-stanza';
+
+          stanzaLines.forEach(lineText => {
+            if (truncated) return;
+            
+            totalLines++;
+            
+            if (visibleLines < maxVisibleLines) {
+              visibleLines++;
+              const line = document.createElement('li');
+              line.className = 'poetry-line';
+              line.textContent = lineText;
+              stanza.appendChild(line);
+            } else {
+              truncated = true;
+            }
+          });
+
+          if (!truncated && stanza.children.length > 0) {
+            content.appendChild(stanza);
+          } else if (truncated && stanza.children.length > 0) {
+            // 如果在本诗节中被截断，只添加已渲染的部分
+            if (stanza.children.length > 0) {
+              content.appendChild(stanza);
+            }
+          }
+        });
+
+        // 如果内容被截断，添加省略号
+        if (truncated) {
+          const ellipsis = document.createElement('div');
+          ellipsis.className = 'text-neutral-500 italic ml-1';
+          ellipsis.textContent = '...';
+          content.appendChild(ellipsis);
+        }
+
+        // 组合卡片内容
+        card.appendChild(title);
+        card.appendChild(content);
+
+        // 始终显示查看详情按钮
+        const detailBtn = document.createElement('a');
+        detailBtn.href = `shige-detail.html?id=${poem.id}`;
+        detailBtn.className = 'view-details-btn';
+        detailBtn.innerHTML = '<i class="fa fa-external-link mr-1"></i> 查看详情';
+        card.appendChild(detailBtn);
+
+        container.appendChild(card);
+      });
+
+      // 初始化交互效果
+      initPoetryInteractions();
+      initScrollAnimations();
+    }
+
+    // 诗句交互效果
+    function initPoetryInteractions () {
+      const poetryLines = document.querySelectorAll('.poetry-line');
+      poetryLines.forEach(line => {
+        line.addEventListener('mouseenter', () => {
+          line.classList.add('text-primary', 'font-medium');
+        });
+        line.addEventListener('mouseleave', () => {
+          line.classList.remove('text-primary', 'font-medium');
+        });
+      });
+    }
+
+    // 滚动动画
+    function initScrollAnimations () {
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('opacity-100', 'translate-x-0');
+            entry.target.classList.remove('opacity-0', 'translate-x-4');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll('.poetry-card[class*="opacity-0"]').forEach(card => {
+        observer.observe(card);
+      });
+    }
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      renderPoetry();
+
+      // 移动端菜单切换
+      const menuToggle = document.getElementById('menu-toggle');
+      const mobileMenu = document.getElementById('mobile-menu');
+      menuToggle.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+
+      // 深色/浅色模式切换
+      const themeToggle = document.getElementById('theme-toggle');
+      const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+
+      // 初始化主题
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+
+      function toggleTheme () {
+        if (document.documentElement.classList.contains('dark')) {
+          document.documentElement.classList.remove('dark');
+          localStorage.theme = 'light';
+        } else {
+          document.documentElement.classList.add('dark');
+          localStorage.theme = 'dark';
+        }
+      }
+
+      themeToggle.addEventListener('click', toggleTheme);
+      mobileThemeToggle.addEventListener('click', toggleTheme);
+
+      // 平滑滚动
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          if (!mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+          }
+          const targetId = this.getAttribute('href');
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            window.scrollTo({
+              top: targetElement.offsetTop - 80,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+
+      // 返回顶部按钮
+      const backToTopButton = document.getElementById('back-to-top');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 500) {
+          backToTopButton.classList.remove('opacity-0', 'invisible');
+          backToTopButton.classList.add('opacity-100', 'visible');
+        } else {
+          backToTopButton.classList.remove('opacity-100', 'visible');
+          backToTopButton.classList.add('opacity-0', 'invisible');
+        }
+
+        const header = document.querySelector('header');
+        if (window.scrollY > 50) {
+          header.classList.add('py-2', 'shadow-md');
+          header.classList.remove('py-3');
+        } else {
+          header.classList.add('py-3');
+          header.classList.remove('py-2', 'shadow-md');
+        }
+      });
+
+      backToTopButton.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+
+</html>

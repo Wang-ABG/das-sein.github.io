@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>杂记详情 - 绝对理念</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script>
+    // 配置Tailwind自定义主题 - 统一框架基础配置
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#F59E0B',      // 杂记页面主题色：温暖橙
+            secondary: '#D97706',    // 次要色 - 深橙色
+            accent: '#FBBF24',       // 强调色 - 浅橙色
+            light: '#FEF3C7',        // 亮色背景
+            dark: '#92400E',         // 暗色文字
+            // 为统一导航栏定义各页面主题色
+            poem: '#EC4899',         // 诗页面主题色：浪漫粉
+            ci: '#8B5CF6',           // 词页面主题色：优雅紫
+            ge: '#10B981',           // 歌页面主题色：活力绿
+            poetry: '#4F46E5',       // 诗歌页面主题色：靛蓝色
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            serif: ['Noto Serif SC', 'serif'],
+            display: ['"Ma Shan Zheng"', 'cursive']
+          },
+        }
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .bg-blur {
+                backdrop-filter: blur(8px);
+            }
+            .zaji-content {
+                @apply font-serif text-gray-700 dark:text-gray-300 text-base md:text-lg leading-loose;
+            }
+            .section-divider {
+                @apply w-16 h-1 rounded-full my-8 mx-auto bg-primary;
+            }
+            .nav-link {
+                @apply hover:text-primary transition-colors duration-300 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full;
+            }
+            /* 统一动画效果 */
+            .fade-in {
+                animation: fadeIn 0.8s ease-in-out;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .tag-pill {
+                @apply text-sm px-2 py-1 rounded-full bg-primary/10 text-primary dark:bg-primary/20;
+            }
+            .content-section {
+                @apply prose dark:prose-invert max-w-none prose-headings:text-dark dark:prose-headings:text-light prose-p:mb-6 prose-p:text-base md:prose-p:text-lg prose-p:leading-loose;
+            }
+            .back-link {
+                @apply flex items-center text-primary hover:text-secondary transition-colors mb-6;
+            }
+        }
+    </style>
+  <!-- 引入中文字体 -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body class="bg-light dark:bg-gray-900 text-dark dark:text-light transition-colors duration-300">
+  <!-- 导航栏 -->
+  <header
+    class="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 bg-blur border-b border-gray-200 dark:border-gray-800 transition-all duration-300">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="首页.html" class="flex items-center space-x-2">
+        <i class="fa fa-book text-primary text-2xl"></i>
+        <span class="font-display text-xl md:text-2xl">绝对理念</span>
+      </a>
+
+      <!-- 导航链接 - 桌面端 - 统一包含五个页面链接 -->
+      <nav class="hidden md:flex items-center space-x-8">
+        <a href="首页.html" class="nav-link">首页</a>
+        <a href="诗.html" class="nav-link hover:text-poem">诗</a>
+        <a href="词.html" class="nav-link hover:text-ci">词</a>
+        <a href="歌.html" class="nav-link hover:text-ge">歌</a>
+        <a href="诗歌.html" class="nav-link hover:text-poetry">诗歌</a>
+        <a href="杂记.html" class="text-primary font-medium">杂记</a>
+        <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+          <i class="fa fa-moon-o dark:hidden"></i>
+          <i class="fa fa-sun-o hidden dark:inline"></i>
+        </button>
+      </nav>
+
+      <!-- 移动端菜单按钮 -->
+      <button id="menu-toggle" class="md:hidden p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+        <i class="fa fa-bars"></i>
+      </button>
+    </div>
+
+    <!-- 移动端导航菜单 -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+      <div class="container mx-auto px-4 py-3 flex flex-col space-y-4">
+        <a href="首页.html" class="py-2 nav-link">首页</a>
+        <a href="诗.html" class="py-2 nav-link hover:text-poem">诗</a>
+        <a href="词.html" class="py-2 nav-link hover:text-ci">词</a>
+        <a href="歌.html" class="py-2 nav-link hover:text-ge">歌</a>
+        <a href="诗歌.html" class="py-2 nav-link hover:text-poetry">诗歌</a>
+        <a href="杂记.html" class="py-2 text-primary">杂记</a>
+        <button id="mobile-theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors w-fit">
+          <i class="fa fa-moon-o dark:hidden"></i>
+          <i class="fa fa-sun-o hidden dark:inline"></i>
+          <span class="ml-2">切换主题</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="pt-20">
+    <!-- 杂记详情页面内容 -->
+    <section class="py-16 bg-white dark:bg-gray-800">
+      <div class="container mx-auto px-4">
+        <div class="max-w-3xl mx-auto">
+          <!-- 返回列表链接 -->
+          <a href="杂记.html" class="back-link">
+            <i class="fa fa-arrow-left mr-2"></i> 返回杂记列表
+          </a>
+
+          <!-- 杂记内容将通过JavaScript动态生成 -->
+          <div id="zaji-content-wrapper" class="fade-in">
+            <!-- 加载状态 -->
+            <div id="loading-state" class="text-center py-24">
+              <i class="fa fa-spinner fa-spin text-4xl text-primary mb-4"></i>
+              <p>加载中...</p>
+            </div>
+            
+            <!-- 内容容器 -->
+            <div id="content-container" class="hidden">
+              <!-- 标题 -->
+              <h1 id="zaji-title" class="font-display text-3xl md:text-4xl lg:text-5xl mb-8 text-dark dark:text-light leading-tight"></h1>
+              
+              <!-- 元信息 -->
+              <div class="mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
+                <div class="flex flex-wrap items-center text-base text-gray-500 dark:text-gray-400 gap-6">
+                  <span class="flex items-center"><i class="fa fa-calendar-o mr-2"></i><span id="zaji-date"></span></span>
+                </div>
+                
+                <!-- 标签 -->
+                <div id="zaji-tags" class="flex flex-wrap gap-2 mt-4">
+                  <!-- 标签会通过JavaScript动态生成 -->
+                </div>
+              </div>
+              
+              <!-- 正文内容 -->
+              <div id="zaji-content" class="zaji-content space-y-8 mt-8">
+                <!-- 内容会通过JavaScript动态生成 -->
+              </div>
+            </div>
+          </div>
+
+          <!-- 相关文章推荐 -->
+          <div id="related-zajis" class="mt-16">
+            <h3 class="font-display text-xl mb-6">相关杂记</h3>
+            <div id="related-zajis-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- 相关文章将通过JavaScript动态生成 -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-gray-800 text-gray-300 py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 auto-rows-auto">
+        <div>
+          <div class="flex items-center space-x-2 mb-4">
+            <i class="fa fa-book text-primary text-2xl"></i>
+            <span class="font-display text-xl text-white">绝对理念</span>
+          </div>
+          <p class="mb-4">
+              以文字为剑，守护内心的光
+            </p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+              <i class="fa fa-weibo"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+              <i class="fa fa-wechat"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+              <i class="fa fa-envelope-o"></i>
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-white text-lg mb-4">分类导航</h4>
+          <ul class="space-y-2">
+            <li><a href="诗.html" class="hover:text-poem transition-colors">诗</a></li>
+            <li><a href="词.html" class="hover:text-ci transition-colors">词</a></li>
+            <li><a href="歌.html" class="hover:text-ge transition-colors">歌</a></li>
+            <li><a href="诗歌.html" class="hover:text-poetry transition-colors">诗歌</a></li>
+            <li><a href="杂记.html" class="hover:text-primary transition-colors">杂记</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-white text-lg mb-4">快速链接</h4>
+          <ul class="space-y-2">
+            <li><a href="首页.html" class="hover:text-primary transition-colors">首页</a></li>
+            <li><a href="#" class="hover:text-primary transition-colors">关于我</a></li>
+            <li><a href="#" class="hover:text-primary transition-colors">联系方式</a></li>
+            <li><a href="#" class="hover:text-primary transition-colors">版权信息</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-700 mt-10 pt-6 text-center text-sm">
+        <p>© 2025 绝对理念 - 个人博客。</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 返回顶部按钮 -->
+  <button id="back-to-top" class="fixed bottom-6 right-6 p-3 bg-primary text-white rounded-full shadow-lg opacity-0 invisible transition-all duration-300 hover:bg-primary/90">
+    <i class="fa fa-arrow-up"></i>
+  </button>
+
+  <!-- 引入Markdown解析库 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- JavaScript -->
+  <script>
+    // 确保marked库可用，如果不可用则提供基本的文本处理回退
+    if (typeof marked === 'undefined') {
+      window.marked = {
+        parse: function(text) {
+          // 基本的文本处理回退
+          return text.replace(/\n/g, '<br>').replace(/\n\n/g, '</p><p>');
+        },
+        setOptions: function() {}
+      };
+      console.warn('marked.js 库未加载，使用基本文本处理回退');
+    } else {
+      // 配置marked解析器
+      marked.setOptions({
+        breaks: true, // 支持回车换行
+        gfm: true,    // 启用GitHub风格的Markdown
+        sanitize: false // 允许HTML内容
+      });
+    }
+
+    // 获取URL中的杂记ID
+    function getZajiIdFromUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('id');
+    }
+
+    // 格式化杂记内容，处理Markdown格式
+    function formatZajiContent(content) {
+      // 使用marked解析Markdown内容
+      return marked.parse(content);
+    }
+
+    // 加载并渲染指定ID的杂记内容
+    async function loadZajiDetail() {
+      const zajiId = getZajiIdFromUrl();
+      console.log('获取到的杂记ID:', zajiId);
+      const loadingState = document.getElementById('loading-state');
+      const contentContainer = document.getElementById('content-container');
+      const zajiTitle = document.getElementById('zaji-title');
+      const zajiDate = document.getElementById('zaji-date');
+      const zajiTags = document.getElementById('zaji-tags');
+      const zajiContent = document.getElementById('zaji-content');
+      const relatedZajisContainer = document.getElementById('related-zajis-container');
+
+      // 预设的mock数据，用于fetch失败时的回退
+      const mockData = {
+        zajis: [
+          {
+            id: 1,
+            title: "夏日随笔",
+            date: "2023-07-15",
+            content: "夏日的午后，阳光透过树叶的缝隙，洒下斑驳的光影。\n\n我坐在庭院的石凳上，手中捧着一杯清香的绿茶，思绪随着茶香飘向远方。*微风轻拂*，带来了远处的蝉鸣，这是夏天特有的声音。\n\n**生活中的美好，往往就藏在这些平凡的瞬间里**。",
+            tags: ["生活", "随笔", "夏日"]
+          },
+          {
+            id: 2,
+            title: "雨夜沉思",
+            date: "2023-08-20",
+            content: "窗外的雨下得很大，雨滴敲打着玻璃窗，发出清脆的响声。\n\n这样的夜晚，最适合思考。我关掉了灯，坐在黑暗中，听着雨声，感受着夜的静谧。\n\n有时候，孤独并不是一件坏事。它能让我们更好地认识自己，思考人生的意义。",
+            tags: ["思考", "雨夜", "孤独"]
+          },
+          {
+            id: 3,
+            title: "秋日漫步",
+            date: "2023-10-10",
+            content: "秋天的公园真美！树叶都变成了金黄色，微风一吹，纷纷扬扬地飘落下来，仿佛下了一场金色的雨。\n\n我漫步在铺满落叶的小路上，脚下发出沙沙的响声。空气里弥漫着秋天特有的气息，清新中带着一丝凉意。\n\n秋天是收获的季节，也是思考的季节。在这个季节里，我总是会想起很多往事，有开心的，也有难过的。但无论如何，这些都是我人生中宝贵的财富。",
+            tags: ["秋天", "漫步", "回忆"]
+          }
+        ]
+      };
+
+      try {
+        let data;
+        let zaji;
+        const numericId = zajiId ? parseInt(zajiId) : null;
+
+        try {
+          // 尝试通过fetch加载数据
+          const response = await fetch('zajiData.json');
+          console.log('尝试请求zajiData.json');
+          
+          if (response.ok) {
+            data = await response.json();
+            console.log('fetch请求成功，使用真实数据');
+          } else {
+            console.warn('fetch请求返回非成功状态，使用mock数据');
+            data = mockData;
+          }
+        } catch (fetchError) {
+          console.warn('fetch请求失败，使用mock数据:', fetchError);
+          data = mockData;
+        }
+
+        // 根据ID查找杂记
+        if (numericId) {
+          zaji = data.zajis.find(item => item.id === numericId);
+          console.log('根据ID查找杂记:', zaji);
+        }
+
+        // 如果没找到指定ID的杂记或没有提供ID，使用第一篇
+        if (!zaji) {
+          zaji = data.zajis[0];
+          console.log('使用第一篇杂记作为默认内容');
+        }
+
+        // 隐藏加载状态，显示内容
+        loadingState.classList.add('hidden');
+        contentContainer.classList.remove('hidden');
+
+        // 设置页面标题和内容
+        document.title = `${zaji.title} - 杂记 - 绝对理念`;
+        zajiTitle.textContent = zaji.title;
+        zajiDate.textContent = zaji.date;
+        
+        // 渲染标签
+        zajiTags.innerHTML = zaji.tags.map(tag => `<span class="tag-pill">${tag}</span>`).join('');
+        
+        // 渲染内容
+        zajiContent.innerHTML = formatZajiContent(zaji.content);
+
+        // 渲染相关杂记
+        const relatedZajis = data.zajis
+          .filter(item => item.id !== zaji.id)  // 排除当前显示的杂记
+          .slice(0, 2);
+        console.log('相关杂记:', relatedZajis);
+
+        if (relatedZajis.length > 0) {
+          relatedZajisContainer.innerHTML = relatedZajis.map(related => `
+            <a href="zaji-detail.html?id=${related.id}" class="block bg-white dark:bg-gray-800 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow border border-gray-100 dark:border-gray-700">
+              <h4 class="font-display text-xl mb-3 text-dark dark:text-light hover:text-primary transition-colors">${related.title}</h4>
+              <p class="text-base text-gray-600 dark:text-gray-400 line-clamp-3">${related.content.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 150)}...</p>
+              <div class="text-sm text-gray-500 dark:text-gray-400 mt-3">${related.date}</div>
+            </a>
+          `).join('');
+        } else {
+          // 如果没有相关杂记，隐藏整个区域
+          document.getElementById('related-zajis').style.display = 'none';
+        }
+
+      } catch (error) {
+        console.error('加载杂记详情失败:', error);
+        loadingState.innerHTML = '<div class="text-center py-24 text-gray-500">加载失败，请稍后再试</div>';
+        
+        // 最后的应急措施：直接显示一些静态内容
+        setTimeout(() => {
+          try {
+            loadingState.classList.add('hidden');
+            contentContainer.classList.remove('hidden');
+            zajiTitle.textContent = "夏日随笔";
+            zajiDate.textContent = "2023-07-15";
+            zajiTags.innerHTML = '<span class="tag-pill">生活</span><span class="tag-pill">随笔</span><span class="tag-pill">夏日</span>';
+            zajiContent.innerHTML = '夏日的午后，阳光透过树叶的缝隙，洒下斑驳的光影。<br><br>我坐在庭院的石凳上，手中捧着一杯清香的绿茶，思绪随着茶香飘向远方。';
+          } catch (innerError) {
+            console.error('应急显示也失败了:', innerError);
+          }
+        }, 2000);
+      }
+    }
+
+    // 移动端菜单切换
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    menuToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // 深色/浅色模式切换
+    const themeToggle = document.getElementById('theme-toggle');
+    const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+
+    // 检查用户偏好
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    // 切换主题
+    function toggleTheme () {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+      }
+    }
+
+    themeToggle.addEventListener('click', toggleTheme);
+    mobileThemeToggle.addEventListener('click', toggleTheme);
+
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        // 关闭移动菜单（如果打开）
+        if (!mobileMenu.classList.contains('hidden')) {
+          mobileMenu.classList.add('hidden');
+        }
+
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 80,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+
+    // 返回顶部按钮
+    const backToTopButton = document.getElementById('back-to-top');
+
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 500) {
+        backToTopButton.classList.remove('opacity-0', 'invisible');
+        backToTopButton.classList.add('opacity-100', 'visible');
+      } else {
+        backToTopButton.classList.remove('opacity-100', 'visible');
+        backToTopButton.classList.add('opacity-0', 'invisible');
+      }
+
+      // 导航栏滚动效果
+      const header = document.querySelector('header');
+      if (window.scrollY > 50) {
+        header.classList.add('py-2', 'shadow-md');
+        header.classList.remove('py-3');
+      } else {
+        header.classList.add('py-3');
+        header.classList.remove('py-2', 'shadow-md');
+      }
+    });
+
+    backToTopButton.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    // 为每个区域添加进入动画
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('opacity-100', 'translate-y-0');
+          entry.target.classList.remove('opacity-0', 'translate-y-10');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('section').forEach(section => {
+      section.classList.add('transition-all', 'duration-1000', 'opacity-0', 'translate-y-10');
+      observer.observe(section);
+    });
+
+    // 页面加载时执行
+    window.addEventListener('DOMContentLoaded', loadZajiDetail);
+  </script>
+</body>
+</html>
