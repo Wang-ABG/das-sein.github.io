@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>歌详情 - 诗韵集</title>
+  <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入 Font Awesome -->
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- 自定义配置 -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ge: '#E91E63', // 歌页面主题色：玫红色
+          },
+          fontFamily: {
+            display: ['ZCOOL XiaoWei', 'Noto Serif SC', 'serif'],
+            serif: ['Noto Serif SC', 'serif']
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      /* 自定义工具类 */
+      .content-auto {
+        content-visibility: auto;
+      }
+      .poem-line {
+        position: relative;
+        transition: all 0.3s ease;
+      }
+      .poem-line::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background-color: theme('colors.ge');
+        transition: width 0.3s ease;
+      }
+      .poem-line:hover::after {
+        width: 100%;
+      }
+      .section-divider {
+        width: 50px;
+        height: 3px;
+        background-color: theme('colors.ge');
+        margin: 1rem auto;
+        border-radius: 2px;
+      }
+    }
+  </style>
+  <!-- 引入 Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white dark:bg-neutral-900 transition-colors duration-300">
+  <!-- 导航栏 -->
+  <header class="fixed w-full bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md shadow-sm z-40 transition-all duration-300">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center py-4">
+        <!-- Logo -->
+        <a href="首页.html" class="flex items-center space-x-2">
+          <i class="fa fa-music text-ge text-2xl"></i>
+          <span class="font-display text-xl text-neutral-800 dark:text-white">诗韵集 · 歌</span>
+        </a>
+        
+        <!-- 桌面端导航 -->
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="歌.html" class="text-neutral-600 dark:text-neutral-300 hover:text-ge dark:hover:text-ge transition-colors">歌作集</a>
+          <a href="首页.html" class="text-neutral-600 dark:text-neutral-300 hover:text-ge dark:hover:text-ge transition-colors">汇总页</a>
+          <button id="theme-toggle" class="text-neutral-600 dark:text-neutral-300 hover:text-ge dark:hover:text-ge transition-colors">
+            <i class="fa fa-moon-o dark:hidden"></i>
+            <i class="fa fa-sun-o hidden dark:block"></i>
+          </button>
+        </nav>
+        
+        <!-- 移动端菜单按钮 -->
+        <button id="menu-toggle" class="md:hidden text-neutral-600 dark:text-neutral-300">
+          <i class="fa fa-bars text-xl"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- 移动端导航菜单 -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white dark:bg-neutral-900 shadow-lg">
+      <div class="container mx-auto px-4 py-4 space-y-4">
+        <a href="歌.html" class="block text-neutral-600 dark:text-neutral-300 hover:text-ge dark:hover:text-ge transition-colors py-2">歌作集</a>
+        <a href="首页.html" class="block text-neutral-600 dark:text-neutral-300 hover:text-ge dark:hover:text-ge transition-colors py-2">汇总页</a>
+        <button id="mobile-theme-toggle" class="flex items-center space-x-2 text-neutral-600 dark:text-neutral-300 hover:text-ge dark:hover:text-ge transition-colors py-2">
+          <i class="fa fa-moon-o dark:hidden"></i>
+          <i class="fa fa-sun-o hidden dark:block"></i>
+          <span>切换主题</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="pt-28 pb-20">
+    <div class="container mx-auto px-4">
+      <!-- 返回按钮 -->
+      <div class="mb-8">
+        <a href="歌.html" class="inline-flex items-center px-4 py-2 bg-white dark:bg-neutral-800 border border-ge text-ge hover:bg-ge hover:text-white rounded-full transition-all shadow-md hover:shadow-lg">
+          <i class="fa fa-arrow-left mr-2"></i> 返回歌作集
+        </a>
+      </div>
+
+      <!-- 歌详情展示区域 -->
+      <div id="song-detail" class="max-w-3xl mx-auto bg-white dark:bg-neutral-800 rounded-xl shadow-xl p-8 transition-all duration-500 opacity-0 translate-y-4">
+        <!-- 歌标题 -->
+        <h1 id="song-title" class="font-serif text-3xl md:text-4xl mb-8 text-center text-ge"></h1>
+        
+        <!-- 歌内容 -->
+        <div id="song-content" class="space-y-6">
+          <!-- 内容将通过JavaScript动态加载 -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-neutral-800 text-neutral-300 py-8">
+    <div class="container mx-auto px-4 text-center">
+      <p>© 2024 诗韵集 | 专注古典文学展示与传承</p>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // 等待DOM加载完成
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 获取URL中的id参数
+      const urlParams = new URLSearchParams(window.location.search);
+      const songId = urlParams.get('id');
+      
+      const detailContainer = document.getElementById('song-detail');
+      const titleElement = document.getElementById('song-title');
+      const contentElement = document.getElementById('song-content');
+      
+      if (!songId) {
+        titleElement.textContent = '无效的请求';
+        contentElement.innerHTML = '<p class="text-center text-neutral-600 dark:text-neutral-400">未提供有效的歌ID</p>';
+        detailContainer.classList.remove('opacity-0', 'translate-y-4');
+        detailContainer.classList.add('opacity-100', 'translate-y-0');
+        return;
+      }
+      
+      try {
+        // 从JSON文件加载歌数据
+        const response = await fetch('geData.json');
+        if (!response.ok) {
+          throw new Error('数据加载失败');
+        }
+        const data = await response.json();
+        const ges = data.ges || [];
+        
+        // 查找对应ID的歌
+        const song = ges.find(s => s.id === parseInt(songId));
+        
+        if (!song) {
+          titleElement.textContent = '歌不存在';
+          contentElement.innerHTML = '<p class="text-center text-neutral-600 dark:text-neutral-400">未找到对应ID的歌</p>';
+          detailContainer.classList.remove('opacity-0', 'translate-y-4');
+          detailContainer.classList.add('opacity-100', 'translate-y-0');
+          return;
+        }
+        
+        // 渲染歌详情
+        titleElement.textContent = `${song.title} ${song.id > 0 ? `（第${song.id}首）` : ''}`;
+        
+        // 清空内容容器
+        contentElement.innerHTML = '';
+        
+        // 渲染歌内容
+        song.stanzas.forEach(stanza => {
+          const stanzaDiv = document.createElement('div');
+          stanzaDiv.className = 'space-y-3';
+          
+          stanza.forEach(line => {
+            const lineDiv = document.createElement('div');
+            lineDiv.className = 'poem-line text-center text-lg md:text-xl font-medium text-neutral-800 dark:text-neutral-200';
+            lineDiv.textContent = line;
+            stanzaDiv.appendChild(lineDiv);
+          });
+          
+          contentElement.appendChild(stanzaDiv);
+        });
+        
+        // 显示详情容器
+        setTimeout(() => {
+          detailContainer.classList.remove('opacity-0', 'translate-y-4');
+          detailContainer.classList.add('opacity-100', 'translate-y-0');
+        }, 100);
+        
+      } catch (error) {
+        console.error('加载歌详情失败:', error);
+        titleElement.textContent = '加载失败';
+        contentElement.innerHTML = `<p class="text-center text-neutral-600 dark:text-neutral-400">${error.message || '歌详情加载失败，请稍后重试'}</p>`;
+        detailContainer.classList.remove('opacity-0', 'translate-y-4');
+        detailContainer.classList.add('opacity-100', 'translate-y-0');
+      }
+    });
+    
+    // 移动端菜单切换
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+    
+    // 深色/浅色模式切换
+    const themeToggle = document.getElementById('theme-toggle');
+    const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+    // 检查用户偏好
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    // 切换主题函数
+    function toggleTheme () {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.theme = 'light';
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.theme = 'dark';
+      }
+    }
+    themeToggle.addEventListener('click', toggleTheme);
+    mobileThemeToggle.addEventListener('click', toggleTheme);
+  </script>
+</body>
+</html>

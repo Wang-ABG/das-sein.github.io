@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>诗韵集 - 词专题</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script>
+    // 统一框架基础配置
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#8B5CF6', // 词的主色调：优雅紫
+            ci: '#8B5CF6', // 词的主题色
+            poem: '#EC4899', // 诗的主题色：浪漫粉
+            ge: '#10B981', // 歌的主题色：活力绿
+            poetry: '#4F46E5', // 诗歌的主题色：靛蓝色
+            neutral: {
+              100: '#F9FAFB',
+              200: '#F3F4F6',
+              800: '#1F2937',
+              900: '#111827'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            serif: ['Noto Serif SC', 'serif'], // 词牌阅读专用衬线字体
+            display: ['"Ma Shan Zheng"', 'cursive'] // 标题书法字体
+          },
+        }
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+            @layer utilities {
+                .content-auto {
+                    content-visibility: auto;
+                }
+                .text-shadow {
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+                }
+                .bg-blur {
+                    backdrop-filter: blur(8px);
+                }
+                .line-clamp-15 {
+                    display: -webkit-box;
+                    -webkit-line-clamp: 15;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            .ci-card {
+                @apply bg-white dark:bg-neutral-800 rounded-lg shadow-md p-6 md:p-8 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-l-4 border-ci max-h-[300px] flex flex-col justify-start relative overflow-hidden;
+            }
+            .ci-content {
+                @apply font-serif text-neutral-700 dark:text-neutral-300 leading-relaxed overflow-hidden line-clamp-15 pb-12; /* 添加底部内边距避免被按钮遮挡 */
+            }
+            .view-details-btn {
+                @apply absolute bottom-4 right-4 bg-ci text-white text-sm px-3 py-1 rounded-full shadow-md hover:bg-ci/90 transition-all flex items-center;
+            }
+            .section-divider {
+                @apply w-20 h-1 bg-ci my-12 mx-auto rounded-full;
+            }
+            .ci-stanza {
+                @apply mb-4; /* 词的阕/段间距 */
+            }
+            .ci-variant {
+                @apply text-sm text-neutral-500 dark:text-neutral-400 italic mt-1; /* 备选词句样式 */
+            }
+            .error-message {
+                @apply text-center py-10 text-neutral-600 dark:text-neutral-400;
+            }
+        }
+    </style>
+  <!-- 引入中文字体，优化词牌显示效果 -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body class="bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 transition-colors duration-300">
+  <!-- 导航栏：固定顶部，含返回汇总页入口 -->
+  <header
+    class="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-neutral-900/90 bg-blur border-b border-neutral-200 dark:border-neutral-700 transition-all duration-300">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <!-- 网站标识与标题 -->
+      <a href="#" class="flex items-center space-x-2">
+        <i class="fa fa-book text-ci text-2xl"></i>
+        <span class="font-display text-xl md:text-2xl text-ci">诗韵集 · 词</span>
+      </a>
+
+      <!-- 导航链接：桌面端 - 统一包含五个页面链接 -->
+      <nav class="hidden md:flex items-center space-x-6">
+        <a href="首页.html" class="hover:text-primary transition-colors">首页</a>
+        <a href="诗.html" class="hover:text-poem transition-colors">诗</a>
+        <a href="词.html" class="text-primary font-medium">词</a>
+        <a href="歌.html" class="hover:text-ge transition-colors">歌</a>
+        <a href="诗歌.html" class="hover:text-poetry transition-colors">诗歌</a>
+        <a href="杂记.html" class="hover:text-primary transition-colors">杂记</a>
+        <button id="theme-toggle"
+          class="p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
+          <i class="fa fa-moon-o dark:hidden"></i>
+          <i class="fa fa-sun-o hidden dark:inline"></i>
+        </button>
+      </nav>
+
+      <!-- 移动端菜单按钮 -->
+      <button id="menu-toggle"
+        class="md:hidden p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors">
+        <i class="fa fa-bars"></i>
+      </button>
+    </div>
+
+    <!-- 移动端导航菜单 -->
+      <div id="mobile-menu"
+        class="hidden md:hidden bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700">
+        <div class="container mx-auto px-4 py-3 flex flex-col space-y-4">
+          <a href="首页.html" class="py-2 hover:text-primary transition-colors">首页</a>
+          <a href="诗.html" class="py-2 hover:text-poem transition-colors">诗</a>
+          <a href="词.html" class="py-2 text-primary">词</a>
+          <a href="歌.html" class="py-2 hover:text-ge transition-colors">歌</a>
+          <a href="诗歌.html" class="py-2 hover:text-poetry transition-colors">诗歌</a>
+          <a href="理念.html" class="py-2 hover:text-primary transition-colors">理念</a>
+          <button id="mobile-theme-toggle"
+            class="p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors w-fit">
+            <i class="fa fa-moon-o dark:hidden"></i>
+            <i class="fa fa-sun-o hidden dark:inline"></i>
+            <span class="ml-2">切换主题</span>
+          </button>
+        </div>
+      </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="pt-16">
+    <!-- 英雄区域：词主题视觉展示 -->
+    <section id="hero" class="relative h-[70vh] flex items-center justify-center overflow-hidden">
+      <div class="absolute inset-0 z-0">
+        <img src="https://picsum.photos/id/175/1920/1080" alt="词主题背景：月下柳岸"
+          class="w-full h-full object-cover opacity-30 dark:opacity-20">
+        <div
+          class="absolute inset-0 bg-gradient-to-b from-neutral-900/40 to-neutral-100/30 dark:from-neutral-900/80 dark:to-neutral-900/60">
+        </div>
+      </div>
+
+      <div class="container mx-auto px-4 z-10 text-center">
+        <h1 class="font-display text-4xl md:text-6xl lg:text-7xl mb-6 text-shadow text-ci">
+          词
+        </h1>
+        <p class="text-lg md:text-xl max-w-2xl mx-auto mb-8 text-neutral-800 dark:text-neutral-100">
+          长短句，倚声填词，婉约豪放皆成章；一阕一曲，诉尽悲欢，墨里风华传千古
+        </p>
+        <a href="#ci-list"
+          class="inline-flex items-center px-6 py-3 bg-ci hover:bg-ci/90 text-white rounded-full transition-all shadow-lg hover:shadow-xl">
+          浏览词作
+          <i class="fa fa-arrow-down ml-2"></i>
+        </a>
+      </div>
+    </section>
+
+    <!-- 词之介绍：文化背景区域 -->
+    <section id="about-ci" class="py-16 bg-gradient-to-b from-ci/5 to-white dark:from-ci/10 dark:to-neutral-900">
+      <div class="container mx-auto px-4">
+        <div class="max-w-3xl mx-auto">
+          <h2 class="font-display text-2xl md:text-3xl mb-6 text-center text-ci">词之韵</h2>
+          <p class="text-neutral-700 dark:text-neutral-300 leading-relaxed mb-4">
+            词，始于南朝，定型于中晚唐，盛于宋，又称“长短句”“诗余”。它依曲调填写，句式长短不一，讲究声律与押韵，可配乐演唱，是中国古典文学中极具韵律美的文学形式。
+          </p>
+          <p class="text-neutral-700 dark:text-neutral-300 leading-relaxed mb-4">
+            词分婉约、豪放两派：婉约派如柳永、李清照，多写儿女情长、离愁别绪，语言清丽；豪放派如苏轼、辛弃疾，常抒家国情怀、人生感慨，气势磅礴。每一词牌皆有固定曲调与格律，如《鹧鸪天》《鹊桥仙》《满江红》等，各有韵味。
+          </p>
+          <p class="text-neutral-700 dark:text-neutral-300 leading-relaxed">
+            本页收录的词作，涵盖多种词牌，或写景抒情，或感怀伤时，或言志咏怀，皆循词律，力求展现词的韵律之美与情感之深。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 词作列表区域：核心内容 -->
+    <section id="ci-list" class="py-20">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+          <h2 class="font-display text-3xl md:text-4xl mb-4">词作集</h2>
+          <p class="max-w-2xl mx-auto text-neutral-600 dark:text-neutral-400">
+            精选词作，每一词牌都是一段心境，每一阕都是一段故事
+          </p>
+          <div class="section-divider"></div>
+        </div>
+
+        <!-- 词作列表 - 使用网格布局：每行两列 -->
+        <div id="ci-container" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          <!-- 词作将通过JavaScript动态加载 -->
+          <div class="text-center col-span-full py-10">
+            <i class="fa fa-circle-o-notch fa-spin text-3xl text-ci"></i>
+            <p class="mt-4">加载词作中...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 跳转区域：关联汇总页 -->
+    <section id="首页-page" class="py-16 bg-gradient-to-b from-ci/10 to-white dark:from-ci/15 dark:to-neutral-900">
+      <div class="container mx-auto px-4 text-center">
+        <h2 class="font-display text-2xl md:text-3xl mb-6 text-ci">探索更多</h2>
+        <p class="max-w-2xl mx-auto mb-8 text-neutral-600 dark:text-neutral-400">
+          除了“词”，还有“诗”“歌”“诗歌”等更多文学形式等你来赏，点击下方按钮前往汇总页
+        </p>
+        <a href="首页.html"
+          class="inline-flex items-center px-6 py-3 bg-white dark:bg-neutral-800 border-2 border-ci text-ci hover:bg-ci hover:text-white rounded-full transition-all shadow-md hover:shadow-lg">
+          <i class="fa fa-th-large mr-2"></i> 前往汇总页
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="bg-neutral-800 text-neutral-300 py-10">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="flex items-center space-x-2 mb-4 md:mb-0">
+          <i class="fa fa-book text-ci text-2xl"></i>
+          <span class="font-display text-xl text-white">诗韵集 · 词</span>
+        </div>
+        <div class="text-sm">
+          <p>© 2024 诗韵集 | 专注古典文学展示与传承</p>
+          <p class="mt-1 text-neutral-500">点击 <a href="首页.html" class="text-ci hover:underline">汇总页</a>
+            查看“诗”“歌”“诗歌”专题</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 回到顶部按钮 -->
+  <button id="back-to-top"
+    class="fixed bottom-6 right-6 p-3 bg-ci text-white rounded-full shadow-lg opacity-0 invisible transition-all duration-300 hover:bg-ci/90 z-50">
+    <i class="fa fa-arrow-up"></i>
+  </button>
+
+  <!-- 引入词数据并动态加载 -->
+  <script>
+    // 封装词作加载功能
+    class CiLoader {
+      constructor(containerId) {
+        this.container = document.getElementById(containerId);
+        this.animationObserver = null;
+        this.maxVisibleLines = 6; // 最多显示的行数
+      }
+
+      // 初始化
+      async init () {
+        try {
+          // 尝试从JSON文件加载词数据
+          const response = await fetch('ciData.json');
+          if (!response.ok) {
+            throw new Error('数据加载失败');
+          }
+          const data = await response.json();
+          const ciData = data.cis || [];
+
+          if (!Array.isArray(ciData) || ciData.length === 0) {
+            throw new Error('未找到有效的词作数据');
+          }
+
+          this.renderCiData(ciData);
+          this.initAnimationObserver();
+        } catch (error) {
+          console.error('加载词作失败:', error);
+          this.showError('加载词作失败，请稍后再试');
+        }
+      }
+
+      // 渲染词作数据
+      renderCiData (ciData) {
+        if (!this.container || !ciData || ciData.length === 0) return;
+
+        this.container.innerHTML = ''; // 清空加载提示
+
+        // 设置最大可见行数
+        const maxVisibleLines = 15;
+
+        ciData.forEach((ci, index) => {
+          // 创建词卡片容器
+          const card = document.createElement('div');
+          card.className = 'ci-card';
+          // 设置ID，方便后续可能的操作
+          card.id = `ci-${ci.id || index}`;
+          
+          // 创建标题
+          const title = document.createElement('h3');
+          title.className = 'font-serif text-xl md:text-2xl mb-4 text-ci';
+          title.textContent = ci.title + (ci.subtitle ? `（${ci.subtitle}）` : '');
+          card.appendChild(title);
+
+          // 创建内容容器
+          const contentContainer = document.createElement('div');
+          contentContainer.className = 'ci-content';
+
+          // 计算可见行数与截断标记
+          let visibleLines = 0;
+          let truncated = false;
+
+          // 遍历词的阕/段
+          if (ci.stanzas && Array.isArray(ci.stanzas)) {
+            ci.stanzas.forEach((stanza, stanzaIndex) => {
+              if (truncated) return;
+              
+              const stanzaElement = document.createElement('div');
+              stanzaElement.className = 'ci-stanza';
+
+              // 遍历阕/段中的句子
+              stanza.forEach(line => {
+                if (truncated) return;
+                
+                if (visibleLines < maxVisibleLines) {
+                  visibleLines++;
+                  const lineElement = document.createElement('p');
+                  lineElement.className = 'mb-2';
+                  lineElement.textContent = line;
+                  stanzaElement.appendChild(lineElement);
+                } else {
+                  truncated = true;
+                }
+              });
+
+              if (!truncated) {
+                contentContainer.appendChild(stanzaElement);
+              } else {
+                // 如果在本阕被截断，添加已渲染的部分
+                if (stanzaElement.children.length > 0) {
+                  contentContainer.appendChild(stanzaElement);
+                }
+              }
+
+              // 添加备选词句（如果有）
+              if (!truncated && ci.variants && ci.variants[stanzaIndex]) {
+                if (visibleLines < maxVisibleLines) {
+                  visibleLines++;
+                  const variantElement = document.createElement('p');
+                  variantElement.className = 'ci-variant';
+                  variantElement.textContent = ci.variants[stanzaIndex];
+                  contentContainer.appendChild(variantElement);
+                } else {
+                  truncated = true;
+                }
+              }
+            });
+          }
+
+          // 添加注释（如果有）
+          if (!truncated && ci.note) {
+            if (visibleLines < maxVisibleLines) {
+              visibleLines++;
+              const noteElement = document.createElement('div');
+              noteElement.className = 'ci-variant mt-4';
+              noteElement.textContent = ci.note;
+              contentContainer.appendChild(noteElement);
+            } else {
+              truncated = true;
+            }
+          }
+          
+          // 如果内容被截断，添加省略号
+          if (truncated) {
+            const ellipsis = document.createElement('div');
+            ellipsis.className = 'text-neutral-500 italic';
+            ellipsis.textContent = '...';
+            contentContainer.appendChild(ellipsis);
+          }
+
+          card.appendChild(contentContainer);
+          
+          // 始终显示查看详情按钮
+          const viewDetailsBtn = document.createElement('a');
+          viewDetailsBtn.href = `ci-detail.html?id=${ci.id || index}`;
+          viewDetailsBtn.className = 'view-details-btn';
+          viewDetailsBtn.innerHTML = '<i class="fa fa-external-link mr-1"></i> 查看详情';
+          card.appendChild(viewDetailsBtn);
+          this.container.appendChild(card);
+        });
+      }
+
+      // 初始化动画观察器，实现滚动时的渐入效果
+      initAnimationObserver () {
+        const observerOptions = {
+          threshold: 0.1,
+          rootMargin: '0px 0px -50px 0px'
+        };
+
+        this.animationObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('opacity-100', 'translate-x-0');
+              entry.target.classList.remove('opacity-0', 'translate-x-4');
+              this.animationObserver.unobserve(entry.target);
+            }
+          });
+        }, observerOptions);
+
+        // 为所有词卡片添加初始动画类
+        document.querySelectorAll('.ci-card').forEach(card => {
+          card.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-x-4');
+          this.animationObserver.observe(card);
+        });
+      }
+
+      // 显示错误信息
+      showError (message) {
+        if (!this.container) return;
+
+        this.container.innerHTML = `
+          <div class="error-message col-span-full">
+            <i class="fa fa-exclamation-circle text-xl text-ci mb-2"></i>
+            <p>${message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // 等待DOM加载完成后初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      const ciLoader = new CiLoader('ci-container');
+      ciLoader.init();
+    });
+  </script>
+
+  <!-- JavaScript：交互功能 -->
+  <script>
+    // 封装页面交互功能
+    document.addEventListener('DOMContentLoaded', () => {
+      // 移动端菜单切换
+      const menuToggle = document.getElementById('menu-toggle');
+      const mobileMenu = document.getElementById('mobile-menu');
+
+      if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener('click', () => {
+          mobileMenu.classList.toggle('hidden');
+          // 切换图标
+          const icon = menuToggle.querySelector('i');
+          if (mobileMenu.classList.contains('hidden')) {
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+          } else {
+            icon.classList.remove('fa-bars');
+            icon.classList.add('fa-times');
+          }
+        });
+      }
+
+      // 深色/浅色模式切换
+      const themeToggle = document.getElementById('theme-toggle');
+      const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+
+      // 初始化主题
+      function initTheme () {
+        if (localStorage.theme === 'dark' ||
+          (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+
+      // 切换主题函数
+      function toggleTheme () {
+        if (document.documentElement.classList.contains('dark')) {
+          document.documentElement.classList.remove('dark');
+          localStorage.theme = 'light';
+        } else {
+          document.documentElement.classList.add('dark');
+          localStorage.theme = 'dark';
+        }
+      }
+
+      // 初始化主题
+      initTheme();
+
+      // 绑定主题切换事件
+      if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+      if (mobileThemeToggle) mobileThemeToggle.addEventListener('click', toggleTheme);
+
+      // 平滑滚动处理
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+
+          // 关闭移动菜单（如果打开）
+          if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+            // 恢复菜单图标
+            const icon = menuToggle?.querySelector('i');
+            if (icon) {
+              icon.classList.remove('fa-times');
+              icon.classList.add('fa-bars');
+            }
+          }
+
+          const targetId = this.getAttribute('href');
+          const targetElement = document.querySelector(targetId);
+
+          if (targetElement) {
+            window.scrollTo({
+              top: targetElement.offsetTop - 80,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+
+      // 返回顶部按钮功能
+      const backToTopButton = document.getElementById('back-to-top');
+
+      if (backToTopButton) {
+        // 监听滚动事件
+        window.addEventListener('scroll', () => {
+          // 控制返回顶部按钮显示/隐藏
+          if (window.scrollY > 500) {
+            backToTopButton.classList.remove('opacity-0', 'invisible');
+            backToTopButton.classList.add('opacity-100', 'visible');
+          } else {
+            backToTopButton.classList.remove('opacity-100', 'visible');
+            backToTopButton.classList.add('opacity-0', 'invisible');
+          }
+
+          // 导航栏滚动效果
+          const header = document.querySelector('header');
+          if (header) {
+            if (window.scrollY > 50) {
+              header.classList.add('py-2', 'shadow-md');
+              header.classList.remove('py-3');
+            } else {
+              header.classList.add('py-3');
+              header.classList.remove('py-2', 'shadow-md');
+            }
+          }
+        });
+
+        // 点击返回顶部
+        backToTopButton.addEventListener('click', () => {
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>>
