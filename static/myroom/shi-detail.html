@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>诗详情 - 诗韵集</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script>
+    // 配置Tailwind主题，以诗的代表色（浪漫粉）为核心
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            shi: '#EC4899', // 诗的主色调：浪漫粉
+            neutral: {
+              100: '#F9FAFB',
+              200: '#F3F4F6',
+              800: '#1F2937',
+              900: '#111827'
+            },
+            // 为统一导航栏定义各页面主题色
+            poem: '#EC4899', // 诗页面主题色：浪漫粉
+            ci: '#8B5CF6',   // 词页面主题色：优雅紫
+            ge: '#10B981',   // 歌页面主题色：活力绿
+            poetry: '#4F46E5', // 诗歌页面主题色：靛蓝色
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            serif: ['Noto Serif SC', 'serif'], // 诗歌阅读专用衬线字体
+            display: ['"Ma Shan Zheng"', 'cursive'] // 标题书法字体
+          },
+        }
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .bg-blur {
+                backdrop-filter: blur(8px);
+            }
+            .detail-card {
+                @apply bg-white dark:bg-neutral-800 rounded-lg shadow-md p-6 md:p-8 border-l-4 border-shi;
+            }
+            .detail-content {
+                @apply font-serif text-neutral-700 dark:text-neutral-300 leading-relaxed;
+            }
+            .detail-stanza {
+                @apply mb-4;
+            }
+            .back-button {
+                @apply inline-flex items-center px-4 py-2 bg-shi/10 hover:bg-shi/20 text-shi rounded-full transition-all;
+            }
+        }
+    </style>
+  <!-- 引入中文字体，优化诗歌显示效果 -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body class="bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 transition-colors duration-300 min-h-screen">
+  <!-- 导航栏：固定顶部 -->
+  <header
+    class="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-neutral-900/90 bg-blur border-b border-neutral-200 dark:border-neutral-700 transition-all duration-300">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <!-- 网站标识与标题 -->
+      <a href="首页.html" class="flex items-center space-x-2">
+        <i class="fa fa-book text-shi text-2xl"></i>
+        <span class="font-display text-xl md:text-2xl text-shi">诗韵集 · 诗详情</span>
+      </a>
+
+      <!-- 返回按钮 -->
+      <a href="诗.html" class="back-button">
+        <i class="fa fa-arrow-left mr-2"></i>
+        返回诗集
+      </a>
+    </div>
+  </header>
+
+  <!-- 主内容区 -->
+  <main class="pt-24 pb-16">
+    <div class="container mx-auto px-4">
+      <!-- 详情展示区域 -->
+      <div id="shi-detail" class="max-w-3xl mx-auto">
+        <!-- 加载状态 -->
+        <div id="loading" class="text-center py-20">
+          <i class="fa fa-circle-o-notch fa-spin text-3xl text-shi mb-4"></i>
+          <p>加载诗详情中...</p>
+        </div>
+        
+        <!-- 错误状态（默认隐藏） -->
+        <div id="error" class="text-center py-20 text-neutral-600 dark:text-neutral-400">
+          <i class="fa fa-exclamation-circle text-xl text-shi mb-2"></i>
+          <p>无法加载诗详情，请稍后重试。</p>
+        </div>
+        
+        <!-- 详情内容（默认隐藏，通过JS动态填充） -->
+        <div id="detail-content" class="hidden">
+          <div class="detail-card mb-8">
+            <h1 id="detail-title" class="font-serif text-3xl md:text-4xl mb-6 text-shi"></h1>
+            <div id="detail-stanzas" class="detail-content"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // 诗详情页逻辑
+    document.addEventListener('DOMContentLoaded', () => {
+      // 获取URL中的诗ID
+      function getShiIdFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('id');
+      }
+
+      // 加载诗详情数据
+      async function loadShiDetail() {
+        const shiId = getShiIdFromUrl();
+        
+        if (!shiId) {
+          showError('未找到诗ID');
+          return;
+        }
+
+        try {
+          // 加载数据文件
+          const response = await fetch('shiData.json');
+          const data = await response.json();
+          const shi = data.find(item => item.id.toString() === shiId);
+          
+          if (!shi) {
+            showError('未找到该诗');
+            return;
+          }
+
+          // 渲染诗详情
+          renderShiDetail(shi);
+        } catch (error) {
+          console.error('加载诗详情失败:', error);
+          showError('加载诗详情失败');
+        }
+      }
+
+      // 渲染诗详情
+      function renderShiDetail(shi) {
+        // 显示标题
+        document.getElementById('detail-title').textContent = shi.title || '无题';
+        
+        // 渲染诗的内容
+        const stanzasContainer = document.getElementById('detail-stanzas');
+        stanzasContainer.innerHTML = '';
+        
+        shi.stanzas.forEach(stanza => {
+          const stanzaElement = document.createElement('div');
+          stanzaElement.className = 'detail-stanza';
+          
+          stanza.forEach(line => {
+            const lineElement = document.createElement('p');
+            lineElement.textContent = line;
+            stanzaElement.appendChild(lineElement);
+          });
+          
+          stanzasContainer.appendChild(stanzaElement);
+        });
+        
+        // 显示内容，隐藏加载状态
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('detail-content').classList.remove('hidden');
+      }
+
+      // 显示错误信息
+      function showError(message) {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('error').classList.remove('hidden');
+        document.getElementById('error').querySelector('p').textContent = message;
+      }
+
+      // 初始化主题
+      function initTheme() {
+        if (localStorage.theme === 'dark' ||
+          (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+
+      // 初始化
+      initTheme();
+      loadShiDetail();
+    });
+  </script>
+</body>
+
+</html>
