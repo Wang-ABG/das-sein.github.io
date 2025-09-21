@@ -229,149 +229,76 @@
 
   <!-- JavaScript -->
   <script>
-    // Mock数据，用于在本地文件系统无法访问zajiData.json时使用
-    const mockData = {
-      zajis: [
-        {
-          id: 1,
-          title: "关于春天的思考",
-          date: "2024-03-15",
-          content: "春天总是让人感到生机勃发，万物复苏。走在公园里，看着嫩绿的新芽从树枝上冒出，仿佛能感受到生命的力量在流动。阳光温暖但不灼热，春风拂面带来阵阵花香。这时候总是忍不住思考，生命的意义究竟是什么？或许就是在这样美好的时刻，用心去感受，用力去生活吧。",
-          isInitialVisible: true,
-          tags: ["思考", "春天", "生活"]
-        },
-        {
-          id: 2,
-          title: "夜晚的城市",
-          date: "2024-02-28",
-          content: "当夜幕降临，城市的灯光亮起，整个城市仿佛换了一个模样。霓虹灯闪烁，车水马龙，加班的人们行色匆匆。站在高处俯瞰这座城市，既有繁华的一面，也有疲惫的一面。每个人都在为了生活而努力，这座城市因为这些努力而变得更加美丽。",
-          isInitialVisible: true,
-          tags: ["城市", "夜晚", "观察"]
-        },
-        {
-          id: 3,
-          title: "读书的乐趣",
-          date: "2024-02-10",
-          content: "读书是一种享受，可以让我们暂时逃离现实的喧嚣，进入一个全新的世界。无论是小说、散文还是诗歌，每一本书都像一位良师益友，带给我们不同的思考和感悟。在这个快节奏的时代，能静下心来读一本书，是多么珍贵的事情啊。",
-          isInitialVisible: true,
-          tags: ["读书", "思考", "生活方式"]
-        }
-      ]
-    };
-
     // 加载杂记数据并渲染列表
     async function loadZajiData() {
       try {
-        console.log('开始加载杂记数据...');
-        let data;
+        const response = await fetch('zajiData.json');
+        const data = await response.json();
         const zajiList = document.getElementById('zaji-list');
-        
-        // 尝试从本地JSON文件加载数据
-        try {
-          const response = await fetch('zajiData.json');
-          
-          if (!response.ok) {
-            console.warn('HTTP请求失败，状态码:', response.status);
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          
-          data = await response.json();
-          console.log('成功加载zajiData.json数据');
-        } catch (fetchError) {
-          console.warn('无法从zajiData.json加载数据，使用mock数据:', fetchError);
-          // 使用mock数据作为回退
-          data = mockData;
-        }
 
         // 清空列表容器
         zajiList.innerHTML = '';
 
         // 渲染每个杂记卡片
-        if (data && data.zajis && Array.isArray(data.zajis)) {
-          data.zajis.forEach(zaji => {
-            // 创建卡片元素
-            const card = document.createElement('div');
-            card.className = 'zaji-card fade-in';
-            
-            // 创建日期元素
-            const date = document.createElement('div');
-            date.className = 'zaji-date';
-            date.innerHTML = `<i class="fa fa-calendar-o mr-2"></i>${zaji.date || '未知日期'}`;
-            
-            // 创建标题链接
-            const titleLink = document.createElement('a');
-            titleLink.href = `zaji-detail.html?id=${zaji.id || ''}`;
-            titleLink.className = 'block';
-            
-            const title = document.createElement('h3');
-            title.className = 'zaji-title';
-            title.textContent = zaji.title || '无标题';
-            titleLink.appendChild(title);
-            
-            // 创建摘要
-            const excerpt = document.createElement('p');
-            excerpt.className = 'zaji-excerpt';
-            // 从内容中提取纯文本摘要，去除换行和多余空格
-            const plainContent = zaji.content ? zaji.content.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim() : '';
-            excerpt.textContent = plainContent.length > 150 ? plainContent.substring(0, 150) + '...' : plainContent;
-            
-            // 创建标签容器
-            const tagsContainer = document.createElement('div');
-            tagsContainer.className = 'zaji-tags';
-            
-            // 添加每个标签
-            if (zaji.tags && Array.isArray(zaji.tags)) {
-              zaji.tags.forEach(tag => {
-                const tagElement = document.createElement('span');
-                tagElement.className = 'tag-pill';
-                tagElement.textContent = tag;
-                tagsContainer.appendChild(tagElement);
-              });
-            }
-            
-            // 创建阅读更多链接
-            const readMoreLink = document.createElement('a');
-            readMoreLink.href = `zaji-detail.html?id=${zaji.id || ''}`;
-            readMoreLink.className = 'read-more';
-            readMoreLink.innerHTML = '阅读全文 <i class="fa fa-long-arrow-right ml-1"></i>';
-            
-            // 组装卡片
-            card.appendChild(date);
-            card.appendChild(titleLink);
-            card.appendChild(excerpt);
-            card.appendChild(tagsContainer);
-            card.appendChild(readMoreLink);
-            
-            // 添加到列表
-            zajiList.appendChild(card);
+        data.zajis.forEach(zaji => {
+          // 创建卡片元素
+          const card = document.createElement('div');
+          card.className = 'zaji-card fade-in';
+          
+          // 创建日期元素
+          const date = document.createElement('div');
+          date.className = 'zaji-date';
+          date.innerHTML = `<i class="fa fa-calendar-o mr-2"></i>${zaji.date}`;
+          
+          // 创建标题链接
+          const titleLink = document.createElement('a');
+          titleLink.href = `zaji-detail.html?id=${zaji.id}`;
+          titleLink.className = 'block';
+          
+          const title = document.createElement('h3');
+          title.className = 'zaji-title';
+          title.textContent = zaji.title;
+          titleLink.appendChild(title);
+          
+          // 创建摘要
+          const excerpt = document.createElement('p');
+          excerpt.className = 'zaji-excerpt';
+          // 从内容中提取纯文本摘要，去除换行和多余空格
+          const plainContent = zaji.content.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+          excerpt.textContent = plainContent.length > 150 ? plainContent.substring(0, 150) + '...' : plainContent;
+          
+          // 创建标签容器
+          const tagsContainer = document.createElement('div');
+          tagsContainer.className = 'zaji-tags';
+          
+          // 添加每个标签
+          zaji.tags.forEach(tag => {
+            const tagElement = document.createElement('span');
+            tagElement.className = 'tag-pill';
+            tagElement.textContent = tag;
+            tagsContainer.appendChild(tagElement);
           });
-        } else {
-          console.error('数据格式不正确或没有杂记数据');
-          zajiList.innerHTML = '<div class="text-center py-12 text-gray-500">暂无杂记数据</div>';
-        }
+          
+          // 创建阅读更多链接
+          const readMoreLink = document.createElement('a');
+          readMoreLink.href = `zaji-detail.html?id=${zaji.id}`;
+          readMoreLink.className = 'read-more';
+          readMoreLink.innerHTML = '阅读全文 <i class="fa fa-long-arrow-right ml-1"></i>';
+          
+          // 组装卡片
+          card.appendChild(date);
+          card.appendChild(titleLink);
+          card.appendChild(excerpt);
+          card.appendChild(tagsContainer);
+          card.appendChild(readMoreLink);
+          
+          // 添加到列表
+          zajiList.appendChild(card);
+        });
       } catch (error) {
-        console.error('加载杂记数据过程中发生错误:', error);
+        console.error('加载杂记数据失败:', error);
         const zajiList = document.getElementById('zaji-list');
-        
-        // 最后的应急显示措施
-        const emergencyContent = `
-          <div class="zaji-card fade-in">
-            <div class="zaji-date"><i class="fa fa-calendar-o mr-2"></i>2024-03-15</div>
-            <a href="#" class="block"><h3 class="zaji-title">关于春天的思考</h3></a>
-            <p class="zaji-excerpt">春天总是让人感到生机勃发，万物复苏。走在公园里，看着嫩绿的新芽从树枝上冒出，仿佛能感受到生命的力量在流动。阳光温暖但不灼热，春风拂面带来阵阵花香。</p>
-            <div class="zaji-tags"><span class="tag-pill">思考</span><span class="tag-pill">春天</span><span class="tag-pill">生活</span></div>
-            <a href="#" class="read-more">阅读全文 <i class="fa fa-long-arrow-right ml-1"></i></a>
-          </div>
-          <div class="zaji-card fade-in">
-            <div class="zaji-date"><i class="fa fa-calendar-o mr-2"></i>2024-02-28</div>
-            <a href="#" class="block"><h3 class="zaji-title">夜晚的城市</h3></a>
-            <p class="zaji-excerpt">当夜幕降临，城市的灯光亮起，整个城市仿佛换了一个模样。霓虹灯闪烁，车水马龙，加班的人们行色匆匆。站在高处俯瞰这座城市，既有繁华的一面，也有疲惫的一面。</p>
-            <div class="zaji-tags"><span class="tag-pill">城市</span><span class="tag-pill">夜晚</span><span class="tag-pill">观察</span></div>
-            <a href="#" class="read-more">阅读全文 <i class="fa fa-long-arrow-right ml-1"></i></a>
-          </div>
-        `;
-        
-        zajiList.innerHTML = emergencyContent;
+        zajiList.innerHTML = '<div class="text-center py-12 text-gray-500">加载杂记失败，请稍后再试</div>';
       }
     }
 
